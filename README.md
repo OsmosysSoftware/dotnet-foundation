@@ -2,7 +2,7 @@
 
 ## Overview of the project
 
-Dotnet Foundation is a boiler plate project for ASP .NET projects. This boiler plate can be used in any .NET project for Osmosys. This project contains common files that  can be reused  again and again. Objective of building this project is to make it so that people can copy the project and build on top of it.
+Dotnet Foundation is a boilerplate project for ASP.NET WebAPI projects. This boilerplate can be used in any .NET project for Osmosys. This project contains common files that  can be reused. Objective of building this project is to make it so that people can copy the project and build on top of it.
 
 ## Development Setup
 
@@ -19,7 +19,16 @@ Dotnet Foundation is a boiler plate project for ASP .NET projects. This boiler p
 - dotnet run --project .\DotnetFoundation.API\
 ```
 
+# License
+The Dotnet Foundation is licensed under the [MIT](https://github.com/OsmosysSoftware/dotnet-foundation/blob/main/LICENSE) license.
 
+## 👏 Big Thanks to Our Contributors
+
+<a href="https://github.com/OsmosysSoftware/dotnet-foundation/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=OsmosysSoftware/dotnet-foundation" alt="Contributors" />
+</a>
+
+We appreciate the time and effort put in by all contributors to make this project better!
 
 
 
