@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Identity;
+
 namespace DotnetFoundation.DAL.Models;
 
-public partial class UsersDBO
+public partial class UsersDBO : IdentityUser
 {
     public string UserId { get; set; } = null!;
 
