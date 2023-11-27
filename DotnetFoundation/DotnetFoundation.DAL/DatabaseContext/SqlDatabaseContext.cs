@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using DotnetFoundation.DAL.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace DotnetFoundation.DAL.DatabaseContext
 {
-    public partial class SqlDatabaseContext : DbContext
+    public partial class SqlDatabaseContext : IdentityDbContext<UsersDBO>
     {
         public SqlDatabaseContext()
         {
@@ -22,6 +24,9 @@ namespace DotnetFoundation.DAL.DatabaseContext
             modelBuilder
                 .UseCollation("latin1_swedish_ci")
                 .HasCharSet("latin1");
+            modelBuilder.Entity<IdentityUserLogin<string>>().HasKey(e => e.UserId);
+            modelBuilder.Entity<IdentityUserRole<string>>().HasKey(e => e.RoleId);
+            modelBuilder.Entity<IdentityUserToken<string>>().HasKey(e => new { e.LoginProvider, e.UserId });
 
             modelBuilder.Entity<UsersDBO>(entity =>
             {
