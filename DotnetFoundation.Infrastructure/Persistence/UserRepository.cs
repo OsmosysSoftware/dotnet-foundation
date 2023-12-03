@@ -36,8 +36,8 @@ public class UserRepository : IUserRepository
             new(ClaimTypes.Email, user.Email),
             // Add additional claims for roles
         };
-
-    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+    var JWT_KEY = _configuration["Jwt:Key"] ?? throw new Exception("No JWT configuration");
+    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JWT_KEY));
     var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
     var token = new JwtSecurityToken(

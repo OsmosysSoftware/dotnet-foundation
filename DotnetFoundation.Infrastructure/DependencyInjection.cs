@@ -26,11 +26,13 @@ public static class DependencyInjection
 
     services.AddAuthentication(options =>
     {
+
       options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
       options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     })
     .AddJwtBearer(options =>
     {
+      var JWT_KEY = configuration["Jwt:Key"] ?? throw new Exception("No JWT key specified");
       options.TokenValidationParameters = new TokenValidationParameters
       {
         ValidateIssuer = true,
@@ -39,7 +41,7 @@ public static class DependencyInjection
         ValidateIssuerSigningKey = true,
         ValidIssuer = configuration["Jwt:Issuer"],
         ValidAudience = configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JWT_KEY))
       };
 
     });
