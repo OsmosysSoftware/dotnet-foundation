@@ -1,3 +1,4 @@
+using DotnetFoundation.Application.DTO.UserDTO;
 using DotnetFoundation.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +17,7 @@ public class UserController : ControllerBase
 
 
   [HttpGet]
-  [Authorize]
+  [Authorize(Roles = "LEAD")]
   public async Task<IActionResult> GetAllUsersAsync()
   {
     var result = await _userService.GetAllUsersAsync();
@@ -27,6 +28,13 @@ public class UserController : ControllerBase
   public async Task<IActionResult> GetUserByIdAsync(int userId)
   {
     var result = await _userService.GetUserByIdAsync(userId);
+    return Ok(result);
+  }
+  [Authorize(Roles = "ADMIN")]
+  [HttpPost("add-role")]
+  public async Task<IActionResult> AddUserRoleAsync(UserRoleRequest roleRequest)
+  {
+    var result = await _userService.AddUserRoleAsync(roleRequest.Email, roleRequest.Role);
     return Ok(result);
   }
 }
