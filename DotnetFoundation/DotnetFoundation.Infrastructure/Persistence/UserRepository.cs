@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Transactions;
 using DotnetFoundation.Application.DTO.AuthenticationDTO;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Domain.Entities;
@@ -52,25 +53,46 @@ public class UserRepository : IUserRepository
   }
   public async Task<string> AddUserAsync(RegisterRequest request)
   {
-    IdentityApplicationUser newIdentityApplicationUser = new()
-    {
-      UserName = request.Email,
-      Email = request.Email
-    };
-    var identityResult = await _userManager.CreateAsync(newIdentityApplicationUser, request.Password);
-    var identityApplicationUser = await _userManager.FindByEmailAsync(request.Email) ?? throw new Exception("Error creating user");
-    ApplicationUser applicationUser = new()
-    {
-      FirstName = request.FirstName,
-      LastName = request.LastName,
-      IdentityApplicationUserId = identityApplicationUser.Id
-    };
-    var res = await _dbContext.ApplicationUsers.AddAsync(applicationUser);
-    await _dbContext.SaveChangesAsync();
-    UserInfo userInfo = new(identityApplicationUser.Id, request.Email);
-    return GenerateJwtToken(userInfo);
+    var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
+    try
+    {
+      IdentityApplicationUser newIdentityApplicationUser = new()
+      {
+        UserName = request.Email,
+        Email = request.Email
+      };
+      var identityResult = await _userManager.CreateAsync(newIdentityApplicationUser, request.Password);
+      if (!identityResult.Succeeded)
+      {
+        throw new Exception("Error creating identity user");
+      }
+      var identityApplicationUser = await _userManager.FindByEmailAsync(request.Email) ?? throw new Exception("Error finding user");
+      ApplicationUser applicationUser = new()
+      {
+        FirstName = request.FirstName,
+        LastName = request.LastName,
+        IdentityApplicationUserId = identityApplicationUser.Id
+      };
+
+      var res = await _dbContext.ApplicationUsers.AddAsync(applicationUser);
+      await _dbContext.SaveChangesAsync();
+      UserInfo userInfo = new(identityApplicationUser.Id, request.Email);
+
+      // If everything succeeds, commit the transaction
+      scope.Complete();
+      return GenerateJwtToken(userInfo);
+    }
+    catch (Exception ex)
+    {
+      return ex.Message;
+    }
+    finally
+    {
+      scope.Dispose(); // Ensure to dispose the TransactionScope
+    }
   }
+
 
   public async Task<List<User>> GetAllUsersAsync()
   {
