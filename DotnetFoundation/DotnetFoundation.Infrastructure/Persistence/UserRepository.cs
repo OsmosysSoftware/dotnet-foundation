@@ -34,9 +34,13 @@ public class UserRepository : IUserRepository
     var claims = new List<Claim>
         {
             new(ClaimTypes.Email,user.Id.ToString()),
-            new(ClaimTypes.Email, user.Email),
+            new(ClaimTypes.Name, user.Email),
             // Add additional claims for roles
         };
+    foreach (var role in user.Roles)
+    {
+      claims.Add(new Claim(ClaimTypes.Role, role));
+    }
     var JWT_KEY = _configuration["Jwt:Key"] ?? throw new Exception("No JWT configuration");
     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JWT_KEY));
     var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -68,6 +72,7 @@ public class UserRepository : IUserRepository
         throw new Exception("Error creating identity user");
       }
       var identityApplicationUser = await _userManager.FindByEmailAsync(request.Email) ?? throw new Exception("Error finding user");
+      await AddUserRoleAsync(request.Email, 0);
       ApplicationUser applicationUser = new()
       {
         FirstName = request.FirstName,
@@ -77,7 +82,7 @@ public class UserRepository : IUserRepository
 
       var res = await _dbContext.ApplicationUsers.AddAsync(applicationUser);
       await _dbContext.SaveChangesAsync();
-      UserInfo userInfo = new(identityApplicationUser.Id, request.Email);
+      UserInfo userInfo = new(identityApplicationUser.Id, request.Email, (await _userManager.GetRolesAsync(identityApplicationUser)).ToList());
 
       // If everything succeeds, commit the transaction
       scope.Complete();
@@ -116,7 +121,7 @@ public class UserRepository : IUserRepository
       throw new Exception("Invalid Email or Password");
     }
     IdentityApplicationUser user = await _userManager.FindByEmailAsync(request.Email) ?? throw new Exception("User does not exist");
-    UserInfo userInfo = new(user.Id, request.Email);
+    UserInfo userInfo = new(user.Id, request.Email, (await _userManager.GetRolesAsync(user)).ToList());
     return GenerateJwtToken(userInfo);
   }
 
@@ -132,7 +137,20 @@ public class UserRepository : IUserRepository
     var user = await _userManager.FindByEmailAsync(email) ?? throw new Exception("Invalid Email");
     var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
     if (!result.Succeeded) throw new Exception("Invalid token");
-    UserInfo userInfo = new(user.Id, email);
+    UserInfo userInfo = new(user.Id, email, (await _userManager.GetRolesAsync(user)).ToList());
     return GenerateJwtToken(userInfo);
+  }
+
+  public async Task<bool> AddUserRoleAsync(string email, int role)
+  {
+    string newRole = ((Roles)role).ToString();
+    if (!await _roleManager.RoleExistsAsync(newRole))
+    {
+      await _roleManager.CreateAsync(new IdentityRole(newRole));
+    }
+    var identityApplicationUser = await _userManager.FindByEmailAsync(email) ?? throw new Exception("Error finding user");
+    await _userManager.AddToRoleAsync(identityApplicationUser, newRole);
+    await _userManager.AddClaimAsync(identityApplicationUser, new Claim(ClaimTypes.Role, newRole));
+    return true;
   }
 }

@@ -11,5 +11,6 @@ public interface IUserRepository
   public Task<User?> GetUserByIdAsync(int Id);
   public Task<string> ForgotPasswordAsync(string email);
   public Task<string> ResetPasswordAsync(string email, string token, string newPassword);
+  public Task<bool> AddUserRoleAsync(string email, int role);
 
 }

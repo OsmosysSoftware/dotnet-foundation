@@ -25,4 +25,7 @@ public class SqlDatabaseContext : IdentityDbContext<IdentityApplicationUser>
     .WithOne(iu => iu.ApplicationUser)
     .HasForeignKey<ApplicationUser>(au => au.IdentityApplicationUserId);
   }
+
+
 }
+

@@ -26,4 +26,10 @@ public class UserService : IUserService
     var res = await _userRepository.GetUserByIdAsync(Id) ?? throw new Exception("No user found");
     return DTOMapper(res);
   }
+
+  public async Task<bool> AddUserRoleAsync(string email, int role)
+  {
+    var res = await _userRepository.AddUserRoleAsync(email, role);
+    return res;
+  }
 }
