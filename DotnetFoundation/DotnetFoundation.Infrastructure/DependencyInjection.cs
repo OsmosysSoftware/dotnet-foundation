@@ -20,7 +20,7 @@ public static class DependencyInjection
       string connectionString = configuration.GetConnectionString("DBConnection") ?? throw new Exception("Invalid connection string");
       options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
     });
-    services.AddIdentity<IdentityApplicationUser, IdentityRole>()
+    services.AddIdentity<IdentityApplicationUser, IdentityRole<int>>()
     .AddEntityFrameworkStores<SqlDatabaseContext>()
     .AddDefaultTokenProviders();
 

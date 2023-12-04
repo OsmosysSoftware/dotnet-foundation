@@ -2,10 +2,11 @@ namespace DotnetFoundation.Infrastructure;
 
 
 using DotnetFoundation.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-public class SqlDatabaseContext : IdentityDbContext<IdentityApplicationUser>
+public class SqlDatabaseContext : IdentityDbContext<IdentityApplicationUser, IdentityRole<int>, int>
 {
   public SqlDatabaseContext(DbContextOptions<SqlDatabaseContext> options) : base(options)
   {

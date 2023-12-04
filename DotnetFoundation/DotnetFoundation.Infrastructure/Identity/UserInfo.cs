@@ -1,2 +1,2 @@
 namespace DotnetFoundation.Infrastructure.Identity;
-public record UserInfo(string Id, string Email);
+public record UserInfo(int Id, string Email);
