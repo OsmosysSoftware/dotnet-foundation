@@ -4,6 +4,13 @@
 
 Dotnet Foundation is a boilerplate project for ASP.NET WebAPI projects. This boilerplate can be used in any .NET project for Osmosys. This project contains common files that  can be reused. Objective of building this project is to make it so that people can copy the project and build on top of it.
 
+## Features
+
+This project uses modern features of dotnet such as Clean Architecture and AspNetCore.Identity. To learn more about them, please go through the following documents:
+
+1. [Clean Architecture](./docs/CLEAN_ARCHITECTURE.md)
+2. [AspNetCore.Identity](./docs/ASPNETCORE_IDENTITY.md)
+
 ## Development Setup
 
 1. Install [VS Code](https://code.visualstudio.com/)
