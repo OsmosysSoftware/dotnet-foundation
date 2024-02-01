@@ -14,7 +14,7 @@ The `DotnetFoundation.API` folder contains all files and folders related to pres
 
  `Properties`: This folder usually consists of launchsettings.json which determines the type of launch profiles to be used to launch the application during development.
 
- `program.cs`: This file  contains the entry point for the application and is responsible for configuring and building the web host.
+ `Program.cs`: This file  contains the entry point for the application and is responsible for configuring and building the web host.
 
  `appsettings.json`: This file contains application-specific settings, configurations, and connection strings.
 
