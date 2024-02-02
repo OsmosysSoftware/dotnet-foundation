@@ -1,8 +1,8 @@
-using DotnetFoundation.Infrastructure;
 using DotnetFoundation.Application;
-using Microsoft.OpenApi.Models;
+using DotnetFoundation.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-var builder = WebApplication.CreateBuilder(args);
+using Microsoft.OpenApi.Models;
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
@@ -14,7 +14,7 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API", Version = "v1" });
 
     // Add JWT authentication
-    var securityScheme = new OpenApiSecurityScheme
+    OpenApiSecurityScheme securityScheme = new OpenApiSecurityScheme
     {
         Name = "JWT Authentication",
         Description = "Enter your JWT token",
@@ -38,7 +38,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
