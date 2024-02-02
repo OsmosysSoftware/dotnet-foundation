@@ -6,5 +6,5 @@ public enum Roles
     DEVELOPER,
     LEAD,
     ADMIN,
-    SUPER_ADMIN
+    SUPERADMIN
 }
