@@ -17,26 +17,26 @@ public class AuthenticationController : ControllerBase
     [HttpPost("regiser")]
     public async Task<IActionResult> RegisterAsync(RegisterRequest request)
     {
-        AuthenticationResponse result = await _authenticationService.RegisterAsync(request);
+        AuthenticationResponse result = await _authenticationService.RegisterAsync(request).ConfigureAwait(false);
         return Ok(result);
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> LoginAsync(LoginRequest request)
     {
-        AuthenticationResponse result = await _authenticationService.LoginAsync(request);
+        AuthenticationResponse result = await _authenticationService.LoginAsync(request).ConfigureAwait(false);
         return Ok(result);
     }
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPasswordAsync(PasswordResetRequest request)
     {
-        AuthenticationResponse result = await _authenticationService.ResetPasswordAsync(request);
+        AuthenticationResponse result = await _authenticationService.ResetPasswordAsync(request).ConfigureAwait(false);
         return Ok(result);
     }
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPasswordAsync(string email)
     {
-        string result = await _authenticationService.ForgotPasswordAsync(email);
+        string result = await _authenticationService.ForgotPasswordAsync(email).ConfigureAwait(false);
         return Ok(result);
     }
 }

@@ -17,19 +17,19 @@ public class UserService : IUserService
     }
     public async Task<List<UserResponse>> GetAllUsersAsync()
     {
-        List<UserResponse> response = (await _userRepository.GetAllUsersAsync()).Select(DTOMapper).ToList();
+        List<UserResponse> response = (await _userRepository.GetAllUsersAsync().ConfigureAwait(false)).Select(DTOMapper).ToList();
         return response;
     }
 
     public async Task<UserResponse?> GetUserByIdAsync(int Id)
     {
-        User res = await _userRepository.GetUserByIdAsync(Id) ?? throw new Exception("No user found");
+        User res = await _userRepository.GetUserByIdAsync(Id).ConfigureAwait(false) ?? throw new Exception("No user found");
         return DTOMapper(res);
     }
 
     public async Task<bool> AddUserRoleAsync(string email, int role)
     {
-        bool res = await _userRepository.AddUserRoleAsync(email, role);
+        bool res = await _userRepository.AddUserRoleAsync(email, role).ConfigureAwait(false);
         return res;
     }
 }
