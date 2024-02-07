@@ -8,7 +8,7 @@ This document outlines the recommended folder structure for the project, focusin
 ### `DotnetFoundation.API`
 The `DotnetFoundation.API` folder contains all files and folders related to presenting data for client interaction in the form of JSON objects through HTTP requests. This facilitates the consumption of data by front-end applications. Front-end applications can consume these APIs to display and interact with the data in a user-friendly manner through the UI.
 
-**Components**
+#### Components
 
  `Controller`: This folder consists of controller files that act as an intermediary between the user interface and the application logic.
 
@@ -18,7 +18,8 @@ The `DotnetFoundation.API` folder contains all files and folders related to pres
 
  `appsettings.json`: This file contains application-specific settings, configurations, and connection strings.
 
-**Function**
+#### Function
+
 - Responsible for handling HTTP requests.
 - Follows RESTful API design principles.
 - Contains controllers for user management, authentication, and authorization.
@@ -26,7 +27,7 @@ The `DotnetFoundation.API` folder contains all files and folders related to pres
 ### `DotnetFoundation.Application`
 The `DotnetFoundation.Application` folder contains the business logic. All the business logic will be written in this layer. It is in this layer that services interfaces are kept, separate from their implementation, for loose coupling and separation of concerns.
 
-**Components**
+#### Components
 
 `DTO`: Data Transfer Object. Define the DTO for clean data transfer between different layers of the application
 
@@ -34,7 +35,8 @@ The `DotnetFoundation.Application` folder contains the business logic. All the b
 
 `Services`: Contain the implementations of the various application services centralizing and managing the business logic and application-specific rules
 
-**Function**
+#### Function
+
 - Manages business logic and application-specific rules.
 - Consists of Data Transfer Objects (DTOs), interfaces, and services.
 - Interfaces define contracts for interacting with the domain and infrastructure layers.
@@ -43,11 +45,11 @@ The `DotnetFoundation.Application` folder contains the business logic. All the b
 ### `DotnetFoundation.Domain`
 The `DotnetFoundation.Domain` folder contains the enterprise logic, like the entities and their specifications
 
-**Components**
+#### Components
 
 `Entities`: Defines the Core business entities, representing the fundamental building blocks of the business model
 
-**Function**
+#### Function
 
 - Defines core entities representing the business model.
 - Encapsulates business rules, validation, and domain-specific logic.
@@ -56,7 +58,7 @@ The `DotnetFoundation.Domain` folder contains the enterprise logic, like the ent
 ### `DotnetFoundation.Infrastructure`
 The `DotnetFoundation.Infrastructure` folder contains all the database migrations and database context Objects. Here, we have the repositories of all the domain model objects
 
-**Components**
+#### Components
 
 `Identity`: This directory defines entities related to identity models within the ASP.NET Identity framework
 
@@ -64,7 +66,7 @@ The `DotnetFoundation.Infrastructure` folder contains all the database migration
 
 `Persistence`: Contain database context object and repositories
 
-**Function**
+#### Function
 
 - Implements data storage, external integrations, and identity.
 - Includes Identity Models extending the ASP.NET Identity framework.
