@@ -6,30 +6,30 @@ using DotnetFoundation.Domain.Entities;
 namespace DotnetFoundation.Application.Services.UserService;
 public class UserService : IUserService
 {
-  private readonly IUserRepository _userRepository;
-  private static UserResponse DTOMapper(User user)
-  {
-    return new(Id: user.Id, FirstName: user.FirstName, LastName: user.LastName);
-  }
-  public UserService(IUserRepository userRepository)
-  {
-    _userRepository = userRepository;
-  }
-  public async Task<List<UserResponse>> GetAllUsersAsync()
-  {
-    var response = (await _userRepository.GetAllUsersAsync()).Select(DTOMapper).ToList();
-    return response;
-  }
+    private readonly IUserRepository _userRepository;
+    private static UserResponse DTOMapper(User user)
+    {
+        return new(Id: user.Id, FirstName: user.FirstName, LastName: user.LastName);
+    }
+    public UserService(IUserRepository userRepository)
+    {
+        _userRepository = userRepository;
+    }
+    public async Task<List<UserResponse>> GetAllUsersAsync()
+    {
+        List<UserResponse> response = (await _userRepository.GetAllUsersAsync().ConfigureAwait(false)).Select(DTOMapper).ToList();
+        return response;
+    }
 
-  public async Task<UserResponse?> GetUserByIdAsync(int Id)
-  {
-    var res = await _userRepository.GetUserByIdAsync(Id) ?? throw new Exception("No user found");
-    return DTOMapper(res);
-  }
+    public async Task<UserResponse?> GetUserByIdAsync(int Id)
+    {
+        User res = await _userRepository.GetUserByIdAsync(Id).ConfigureAwait(false) ?? throw new Exception("No user found");
+        return DTOMapper(res);
+    }
 
-  public async Task<bool> AddUserRoleAsync(string email, int role)
-  {
-    var res = await _userRepository.AddUserRoleAsync(email, role);
-    return res;
-  }
+    public async Task<bool> AddUserRoleAsync(string email, int role)
+    {
+        bool res = await _userRepository.AddUserRoleAsync(email, role).ConfigureAwait(false);
+        return res;
+    }
 }
