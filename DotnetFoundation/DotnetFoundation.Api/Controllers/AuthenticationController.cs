@@ -14,7 +14,7 @@ public class AuthenticationController : ControllerBase
         _authenticationService = authenticationService;
     }
 
-    [HttpPost("regiser")]
+    [HttpPost("register")]
     public async Task<IActionResult> RegisterAsync(RegisterRequest request)
     {
         AuthenticationResponse result = await _authenticationService.RegisterAsync(request).ConfigureAwait(false);
