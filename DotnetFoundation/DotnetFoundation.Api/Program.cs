@@ -2,6 +2,8 @@ using DotnetFoundation.Application;
 using DotnetFoundation.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
+
+Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration
