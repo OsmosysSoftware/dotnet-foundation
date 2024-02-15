@@ -20,15 +20,15 @@ code .
 
 In Visual Studio Code, go to the Extensions view (shortcut: `Ctrl+Shift+X`), search for "Remote Development and Dev Containers," and install the extension provided by Microsoft.
 
-### Step 5: Reopen Project in Dev Container
+### Step 4: Reopen Project in Dev Container
 
 Press `Ctrl+Shift+P`, type "Dev Containers: Reopen in container," and select this option. This command reloads the project in a containerized development environment.
 
-### Step 6: Verify Dev Container Setup
+### Step 5: Verify Dev Container Setup
 
 Open a terminal in VS Code; you should find yourself inside the development container. Confirm that the required dependencies are installed, and the project runs successfully.
 
-### Step 7: Run the Application
+### Step 6: Run the Application
 
 Proceed with the development of your application within the container.
 
