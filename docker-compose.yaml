@@ -5,11 +5,13 @@ services:
     container_name: foundation-db
     ports:
       - 3307:3306
+    env_file:
+      - .env
     environment:
-      - MARIADB_ROOT_PASSWORD=Change123
-      - MARIADB_USER=foundation-user
-      - MARIADB_PASSWORD=Change123
-      - MARIADB_DATABASE=DotnetFoundation
+      - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MYSQL_USER=${MARIADB_USER}
+      - MYSQL_PASSWORD=${MARIADB_PASSWORD}
+      - MYSQL_DATABASE=${MARIADB_DATABASE}
     volumes:
       - foundation-db-data:/var/lib/mysql
     restart: always
