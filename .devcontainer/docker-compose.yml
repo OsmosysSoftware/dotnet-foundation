@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    volumes:
+      - ../..:/workspaces:cached
+
+    # Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
+    network_mode: service:foundation-mariadb
+
+  foundation-mariadb:
+    image: mariadb:11.2.2
+    environment:
+      - MARIADB_ROOT_PASSWORD=Change123
+      - MARIADB_USER=foundation-user
+      - MARIADB_PASSWORD=Change123
+      - MARIADB_DATABASE=DotnetFoundation
+    volumes:
+      - foundation-db-data:/var/lib/mysql
+    restart: always
+    ports:
+      - 3307:3306
+
+volumes:
+  foundation-db-data:
