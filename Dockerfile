@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /app
 
 ENV ASPNETCORE_ENVIRONMENT=Development
@@ -14,7 +14,7 @@ RUN dotnet restore
 RUN dotnet publish -c Debug -o out
 
 # Install EF Core tools extension
-RUN dotnet tool install --global dotnet-ef --version 7.0.0
+RUN dotnet tool install --global dotnet-ef --version 8.0.0
 ENV PATH $PATH:/root/.dotnet/tools
 
 #Install wait-for-it script
