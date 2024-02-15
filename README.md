@@ -34,6 +34,9 @@ The development of this application happens using Visual Studio IDE on a Windows
 6. Project will run on `http://localhost:5000` you can access the swagger ui at `http:localhost:5000/swagger/index.html`
 7. Test the API via Postman. The app can be accessed using `http://localhost:5000/<API>`.
 
+## Setup Application for Development using Dev Container
+  To develop the application using the dev containers follow this [file](docs/docker.md) 
+
 # License
 
 The Dotnet Foundation is licensed under the [MIT](https://github.com/OsmosysSoftware/dotnet-foundation/blob/main/LICENSE) license.
