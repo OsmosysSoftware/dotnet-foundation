@@ -141,7 +141,11 @@ public class UserRepository : IUserRepository
     {
         IdentityApplicationUser user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new Exception("Invalid Email");
         IdentityResult result = await _userManager.ResetPasswordAsync(user, token, newPassword).ConfigureAwait(false);
-        if (!result.Succeeded) throw new Exception("Invalid token");
+        if (!result.Succeeded)
+        {
+            throw new Exception("Invalid token");
+        }
+
         UserInfo userInfo = new(user.Id, email, (await _userManager.GetRolesAsync(user).ConfigureAwait(false)).ToList());
         return GenerateJwtToken(userInfo);
     }
