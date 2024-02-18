@@ -1,5 +1,6 @@
 using DotnetFoundation.Application.DTO.AuthenticationDTO;
 using DotnetFoundation.Application.Interfaces.Persistence;
+using DotnetFoundation.Application.Services.EmailService;
 using DotnetFoundation.Domain.Entities;
 using DotnetFoundation.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -27,7 +28,6 @@ public class UserRepository : IUserRepository
         _roleManager = roleManager;
         _signInManager = signinManager;
         _userManager = userManager;
-
     }
     public string GenerateJwtToken(UserInfo user)
     {
@@ -55,6 +55,7 @@ public class UserRepository : IUserRepository
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
     public async Task<string> AddUserAsync(RegisterRequest request)
     {
         TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
@@ -98,7 +99,6 @@ public class UserRepository : IUserRepository
         }
     }
 
-
     public async Task<List<User>> GetAllUsersAsync()
     {
         List<User> users = (await _dbContext.ApplicationUsers.ToListAsync().ConfigureAwait(false)).Select(user => new User { Id = user.Id, FirstName = user.FirstName, LastName = user.LastName }).ToList();
@@ -128,8 +128,13 @@ public class UserRepository : IUserRepository
     public async Task<string> ForgotPasswordAsync(string email)
     {
         IdentityApplicationUser user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new Exception("Invalid Email");
-        string token = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false);
-        return token;
+        if (user != null)
+        {
+            string token = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false);
+            EmailService emailService = new EmailService();
+            await emailService.SendEmail(email, "forget password", token).ConfigureAwait(false);
+        }
+        return "ok";
     }
 
     public async Task<string> ResetPasswordAsync(string email, string token, string newPassword)

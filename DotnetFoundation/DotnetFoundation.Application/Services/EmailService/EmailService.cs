@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Interfaces.Services;
 
@@ -9,14 +5,19 @@ namespace DotnetFoundation.Application.Services.EmailService;
 
 public class EmailService : IEmailService
 {
-    private readonly IUserRepository _userRepository;
-    public EmailService(IUserRepository userRepository)
+    private readonly IEmailRepository _emailRepository;
+
+    public EmailService()
     {
-        _userRepository = userRepository;
+    }
+
+    public EmailService(IEmailRepository emailRepository)
+    {
+        _emailRepository = emailRepository;
     }
     public async Task<string> SendEmail(string emailId, string subject, string body)
     {
-        string res = await _userRepository.SendForgetPasswordEmail(emailId, subject, body).ConfigureAwait(false);
+        string res = await _emailRepository.SendForgetPasswordEmailAsync(emailId, subject, body).ConfigureAwait(false);
         return res;
     }
 }

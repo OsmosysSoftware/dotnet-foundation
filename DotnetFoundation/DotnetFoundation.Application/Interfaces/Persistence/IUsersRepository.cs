@@ -12,5 +12,4 @@ public interface IUserRepository
     public Task<string> ForgotPasswordAsync(string email);
     public Task<string> ResetPasswordAsync(string email, string token, string newPassword);
     public Task<bool> AddUserRoleAsync(string email, int role);
-
 }
