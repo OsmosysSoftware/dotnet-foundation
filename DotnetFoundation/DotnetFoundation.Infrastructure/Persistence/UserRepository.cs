@@ -135,7 +135,7 @@ public class UserRepository : IUserRepository
         if (user != null)
         {
             token = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false);
-            await _emailRepo.SendForgetPasswordEmailAsync(email, "forget password", token).ConfigureAwait(false);
+            await _emailRepo.SendForgetPasswordEmailAsync(email, token).ConfigureAwait(false);
         }
         return "Success";
     }

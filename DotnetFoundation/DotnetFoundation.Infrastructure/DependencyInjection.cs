@@ -23,10 +23,11 @@ public static class DependencyInjection
         services.AddIdentity<IdentityApplicationUser, IdentityRole>()
         .AddEntityFrameworkStores<SqlDatabaseContext>()
         .AddDefaultTokenProviders();
+        services.Configure<DataProtectionTokenProviderOptions>(options =>
+            options.TokenLifespan = TimeSpan.FromMinutes(30));
 
         services.AddAuthentication(options =>
         {
-
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         })

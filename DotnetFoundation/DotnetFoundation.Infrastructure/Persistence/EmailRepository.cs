@@ -19,7 +19,7 @@ public class EmailRepository : IEmailRepository
         ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12; // Ensure secure connection
     }
 
-    public async Task<string> SendForgetPasswordEmailAsync(string email, string subject, string body)
+    public async Task<string> SendForgetPasswordEmailAsync(string email, string body)
     {
         // Read the JWT token from the environment variable
         string apiKey = _configuration["Notification:OsmoxServerKey"] ?? throw new Exception("Server key Missing");
@@ -34,9 +34,9 @@ public class EmailRepository : IEmailRepository
             {
                 From = _configuration["Notification:From"] ?? throw new Exception("From Address Missing"),
                 To = email,
-                Subject = EmailEvents.ForgetPasswordTemplate.Subject,
+                Subject = EmailConfig.EmailTemplatesDictionary[EmailEvents.FORGET_PASSWORD].Subject,
                 Text = "Forget password Token",
-                Html = ReadHtmlTemplate(EmailEvents.ForgetPasswordTemplate.TemplatePath, body)
+                Html = ReadHtmlTemplate(EmailConfig.EmailTemplatesDictionary[EmailEvents.FORGET_PASSWORD].TemplatePath, body)
             }
         };
 

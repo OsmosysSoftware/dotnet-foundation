@@ -13,7 +13,7 @@ public class EmailService : IEmailService
     }
     public async Task<string> SendEmail(string emailId, string subject, string body)
     {
-        string res = await _emailRepository.SendForgetPasswordEmailAsync(emailId, subject, body).ConfigureAwait(false);
+        string res = await _emailRepository.SendForgetPasswordEmailAsync(emailId, body).ConfigureAwait(false);
         return res;
     }
 }

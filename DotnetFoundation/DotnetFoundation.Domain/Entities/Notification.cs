@@ -6,7 +6,10 @@ public enum ChannelTypeEnum
     MailGun = 2,
     WhatsApp = 3
 }
-
+public enum EmailEvents
+{
+    FORGET_PASSWORD
+}
 public class NotificationData
 {
     public string? From { get; set; }
@@ -26,11 +29,19 @@ public class EmailTemplate
     public string TemplatePath { get; set; }
     public string Subject { get; set; }
 }
-public class EmailEvents
+
+public static class EmailConfig
 {
-    public static EmailTemplate ForgetPasswordTemplate => new EmailTemplate
+    public static Dictionary<EmailEvents, EmailTemplate> EmailTemplatesDictionary = new()
     {
-        TemplatePath = "C:/osmosys/dotnet-foundation/DotnetFoundation/DotnetFoundation.Domain/Templates/Emails/ForgetPasswordTemplate.html",
-        Subject = "Forget password"
+        {
+            EmailEvents.FORGET_PASSWORD,
+            new EmailTemplate
+            {
+                TemplatePath = "../DotnetFoundation.Domain/Templates/Emails/ForgetPasswordTemplate.html",
+                Subject = "Forget password"
+            }
+        }
+
     };
 }
