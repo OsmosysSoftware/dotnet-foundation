@@ -10,4 +10,7 @@
   <ItemGroup>
 	  <ProjectReference Include="..\DotnetFoundation.Domain\DotnetFoundation.Domain.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="..\CodeMetricsConfig.txt" />
+  </ItemGroup>
 </Project>
