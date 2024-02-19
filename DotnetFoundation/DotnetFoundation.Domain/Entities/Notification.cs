@@ -8,7 +8,7 @@ public enum ChannelTypeEnum
 }
 public enum EmailEvents
 {
-    FORGET_PASSWORD
+    ForgetPassword
 }
 public class NotificationData
 {
@@ -26,8 +26,8 @@ public class Notification
 }
 public class EmailTemplate
 {
-    public string TemplatePath { get; set; }
-    public string Subject { get; set; }
+    public string? TemplatePath { get; set; }
+    public string? Subject { get; set; }
 }
 
 public static class EmailConfig
@@ -35,7 +35,7 @@ public static class EmailConfig
     public static Dictionary<EmailEvents, EmailTemplate> EmailTemplatesDictionary = new()
     {
         {
-            EmailEvents.FORGET_PASSWORD,
+            EmailEvents.ForgetPassword,
             new EmailTemplate
             {
                 TemplatePath = "../DotnetFoundation.Domain/Templates/Emails/ForgetPasswordTemplate.html",

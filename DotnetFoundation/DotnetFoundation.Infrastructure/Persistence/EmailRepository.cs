@@ -34,9 +34,9 @@ public class EmailRepository : IEmailRepository
             {
                 From = _configuration["Notification:From"] ?? throw new Exception("From Address Missing"),
                 To = email,
-                Subject = EmailConfig.EmailTemplatesDictionary[EmailEvents.FORGET_PASSWORD].Subject,
+                Subject = EmailConfig.EmailTemplatesDictionary[EmailEvents.ForgetPassword].Subject,
                 Text = "Forget password Token",
-                Html = ReadHtmlTemplate(EmailConfig.EmailTemplatesDictionary[EmailEvents.FORGET_PASSWORD].TemplatePath, body)
+                Html = ReadHtmlTemplate(EmailConfig.EmailTemplatesDictionary[EmailEvents.ForgetPassword].TemplatePath, body)
             }
         };
 
@@ -46,7 +46,8 @@ public class EmailRepository : IEmailRepository
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         });
 
-        StringContent content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+        using StringContent content = new(jsonBody, Encoding.UTF8, "application/json");
+
         HttpResponseMessage response = await _httpClient.PostAsync(notificationApiUrl, content).ConfigureAwait(false);
         if (response.IsSuccessStatusCode)
         {
@@ -60,7 +61,7 @@ public class EmailRepository : IEmailRepository
             throw new Exception($"Failed to send notification. Status code: {response.StatusCode}");
         }
     }
-    private string ReadHtmlTemplate(string templatePath, string body)
+    private static string ReadHtmlTemplate(string templatePath, string body)
     {
         string htmlContent = File.ReadAllText(templatePath);
         // Replace placeholder in the template with the actual value
