@@ -1,5 +1,6 @@
 using DotnetFoundation.Application.DTO.AuthenticationDTO;
 using DotnetFoundation.Application.Interfaces.Persistence;
+using DotnetFoundation.Application.Interfaces.Services;
 using DotnetFoundation.Application.Services.EmailService;
 using DotnetFoundation.Domain.Entities;
 using DotnetFoundation.Infrastructure.Identity;
@@ -21,13 +22,15 @@ public class UserRepository : IUserRepository
     private readonly SignInManager<IdentityApplicationUser> _signInManager;
     private readonly UserManager<IdentityApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
-    public UserRepository(IConfiguration configuration, SqlDatabaseContext sqlDatabaseContext, SignInManager<IdentityApplicationUser> signinManager, RoleManager<IdentityRole> roleManager, UserManager<IdentityApplicationUser> userManager)
+    private readonly IEmailRepository _emailRepo;
+    public UserRepository(IConfiguration configuration, SqlDatabaseContext sqlDatabaseContext, SignInManager<IdentityApplicationUser> signinManager, RoleManager<IdentityRole> roleManager, UserManager<IdentityApplicationUser> userManager, IEmailRepository emailRepository)
     {
         _dbContext = sqlDatabaseContext;
         _configuration = configuration;
         _roleManager = roleManager;
         _signInManager = signinManager;
         _userManager = userManager;
+        _emailRepo = emailRepository;
     }
     public string GenerateJwtToken(UserInfo user)
     {
@@ -128,13 +131,13 @@ public class UserRepository : IUserRepository
     public async Task<string> ForgotPasswordAsync(string email)
     {
         IdentityApplicationUser user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new Exception("Invalid Email");
+        string token = null;
         if (user != null)
         {
-            string token = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false);
-            EmailService emailService = new EmailService();
-            await emailService.SendEmail(email, "forget password", token).ConfigureAwait(false);
+            token = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false);
+            await _emailRepo.SendForgetPasswordEmailAsync(email, "forget password", token).ConfigureAwait(false);
         }
-        return "ok";
+        return "Success";
     }
 
     public async Task<string> ResetPasswordAsync(string email, string token, string newPassword)

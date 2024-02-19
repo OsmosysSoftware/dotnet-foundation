@@ -7,10 +7,6 @@ public class EmailService : IEmailService
 {
     private readonly IEmailRepository _emailRepository;
 
-    public EmailService()
-    {
-    }
-
     public EmailService(IEmailRepository emailRepository)
     {
         _emailRepository = emailRepository;
