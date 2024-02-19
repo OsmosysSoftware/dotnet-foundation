@@ -1,41 +1,42 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 using DotnetFoundation.Application.Interfaces.Persistence;
-using DotnetFoundation.Application.Interfaces.Services;
 using DotnetFoundation.Domain.Entities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Microsoft.Extensions.Configuration;
 
 namespace DotnetFoundation.Infrastructure.Persistence;
 
 public class EmailRepository : IEmailRepository
 {
     private readonly HttpClient _httpClient;
-    public EmailRepository(HttpClient httpClient)
+    private readonly IConfiguration _configuration;
+    public EmailRepository(HttpClient httpClient, IConfiguration configuration)
     {
         _httpClient = httpClient;
+        _configuration = configuration;
         ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12; // Ensure secure connection
     }
 
     public async Task<string> SendForgetPasswordEmailAsync(string email, string subject, string body)
     {
+        // Read the JWT token from the environment variable
+        string apiKey = _configuration["Notification:OsmoxServerKey"] ?? throw new Exception("Server key Missing");
+        string notificationApiUrl = _configuration["Notification:OsmoxServerUrl"] ?? throw new Exception("Server url Missing");
+
         _httpClient.DefaultRequestHeaders.Clear();
-        _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.7ZK6fb6h52dNdy_");
-        string notificationApiUrl = "https://notify.osmosys.co/notifications";
+        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
         Notification payload = new Notification
         {
             ChannelType = ChannelTypeEnum.MailGun,
             Data = new NotificationData
             {
-                From = "FoundationX@osmosys.com",
+                From = _configuration["Notification:From"] ?? throw new Exception("From Address Missing"),
                 To = email,
-                Subject = "Forget password Token",
+                Subject = EmailEvents.ForgetPasswordTemplate.Subject,
                 Text = "Forget password Token",
-                Html = $"<p>Token {body}</p>"
+                Html = ReadHtmlTemplate(EmailEvents.ForgetPasswordTemplate.TemplatePath, body)
             }
         };
 
@@ -58,5 +59,12 @@ public class EmailRepository : IEmailRepository
             // Handle the case where the notification was not sent successfully.
             throw new Exception($"Failed to send notification. Status code: {response.StatusCode}");
         }
+    }
+    private string ReadHtmlTemplate(string templatePath, string body)
+    {
+        string htmlContent = File.ReadAllText(templatePath);
+        // Replace placeholder in the template with the actual value
+        htmlContent = htmlContent.Replace("{body}", body);
+        return htmlContent;
     }
 }

@@ -21,3 +21,16 @@ public class Notification
     public ChannelTypeEnum ChannelType { get; set; }
     public NotificationData? Data { get; set; }
 }
+public class EmailTemplate
+{
+    public string TemplatePath { get; set; }
+    public string Subject { get; set; }
+}
+public class EmailEvents
+{
+    public static EmailTemplate ForgetPasswordTemplate => new EmailTemplate
+    {
+        TemplatePath = "C:/osmosys/dotnet-foundation/DotnetFoundation/DotnetFoundation.Domain/Templates/Emails/ForgetPasswordTemplate.html",
+        Subject = "Forget password"
+    };
+}
