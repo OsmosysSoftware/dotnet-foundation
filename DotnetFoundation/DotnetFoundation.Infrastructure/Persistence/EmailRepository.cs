@@ -22,7 +22,7 @@ public class EmailRepository : IEmailRepository
     public async Task<string> SendForgetPasswordEmailAsync(string email, string body)
     {
         // Read the JWT token from the environment variable
-        string apiKey = _configuration["Notification:OsmoxServerKey"] ?? throw new Exception("Server key Missing");
+        string apiKey = Environment.GetEnvironmentVariable("OSMOX_SERVER_KEY") ?? throw new Exception("Server key Missing");
         string notificationApiUrl = _configuration["Notification:OsmoxServerUrl"] ?? throw new Exception("Server url Missing");
 
         _httpClient.DefaultRequestHeaders.Clear();
