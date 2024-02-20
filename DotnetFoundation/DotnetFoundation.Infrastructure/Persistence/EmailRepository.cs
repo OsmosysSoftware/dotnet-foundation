@@ -34,9 +34,9 @@ public class EmailRepository : IEmailRepository
             {
                 From = _configuration["Notification:From"] ?? throw new Exception("From Address Missing"),
                 To = email,
-                Subject = EmailConfig.EmailTemplatesDictionary[EmailEvents.ForgetPassword].Subject,
+                Subject = _configuration["Emails:ForgetPassword:Subject"],
                 Text = "Forget password Token",
-                Html = ReadHtmlTemplate(EmailConfig.EmailTemplatesDictionary[EmailEvents.ForgetPassword].TemplatePath, body)
+                Html = ReadHtmlTemplate(_configuration["Emails:ForgetPassword:Path"], body)
             }
         };
 

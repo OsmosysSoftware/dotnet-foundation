@@ -11,9 +11,16 @@ public class EmailService : IEmailService
     {
         _emailRepository = emailRepository;
     }
-    public async Task<string> SendEmail(string emailId, string subject, string body)
+    public async Task<string> SendEmail(string emailId, string body)
     {
-        string res = await _emailRepository.SendForgetPasswordEmailAsync(emailId, body).ConfigureAwait(false);
-        return res;
+        try
+        {
+            string res = await _emailRepository.SendForgetPasswordEmailAsync(emailId, body).ConfigureAwait(false);
+            return res;
+        }
+        catch (Exception ex)
+        {
+            return "An error occurred while sending the email: " + ex.Message;
+        }
     }
 }
