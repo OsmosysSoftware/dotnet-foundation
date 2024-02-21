@@ -2,6 +2,7 @@ namespace DotnetFoundation.Application;
 
 using DotnetFoundation.Application.Interfaces.Services;
 using DotnetFoundation.Application.Services.Authentication;
+using DotnetFoundation.Application.Services.EmailService;
 using DotnetFoundation.Application.Services.UserService;
 using Microsoft.Extensions.DependencyInjection;
 public static class DependencyInjection
@@ -10,6 +11,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IEmailService, EmailService>();
         return services;
     }
 }

@@ -1,5 +1,7 @@
 using DotnetFoundation.Application.DTO.AuthenticationDTO;
 using DotnetFoundation.Application.Interfaces.Persistence;
+using DotnetFoundation.Application.Interfaces.Services;
+using DotnetFoundation.Application.Services.EmailService;
 using DotnetFoundation.Domain.Entities;
 using DotnetFoundation.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -20,14 +22,15 @@ public class UserRepository : IUserRepository
     private readonly SignInManager<IdentityApplicationUser> _signInManager;
     private readonly UserManager<IdentityApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
-    public UserRepository(IConfiguration configuration, SqlDatabaseContext sqlDatabaseContext, SignInManager<IdentityApplicationUser> signinManager, RoleManager<IdentityRole> roleManager, UserManager<IdentityApplicationUser> userManager)
+    private readonly IEmailRepository _emailRepo;
+    public UserRepository(IConfiguration configuration, SqlDatabaseContext sqlDatabaseContext, SignInManager<IdentityApplicationUser> signinManager, RoleManager<IdentityRole> roleManager, UserManager<IdentityApplicationUser> userManager, IEmailRepository emailRepository)
     {
         _dbContext = sqlDatabaseContext;
         _configuration = configuration;
         _roleManager = roleManager;
         _signInManager = signinManager;
         _userManager = userManager;
-
+        _emailRepo = emailRepository;
     }
     public string GenerateJwtToken(UserInfo user)
     {
@@ -41,7 +44,7 @@ public class UserRepository : IUserRepository
         {
             claims.Add(new Claim(ClaimTypes.Role, role));
         }
-        string JWT_KEY = _configuration["Jwt:Key"] ?? throw new Exception("No JWT configuration");
+        string JWT_KEY = Environment.GetEnvironmentVariable("JWT_KEY") ?? throw new Exception("No JWT configuration");
         SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JWT_KEY));
         SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
@@ -55,6 +58,7 @@ public class UserRepository : IUserRepository
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
     public async Task<string> AddUserAsync(RegisterRequest request)
     {
         TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
@@ -98,7 +102,6 @@ public class UserRepository : IUserRepository
         }
     }
 
-
     public async Task<List<User>> GetAllUsersAsync()
     {
         List<User> users = (await _dbContext.ApplicationUsers.ToListAsync().ConfigureAwait(false)).Select(user => new User { Id = user.Id, FirstName = user.FirstName, LastName = user.LastName }).ToList();
@@ -127,16 +130,29 @@ public class UserRepository : IUserRepository
 
     public async Task<string> ForgotPasswordAsync(string email)
     {
-        IdentityApplicationUser user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new Exception("Invalid Email");
-        string token = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false);
-        return token;
+        try
+        {
+            IdentityApplicationUser user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new Exception("Invalid Email");
+            string token = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false);
+            await _emailRepo.SendForgetPasswordEmailAsync(email, token).ConfigureAwait(false);
+
+            return "Success";
+        }
+        catch (Exception ex)
+        {
+            return $"Error in ForgotPasswordAsync: {ex}";
+        }
     }
 
     public async Task<string> ResetPasswordAsync(string email, string token, string newPassword)
     {
         IdentityApplicationUser user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new Exception("Invalid Email");
         IdentityResult result = await _userManager.ResetPasswordAsync(user, token, newPassword).ConfigureAwait(false);
-        if (!result.Succeeded) throw new Exception("Invalid token");
+        if (!result.Succeeded)
+        {
+            throw new Exception("Invalid token");
+        }
+
         UserInfo userInfo = new(user.Id, email, (await _userManager.GetRolesAsync(user).ConfigureAwait(false)).ToList());
         return GenerateJwtToken(userInfo);
     }

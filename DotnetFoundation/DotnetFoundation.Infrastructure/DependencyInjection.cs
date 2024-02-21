@@ -23,16 +23,17 @@ public static class DependencyInjection
         services.AddIdentity<IdentityApplicationUser, IdentityRole>()
         .AddEntityFrameworkStores<SqlDatabaseContext>()
         .AddDefaultTokenProviders();
+        services.Configure<DataProtectionTokenProviderOptions>(options =>
+            options.TokenLifespan = TimeSpan.FromMinutes(30));
 
         services.AddAuthentication(options =>
         {
-
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         })
         .AddJwtBearer(options =>
         {
-            string JWT_KEY = configuration["Jwt:Key"] ?? throw new Exception("No JWT key specified");
+            string JWT_KEY = Environment.GetEnvironmentVariable("JWT_KEY") ?? throw new Exception("No JWT key specified");
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
@@ -51,6 +52,8 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IEmailRepository, EmailRepository>();
+        services.AddHttpClient();
 
         return services;
     }

@@ -1,12 +1,19 @@
+using DotnetFoundation.Api;
 using DotnetFoundation.Application;
 using DotnetFoundation.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+
+string root = Directory.GetCurrentDirectory();
+string dotenv = Path.GetFullPath(Path.Combine(root, "..", "..", ".env"));
+DotEnv.Load(dotenv);
+
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddEnvironmentVariables();
 
 // Add services to the container.
 builder.Services.AddControllers();
