@@ -3,11 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Your Email Title</title>
-  </head>
-  <body>
-    <table
-      style="
+    <title>Password Reset</title>
+    <style>
+      table {
         width: 100%;
         max-width: 600px;
         margin: 20px auto;
@@ -15,24 +13,52 @@
         overflow: hidden;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         background: #e5ebe1;
-        font-family: 'Arial', sans-serif;
-      "
-    >
+        font-family: "Arial", sans-serif;
+      }
+
+      th {
+        text-align: center;
+        padding: 20px;
+      }
+
+      .logo {
+        max-width: 90px;
+        border-radius: 8px;
+      }
+
+      h2 {
+        color: #40b01b;
+        margin-top: 0px;
+      }
+
+      td {
+        padding: 20px;
+      }
+
+      .footer {
+        background-color: #b3c6a6;
+        text-align: center;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <table>
       <thead>
         <tr>
-          <th colspan="2" style="text-align: center; padding: 20px">
+          <th colspan="2">
             <img
               src="https://i.postimg.cc/3wC1mFSj/logo.png"
-              alt="Additional Image"
-              style="max-width: 90px; border-radius: 8px"
+              alt="Logo Image"
+              class="logo"
             />
-            <h2 style="color: #40b01b; margin-top: 0px">FoundationX</h2>
+            <h2>FoundationX</h2>
           </th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td colspan="2" style="padding: 20px">
+          <td colspan="2">
             <p>Hello,</p>
             <p>
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed
@@ -45,12 +71,8 @@
         </tr>
       </tbody>
       <tfoot>
-        <tr>
-          <td
-            style="background-color: #b3c6a6; text-align: center; padding: 10px"
-          >
-            Contact us at <strong>info@example.com</strong>
-          </td>
+        <tr class="footer">
+          <td>Contact us at <strong>info@example.com</strong></td>
         </tr>
       </tfoot>
     </table>
