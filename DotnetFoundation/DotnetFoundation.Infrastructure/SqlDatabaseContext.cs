@@ -1,6 +1,6 @@
 namespace DotnetFoundation.Infrastructure;
 
-
+using DotnetFoundation.Domain.Entities;
 using DotnetFoundation.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +12,7 @@ public class SqlDatabaseContext : IdentityDbContext<IdentityApplicationUser>
 
     }
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+    public DbSet<TaskDetails> TaskDetailsDbSet { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -24,8 +25,11 @@ public class SqlDatabaseContext : IdentityDbContext<IdentityApplicationUser>
         .HasOne(au => au.IdentityApplicationUser)
         .WithOne(iu => iu.ApplicationUser)
         .HasForeignKey<ApplicationUser>(au => au.IdentityApplicationUserId);
+
+        // write
+        builder.Entity<TaskDetails>()
+        .HasKey(t => t.Id);
+        builder.Entity<TaskDetails>().ToTable("taskdetails");
     }
-
-
 }
 
