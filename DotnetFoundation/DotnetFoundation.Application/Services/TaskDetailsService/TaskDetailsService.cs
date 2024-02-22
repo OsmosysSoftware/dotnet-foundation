@@ -36,15 +36,48 @@ public class TaskDetailsService : ITaskDetailsService
         return response;
     }
 
-    public async Task<TaskDetailsResponse?> GetTaskByIdAsync(int Id)
+    public async Task<TaskDetailsResponse?> GetTaskByIdAsync(int id)
     {
-        TaskDetails res = await _taskDetailsRepository.GetTaskByIdAsync(Id).ConfigureAwait(false) ?? throw new Exception($"Task with Id={Id} does not exist");
+        TaskDetails res = await _taskDetailsRepository.GetTaskByIdAsync(id).ConfigureAwait(false) ?? throw new Exception($"Task with Id={id} does not exist");
         return TaskDTOMapper(res);
     }
 
-    public async Task<string> AddTaskAsync(TaskDetailsRequest detailsRequest)
+    public async Task<string> InsertTaskAsync(TaskDetailsRequest detailsRequest)
     {
-        string res = await _taskDetailsRepository.AddTaskAsync(detailsRequest).ConfigureAwait(false);
-        return res;
+        try
+        {
+            string res = await _taskDetailsRepository.InsertTaskAsync(detailsRequest).ConfigureAwait(false);
+            return res;
+        }
+        catch (Exception ex)
+        {
+            return $"An error inserting TaskDetails: {ex.Message}";
+        }
+    }
+
+    public async Task<string> UpdateTaskAsync(int id, TaskDetailsRequest modifiedDetails)
+    {
+        try
+        {
+            string res = await _taskDetailsRepository.UpdateTaskAsync(id, modifiedDetails).ConfigureAwait(false);
+            return res;
+        }
+        catch (Exception ex)
+        {
+            return $"An error occurred while updating Task with id = \"{id}\": {ex.Message}";
+        }
+    }
+
+        public async Task<string> DeleteTaskAsync(int id)
+    {
+        try
+        {
+            string res = await _taskDetailsRepository.DeleteTaskAsync(id).ConfigureAwait(false);
+            return res;
+        }
+        catch (Exception ex)
+        {
+            return $"An error occurred while deleting Task with id = \"{id}\": {ex.Message}";
+        }
     }
 }

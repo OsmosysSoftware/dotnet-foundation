@@ -26,7 +26,7 @@ public class SqlDatabaseContext : IdentityDbContext<IdentityApplicationUser>
         .WithOne(iu => iu.ApplicationUser)
         .HasForeignKey<ApplicationUser>(au => au.IdentityApplicationUserId);
 
-        // write
+        // for taskdetails
         builder.Entity<TaskDetails>()
         .HasKey(t => t.Id);
         builder.Entity<TaskDetails>().ToTable("taskdetails");

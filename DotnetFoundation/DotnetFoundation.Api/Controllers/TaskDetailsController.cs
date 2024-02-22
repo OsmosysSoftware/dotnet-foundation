@@ -1,5 +1,6 @@
 using DotnetFoundation.Application.DTO.TaskDetailsDTO;
 using DotnetFoundation.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DotnetFoundation.Api.Controllers;
@@ -28,15 +29,24 @@ public class TaskDetailsController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("addtask")]
-    public async Task<IActionResult> AddTaskAsync(TaskDetailsRequest detailRequest)
+    [HttpPost("insert")]
+    public async Task<IActionResult> InsertTaskAsync(TaskDetailsRequest detailRequest)
     {
-        string result = await _TaskDetailsService.AddTaskAsync(detailRequest
-            // detailRequest.Description,
-            // detailRequest.BudgetedHours,
-            // detailRequest.AssignedTo,
-            // detailRequest.Category
-        ).ConfigureAwait(false);
+        string result = await _TaskDetailsService.InsertTaskAsync(detailRequest).ConfigureAwait(false);
+        return Ok(result);
+    }
+
+    [HttpPut("update/{taskId}")]
+    public async Task<IActionResult> UpdateTaskAsync(int taskId, TaskDetailsRequest modifiedDetails)
+    {
+        string result = await _TaskDetailsService.UpdateTaskAsync(taskId, modifiedDetails).ConfigureAwait(false);
+        return Ok(result);
+    }
+
+    [HttpDelete("delete/{taskId}")]
+    public async Task<IActionResult> DeleteTaskAsync(int taskId)
+    {
+        string result = await _TaskDetailsService.DeleteTaskAsync(taskId).ConfigureAwait(false);
         return Ok(result);
     }
 }

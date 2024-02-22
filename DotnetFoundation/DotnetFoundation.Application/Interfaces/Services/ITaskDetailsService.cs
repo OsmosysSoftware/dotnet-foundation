@@ -7,6 +7,8 @@ namespace DotnetFoundation.Application.Interfaces.Services;
 public interface ITaskDetailsService
 {
     public Task<List<TaskDetailsResponse>> GetAllTasksAsync();
-    public Task<TaskDetailsResponse?> GetTaskByIdAsync(int Id);
-    public Task<string> AddTaskAsync(TaskDetailsRequest request);
+    public Task<TaskDetailsResponse?> GetTaskByIdAsync(int id);
+    public Task<string> InsertTaskAsync(TaskDetailsRequest request);
+    public Task<string> UpdateTaskAsync(int id, TaskDetailsRequest modifiedDetails);
+    public Task<string> DeleteTaskAsync(int id);
 }
