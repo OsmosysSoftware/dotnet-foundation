@@ -46,6 +46,11 @@ public class TaskDetailsRepository : ITaskDetailsRepository
 
     public async Task<string> InsertTaskAsync(TaskDetailsRequest request)
     {
+        User? userExists = await _dbContext.ApplicationUsers.FindAsync(request.AssignedTo).ConfigureAwait(false);
+        if (userExists == null)
+        {
+            throw new Exception($"AssignedTo with userId = \"{request.AssignedTo}\" does not exist. Cannot add task.");
+        }
         TaskDetails inputTaskDetails = new TaskDetails
         {
             Description = request.Description,
@@ -67,10 +72,15 @@ public class TaskDetailsRepository : ITaskDetailsRepository
     public async Task<string> UpdateTaskAsync(int id, TaskDetailsRequest modifiedDetails)
     {
         TaskDetails? existingDetails = await _dbContext.TaskDetailsDbSet.FindAsync(id).ConfigureAwait(false);
-
         if (existingDetails == null)
         {
             throw new Exception($"Task with Id = {id} does not exist");
+        }
+
+        User? userExists = await _dbContext.ApplicationUsers.FindAsync(modifiedDetails.AssignedTo).ConfigureAwait(false);
+        if (userExists == null)
+        {
+            throw new Exception($"AssignedTo with userId = \"{modifiedDetails.AssignedTo}\" does not exist. Cannot add task.");
         }
 
         // Modify data when strings are NOT null and ints are NOT 0
@@ -79,14 +89,9 @@ public class TaskDetailsRepository : ITaskDetailsRepository
             existingDetails.Description = modifiedDetails.Description;
         }
 
-        if (modifiedDetails.BudgetedHours != 0)
+        if (modifiedDetails.BudgetedHours > 0)
         {
             existingDetails.BudgetedHours = modifiedDetails.BudgetedHours;
-        }
-
-        if (modifiedDetails.AssignedTo != 0)
-        {
-            existingDetails.AssignedTo = modifiedDetails.AssignedTo;
         }
 
         if (!modifiedDetails.Category.IsNullOrEmpty())
@@ -94,11 +99,12 @@ public class TaskDetailsRepository : ITaskDetailsRepository
             existingDetails.Category = modifiedDetails.Category;
         }
 
-        // Successfully modified time
+        // Successfully modified items
+        existingDetails.AssignedTo = modifiedDetails.AssignedTo;
         existingDetails.ModifiedOn = DateTime.UtcNow;
 
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
-        return $"Successfully updated Task id = \"{id}\" with description: \"{modifiedDetails.Description}\"";;
+        return $"Successfully updated Task id = \"{id}\" with description: \"{existingDetails.Description}\"";;
     }
 
     public async Task<string> DeleteTaskAsync(int id)
@@ -106,12 +112,12 @@ public class TaskDetailsRepository : ITaskDetailsRepository
         TaskDetails? task = await _dbContext.TaskDetailsDbSet.FindAsync(id).ConfigureAwait(false);
         if (task == null)
         {
-            throw new Exception("Task not found");
+            throw new Exception("Task does not exist.");
         }
 
         _dbContext.TaskDetailsDbSet.Remove(task);
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
 
-        return $"Task with id = \"{id}\" deleted successfully";
+        return $"Task with id = \"{id}\" deleted successfully.";
     }
 }
