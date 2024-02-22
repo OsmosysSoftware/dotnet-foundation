@@ -1,4 +1,6 @@
 using DotnetFoundation.Application.Interfaces.Persistence;
+using DotnetFoundation.Application.Interfaces.Services;
+using DotnetFoundation.Application.Services.TaskDetailsService;
 using DotnetFoundation.Infrastructure.Identity;
 using DotnetFoundation.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -53,6 +55,7 @@ public static class DependencyInjection
 
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IEmailRepository, EmailRepository>();
+        services.AddScoped<ITaskDetailsRepository, TaskDetailsRepository>();
         services.AddHttpClient();
 
         return services;
