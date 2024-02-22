@@ -8,8 +8,9 @@ Dotnet Foundation is a boilerplate project for ASP.NET WebAPI projects. This boi
 
 This project uses modern features of dotnet such as Clean Architecture and AspNetCore.Identity. To learn more about them, please go through the following documents:
 
-1. [Clean Architecture](./docs/CLEAN_ARCHITECTURE.md)
-2. [AspNetCore.Identity](./docs/ASPNETCORE_IDENTITY.md)
+1. [Clean Architecture](./docs/clean-architecture.md)
+2. [AspNetCore.Identity](./docs/aspnetcore-identity.md)
+3. [ApiDocumetation](./docs/api-documentation.md)
 
 ## Development Setup
 
@@ -42,7 +43,8 @@ The development of this application happens using Visual Studio IDE on a Windows
 7. Test the API via Postman. The app can be accessed using `http://localhost:5000/<API>`.
 
 ## Setup Application for Development using Dev Container
-  To develop the application using the dev containers follow this [file](docs/docker.md) 
+
+To develop the application using the dev containers follow this [file](docs/docker.md)
 
 # License
 
