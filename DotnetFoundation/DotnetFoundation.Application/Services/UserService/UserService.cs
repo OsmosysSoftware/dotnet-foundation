@@ -2,6 +2,7 @@ using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Interfaces.Services;
 using DotnetFoundation.Application.Models.DTOs.UserDTO;
 using DotnetFoundation.Domain.Entities;
+using DotnetFoundation.Domain.Enums;
 
 namespace DotnetFoundation.Application.Services.UserService;
 public class UserService : IUserService
@@ -9,7 +10,12 @@ public class UserService : IUserService
     private readonly IUserRepository _userRepository;
     private static UserResponse DTOMapper(User user)
     {
-        return new(Id: user.Id, FirstName: user.FirstName, LastName: user.LastName);
+        return new UserResponse
+        {
+            Id = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName
+        };
     }
     public UserService(IUserRepository userRepository)
     {
@@ -27,7 +33,7 @@ public class UserService : IUserService
         return DTOMapper(res);
     }
 
-    public async Task<bool> AddUserRoleAsync(string email, int role)
+    public async Task<bool> AddUserRoleAsync(string email, Roles role)
     {
         bool res = await _userRepository.AddUserRoleAsync(email, role).ConfigureAwait(false);
         return res;

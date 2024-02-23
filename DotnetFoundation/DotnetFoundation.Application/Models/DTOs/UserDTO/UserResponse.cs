@@ -1,3 +1,8 @@
 namespace DotnetFoundation.Application.Models.DTOs.UserDTO;
 
-public record UserResponse(int Id, string FirstName, string? LastName);
+public record UserResponse
+{
+    public int Id { get; init; }
+    public string FirstName { get; init; }
+    public string? LastName { get; init; }
+}

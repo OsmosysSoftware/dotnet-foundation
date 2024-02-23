@@ -158,9 +158,9 @@ public class UserRepository : IUserRepository
         return GenerateJwtToken(userInfo);
     }
 
-    public async Task<bool> AddUserRoleAsync(string email, int role)
+    public async Task<bool> AddUserRoleAsync(string email, Roles role)
     {
-        string newRole = ((Roles)role).ToString();
+        string newRole = role.ToString();
         if (!await _roleManager.RoleExistsAsync(newRole).ConfigureAwait(false))
         {
             await _roleManager.CreateAsync(new IdentityRole(newRole)).ConfigureAwait(false);

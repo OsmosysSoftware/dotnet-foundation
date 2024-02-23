@@ -1,5 +1,6 @@
 using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
 using DotnetFoundation.Domain.Entities;
+using DotnetFoundation.Domain.Enums;
 
 namespace DotnetFoundation.Application.Interfaces.Persistence;
 
@@ -11,5 +12,5 @@ public interface IUserRepository
     public Task<User?> GetUserByIdAsync(int Id);
     public Task<string> ForgotPasswordAsync(string email);
     public Task<string> ResetPasswordAsync(string email, string token, string newPassword);
-    public Task<bool> AddUserRoleAsync(string email, int role);
+    public Task<bool> AddUserRoleAsync(string email, Roles role);
 }

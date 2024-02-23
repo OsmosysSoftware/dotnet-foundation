@@ -1,2 +1,5 @@
 namespace DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
-public record AuthenticationResponse(string Token);
+public record AuthenticationResponse
+{
+    public string Token { get; init; }
+}

@@ -18,13 +18,19 @@ public class AuthenticationService : IAuthenticationService
     public async Task<AuthenticationResponse> LoginAsync(LoginRequest request)
     {
         string res = await _userRepository.LoginUserAsync(request).ConfigureAwait(false);
-        return new(Token: res);
+        return new AuthenticationResponse
+        {
+            Token = res,
+        };
     }
 
     public async Task<AuthenticationResponse> RegisterAsync(RegisterRequest request)
     {
         string res = await _userRepository.AddUserAsync(request).ConfigureAwait(false);
-        return new(Token: res);
+        return new AuthenticationResponse
+        {
+            Token = res,
+        };
 
     }
     public async Task<string> ForgotPasswordAsync(string email)
@@ -36,6 +42,9 @@ public class AuthenticationService : IAuthenticationService
     public async Task<AuthenticationResponse> ResetPasswordAsync(PasswordResetRequest request)
     {
         string res = await _userRepository.ResetPasswordAsync(request.Email, request.Token, request.Password).ConfigureAwait(false);
-        return new(Token: res);
+        return new AuthenticationResponse
+        {
+            Token = res,
+        };
     }
 }
