@@ -1,5 +1,5 @@
-using DotnetFoundation.Application.DTO.UserDTO;
 using DotnetFoundation.Application.Interfaces.Services;
+using DotnetFoundation.Application.Models.DTOs.UserDTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

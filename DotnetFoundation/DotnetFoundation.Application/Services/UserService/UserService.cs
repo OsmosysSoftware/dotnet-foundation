@@ -1,6 +1,6 @@
-using DotnetFoundation.Application.DTO.UserDTO;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Interfaces.Services;
+using DotnetFoundation.Application.Models.DTOs.UserDTO;
 using DotnetFoundation.Domain.Entities;
 
 namespace DotnetFoundation.Application.Services.UserService;

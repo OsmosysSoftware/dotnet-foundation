@@ -1,6 +1,6 @@
-using DotnetFoundation.Application.DTO.AuthenticationDTO;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Interfaces.Services;
+using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
 using DotnetFoundation.Application.Services.EmailService;
 using DotnetFoundation.Domain.Entities;
 using DotnetFoundation.Domain.Enums;

@@ -1,6 +1,6 @@
-using DotnetFoundation.Application.DTO.AuthenticationDTO;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Interfaces.Services;
+using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
 using DotnetFoundation.Domain.Entities;
 using System.Security.Claims;
 
@@ -14,8 +14,6 @@ public class AuthenticationService : IAuthenticationService
         _userRepository = userRepository;
 
     }
-
-
 
     public async Task<AuthenticationResponse> LoginAsync(LoginRequest request)
     {
@@ -40,5 +38,4 @@ public class AuthenticationService : IAuthenticationService
         string res = await _userRepository.ResetPasswordAsync(request.Email, request.Token, request.Password).ConfigureAwait(false);
         return new(Token: res);
     }
-
 }

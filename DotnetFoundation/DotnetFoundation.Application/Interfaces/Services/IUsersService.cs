@@ -1,4 +1,4 @@
-using DotnetFoundation.Application.DTO.UserDTO;
+using DotnetFoundation.Application.Models.DTOs.UserDTO;
 namespace DotnetFoundation.Application.Interfaces.Services;
 
 public interface IUserService
