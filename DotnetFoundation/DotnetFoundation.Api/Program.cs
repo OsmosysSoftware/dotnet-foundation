@@ -28,6 +28,9 @@ builder.Services.AddControllers(options =>
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
+// AutoMapper Services
+builder.Services.AddAutoMapper(typeof(Program));
+
 // Swagger UI Services
 builder.Services.AddSwaggerGen(options =>
 {
