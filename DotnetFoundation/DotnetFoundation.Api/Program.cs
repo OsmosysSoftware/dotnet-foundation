@@ -1,10 +1,13 @@
 using DotnetFoundation.Api;
 using DotnetFoundation.Application;
 using DotnetFoundation.Infrastructure;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+using Swashbuckle.AspNetCore.Filters;
+using System.Reflection;
+using System.Text.Json.Serialization;
 
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 string root = Directory.GetCurrentDirectory();
 string dotenv = Path.GetFullPath(Path.Combine(root, "..", "..", ".env"));
@@ -16,38 +19,43 @@ builder.Configuration
     .AddEnvironmentVariables();
 
 // Add services to the container.
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+builder.Services.AddControllers(options =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API", Version = "v1" });
-
-    // Add JWT authentication
-    OpenApiSecurityScheme securityScheme = new OpenApiSecurityScheme
+    options.Filters.Add(new ProducesAttribute("application/json"));
+})
+    .AddJsonOptions(options =>
     {
-        Name = "JWT Authentication",
-        Description = "Enter your JWT token",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer", // or another scheme type as needed
-        BearerFormat = "JWT",
-        Reference = new OpenApiReference
-        {
-            Id = JwtBearerDefaults.AuthenticationScheme,
-            Type = ReferenceType.SecurityScheme
-        }
-    };
-
-    c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, securityScheme);
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        { securityScheme, Array.Empty<string>() }
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
+
+// Swagger UI Services
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "DotnetFoundation API", Version = "v1" });
+
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        Name = "JWT Authorization",
+        Description = "Standard Authorization header using the Bearer Scheme (\"bearer {token}\")",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey
+    });
+
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
+
+    string xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    string filePath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(filePath);
 });
 
-builder.Services.AddInfrastructure(builder.Configuration);
+// Adding HTTP Context
+builder.Services.AddHttpContextAccessor();
+
+// Modify builder for different layers
 builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
+
+// Building application
 WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -57,7 +65,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseStaticFiles();
+
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

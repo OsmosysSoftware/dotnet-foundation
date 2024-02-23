@@ -22,4 +22,7 @@
   <ItemGroup>
     <AdditionalFiles Include="..\CodeMetricsConfig.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Notifications\" />
+  </ItemGroup>
 </Project>

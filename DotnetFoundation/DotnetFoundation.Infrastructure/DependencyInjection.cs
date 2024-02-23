@@ -15,44 +15,62 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, ConfigurationManager configuration)
     {
+        // Configure database context
         services.AddDbContext<SqlDatabaseContext>(options =>
         {
             string connectionString = configuration.GetConnectionString("DBConnection") ?? throw new Exception("Invalid connection string");
             options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
         });
+
+        // Configure indentity service
         services.AddIdentity<IdentityApplicationUser, IdentityRole>()
-        .AddEntityFrameworkStores<SqlDatabaseContext>()
-        .AddDefaultTokenProviders();
-        services.Configure<DataProtectionTokenProviderOptions>(options =>
-            options.TokenLifespan = TimeSpan.FromMinutes(30));
+            .AddEntityFrameworkStores<SqlDatabaseContext>()
+            .AddDefaultTokenProviders();
 
-        services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(options =>
-        {
-            string JWT_KEY = Environment.GetEnvironmentVariable("JWT_KEY") ?? throw new Exception("No JWT key specified");
-            options.TokenValidationParameters = new TokenValidationParameters
+        services.Configure<DataProtectionTokenProviderOptions>(options => options.TokenLifespan = TimeSpan.FromMinutes(Convert.ToDouble(configuration["Jwt:Issuer"])));
+
+        // Authentication
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
             {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = configuration["Jwt:Issuer"],
-                ValidAudience = configuration["Jwt:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JWT_KEY))
-            };
+                string JWT_KEY = configuration["Jwt:Key"] ?? throw new Exception("No JWT key specified");
 
-        });
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JWT_KEY)),
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidIssuer = configuration["Jwt:Issuer"],
+                    ValidAudience = configuration["Jwt:Audience"],
+                    ClockSkew = TimeSpan.Zero,
+                    ValidateLifetime = true,
+                    LifetimeValidator = (DateTime? notBefore, DateTime? expires, SecurityToken securityToken, TokenValidationParameters validationParameters) =>
+                    {
+                        TokenValidationParameters clonedParameters = validationParameters.Clone();
+                        clonedParameters.LifetimeValidator = null;
+
+                        // If token expiry time is not null, then validate lifetime
+                        if (expires != null)
+                        {
+                            Validators.ValidateLifetime(notBefore, expires, securityToken, clonedParameters);
+                        }
+
+                        return true;
+                    }
+                };
+            });
+
+        // Authorization
         services.AddAuthorization(options =>
         {
             options.AddPolicy("RequiredAdminRole", policy => policy.RequireRole("ADMIN"));
         });
 
+        // Configure service scope for repositories
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IEmailRepository, EmailRepository>();
+
         services.AddHttpClient();
 
         return services;
