@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DotnetFoundation.Infrastructure.Migrations
 {
     [DbContext(typeof(SqlDatabaseContext))]
-    [Migration("20231201101813_InitialCreate")]
+    [Migration("20240223110647_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -19,16 +19,23 @@ namespace DotnetFoundation.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.2")
+                .HasAnnotation("ProductVersion", "8.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("DotnetFoundation.Infrastructure.Identity.ApplicationUsers", b =>
+            modelBuilder.Entity("DotnetFoundation.Infrastructure.Identity.ApplicationUser", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("FirstName")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("IdentityApplicationUserId")
@@ -36,6 +43,15 @@ namespace DotnetFoundation.Infrastructure.Migrations
 
                     b.Property<string>("LastName")
                         .HasColumnType("longtext");
+
+                    b.Property<int>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ModifiedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -45,7 +61,7 @@ namespace DotnetFoundation.Infrastructure.Migrations
                     b.ToTable("users", (string)null);
                 });
 
-            modelBuilder.Entity("DotnetFoundation.Infrastructure.Identity.IdentityApplicationUsers", b =>
+            modelBuilder.Entity("DotnetFoundation.Infrastructure.Identity.IdentityApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
@@ -237,11 +253,11 @@ namespace DotnetFoundation.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("DotnetFoundation.Infrastructure.Identity.ApplicationUsers", b =>
+            modelBuilder.Entity("DotnetFoundation.Infrastructure.Identity.ApplicationUser", b =>
                 {
-                    b.HasOne("DotnetFoundation.Infrastructure.Identity.IdentityApplicationUsers", "IdentityApplicationUser")
+                    b.HasOne("DotnetFoundation.Infrastructure.Identity.IdentityApplicationUser", "IdentityApplicationUser")
                         .WithOne("ApplicationUser")
-                        .HasForeignKey("DotnetFoundation.Infrastructure.Identity.ApplicationUsers", "IdentityApplicationUserId");
+                        .HasForeignKey("DotnetFoundation.Infrastructure.Identity.ApplicationUser", "IdentityApplicationUserId");
 
                     b.Navigation("IdentityApplicationUser");
                 });
@@ -257,7 +273,7 @@ namespace DotnetFoundation.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("DotnetFoundation.Infrastructure.Identity.IdentityApplicationUsers", null)
+                    b.HasOne("DotnetFoundation.Infrastructure.Identity.IdentityApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -266,7 +282,7 @@ namespace DotnetFoundation.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("DotnetFoundation.Infrastructure.Identity.IdentityApplicationUsers", null)
+                    b.HasOne("DotnetFoundation.Infrastructure.Identity.IdentityApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -281,7 +297,7 @@ namespace DotnetFoundation.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DotnetFoundation.Infrastructure.Identity.IdentityApplicationUsers", null)
+                    b.HasOne("DotnetFoundation.Infrastructure.Identity.IdentityApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -290,14 +306,14 @@ namespace DotnetFoundation.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("DotnetFoundation.Infrastructure.Identity.IdentityApplicationUsers", null)
+                    b.HasOne("DotnetFoundation.Infrastructure.Identity.IdentityApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("DotnetFoundation.Infrastructure.Identity.IdentityApplicationUsers", b =>
+            modelBuilder.Entity("DotnetFoundation.Infrastructure.Identity.IdentityApplicationUser", b =>
                 {
                     b.Navigation("ApplicationUser")
                         .IsRequired();

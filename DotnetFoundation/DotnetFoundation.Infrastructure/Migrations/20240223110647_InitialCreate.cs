@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
-using System;
 
 #nullable disable
 
@@ -204,7 +204,12 @@ public partial class InitialCreate : Migration
                     .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                 IdentityApplicationUserId = table.Column<string>(type: "varchar(255)", nullable: true)
                     .Annotation("MySql:CharSet", "utf8mb4"),
-                FirstName = table.Column<string>(type: "longtext", nullable: true)
+                CreatedOn = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                CreatedBy = table.Column<int>(type: "int", nullable: false),
+                ModifiedOn = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                ModifiedBy = table.Column<int>(type: "int", nullable: false),
+                Status = table.Column<int>(type: "int", nullable: false),
+                FirstName = table.Column<string>(type: "longtext", nullable: false)
                     .Annotation("MySql:CharSet", "utf8mb4"),
                 LastName = table.Column<string>(type: "longtext", nullable: true)
                     .Annotation("MySql:CharSet", "utf8mb4")
