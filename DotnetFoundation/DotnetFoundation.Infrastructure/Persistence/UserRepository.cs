@@ -3,6 +3,7 @@ using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Interfaces.Services;
 using DotnetFoundation.Application.Services.EmailService;
 using DotnetFoundation.Domain.Entities;
+using DotnetFoundation.Domain.Enums;
 using DotnetFoundation.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

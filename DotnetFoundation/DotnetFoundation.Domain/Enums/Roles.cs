@@ -1,4 +1,4 @@
-namespace DotnetFoundation.Domain.Entities;
+namespace DotnetFoundation.Domain.Enums;
 
 public enum Roles
 {
