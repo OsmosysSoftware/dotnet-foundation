@@ -15,18 +15,32 @@ public class AuthenticationController : ControllerBase
         _authenticationService = authenticationService;
     }
 
+    /// <summary>
+    /// User registration.
+    /// </summary>
+    /// <param name="request">New user registration request</param>
     [HttpPost("register")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<BaseResponse<AuthenticationResponse>>> RegisterAsync(RegisterRequest request)
     {
         BaseResponse<AuthenticationResponse> response = new(ResponseStatus.Fail);
-        
+
         response.Data = await _authenticationService.RegisterAsync(request).ConfigureAwait(false);
         response.Status = ResponseStatus.Success;
 
         return Ok(response);
     }
 
+    /// <summary>
+    /// User login.
+    /// </summary>
+    /// <param name="request">User login request</param>
     [HttpPost("login")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<BaseResponse<AuthenticationResponse>>> LoginAsync(LoginRequest request)
     {
         BaseResponse<AuthenticationResponse> response = new(ResponseStatus.Fail);
@@ -37,7 +51,14 @@ public class AuthenticationController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// User password reset using reset token.
+    /// </summary>
+    /// <param name="request">New password details request</param>
     [HttpPost("reset-password")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<BaseResponse<AuthenticationResponse>>> ResetPasswordAsync(PasswordResetRequest request)
     {
         BaseResponse<AuthenticationResponse> response = new(ResponseStatus.Fail);
@@ -48,7 +69,14 @@ public class AuthenticationController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Forgot user password.
+    /// </summary>
+    /// <param name="email">Email of user to reset password</param>
     [HttpPost("forgot-password")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<BaseResponse<string>>> ForgotPasswordAsync(string email)
     {
         BaseResponse<string> response = new(ResponseStatus.Fail);
