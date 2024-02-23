@@ -1,12 +1,8 @@
 using DotnetFoundation.Application.DTO.TaskDetailsDTO;
 using DotnetFoundation.Application.Interfaces.Persistence;
-using DotnetFoundation.Application.Interfaces.Services;
 using DotnetFoundation.Domain.Entities;
-using DotnetFoundation.Infrastructure.Identity;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 
 namespace DotnetFoundation.Infrastructure.Persistence;
 
@@ -51,6 +47,10 @@ public class TaskDetailsRepository : ITaskDetailsRepository
         {
             throw new Exception($"AssignedTo with userId = \"{request.AssignedTo}\" does not exist. Cannot add task.");
         }
+        if (request.BudgetedHours < 0)
+        {
+            throw new Exception($"Hours cannot be less than 0");
+        }
         TaskDetails inputTaskDetails = new TaskDetails
         {
             Description = request.Description,
@@ -83,18 +83,18 @@ public class TaskDetailsRepository : ITaskDetailsRepository
             throw new Exception($"AssignedTo with userId = \"{modifiedDetails.AssignedTo}\" does not exist. Cannot add task.");
         }
 
-        // Modify data when strings are NOT null and ints are NOT 0
-        if (!modifiedDetails.Description.IsNullOrEmpty())
+        // Modify data when strings are NOT null and hours >= 0
+        if (!string.IsNullOrEmpty(modifiedDetails.Description))
         {
             existingDetails.Description = modifiedDetails.Description;
         }
 
-        if (modifiedDetails.BudgetedHours > 0)
+        if (modifiedDetails.BudgetedHours >= 0)
         {
             existingDetails.BudgetedHours = modifiedDetails.BudgetedHours;
         }
 
-        if (!modifiedDetails.Category.IsNullOrEmpty())
+        if (!string.IsNullOrEmpty(modifiedDetails.Category))
         {
             existingDetails.Category = modifiedDetails.Category;
         }

@@ -15,7 +15,7 @@ public class TaskDetailsController : ControllerBase
         _TaskDetailsService = TaskDetailsService;
     }
 
-    [HttpGet]
+    [HttpGet("all")]
     [Authorize]
     public async Task<IActionResult> GetAllTasksAsync()
     {
@@ -40,7 +40,7 @@ public class TaskDetailsController : ControllerBase
     }
 
     [HttpPut("update/{taskId}")]
-    [Authorize]//(Roles = "LEAD")]
+    [Authorize]
     public async Task<IActionResult> UpdateTaskAsync(int taskId, TaskDetailsRequest modifiedDetails)
     {
         string result = await _TaskDetailsService.UpdateTaskAsync(taskId, modifiedDetails).ConfigureAwait(false);
@@ -48,7 +48,7 @@ public class TaskDetailsController : ControllerBase
     }
 
     [HttpDelete("delete/{taskId}")]
-    [Authorize]//(Roles = "ADMIN")]
+    [Authorize]
     public async Task<IActionResult> DeleteTaskAsync(int taskId)
     {
         string result = await _TaskDetailsService.DeleteTaskAsync(taskId).ConfigureAwait(false);
