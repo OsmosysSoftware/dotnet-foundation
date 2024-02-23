@@ -27,7 +27,7 @@ public static class DependencyInjection
             .AddEntityFrameworkStores<SqlDatabaseContext>()
             .AddDefaultTokenProviders();
 
-        services.Configure<DataProtectionTokenProviderOptions>(options => options.TokenLifespan = TimeSpan.FromMinutes(Convert.ToDouble(configuration["Jwt:Issuer"])));
+        services.Configure<DataProtectionTokenProviderOptions>(options => options.TokenLifespan = TimeSpan.FromMinutes(Convert.ToDouble(configuration["Appsettings:IdentityTokenLifespanInMinutes"])));
 
         // Authentication
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
