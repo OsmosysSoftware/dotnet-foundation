@@ -33,6 +33,7 @@ public class UserRepository : IUserRepository
         _userManager = userManager;
         _emailRepo = emailRepository;
     }
+
     public string GenerateJwtToken(UserInfo user)
     {
         List<Claim> claims = new List<Claim>
@@ -50,12 +51,13 @@ public class UserRepository : IUserRepository
         SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         JwtSecurityToken token = new JwtSecurityToken(
-        _configuration["Jwt:Issuer"],
-        _configuration["Jwt:Audience"],
-        claims,
-        expires: DateTime.Now.AddHours(2),
-        signingCredentials: credentials
-    );
+            _configuration["Jwt:Issuer"],
+            _configuration["Jwt:Audience"],
+            claims,
+            notBefore: DateTime.UtcNow,
+            expires: DateTime.UtcNow.AddHours(Convert.ToDouble(_configuration["Appsettings:LoginAuthTokenExpiryTimeInHrs"])),
+            signingCredentials: credentials
+        );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
@@ -71,13 +73,18 @@ public class UserRepository : IUserRepository
                 UserName = request.Email,
                 Email = request.Email
             };
+
             IdentityResult identityResult = await _userManager.CreateAsync(newIdentityApplicationUser, request.Password).ConfigureAwait(false);
+            
             if (!identityResult.Succeeded)
             {
                 throw new Exception("Error creating identity user");
             }
+            
             IdentityApplicationUser identityApplicationUser = await _userManager.FindByEmailAsync(request.Email).ConfigureAwait(false) ?? throw new Exception("Error finding user");
+            
             await AddUserRoleAsync(request.Email, 0).ConfigureAwait(false);
+            
             ApplicationUser applicationUser = new()
             {
                 FirstName = request.FirstName,
@@ -87,6 +94,7 @@ public class UserRepository : IUserRepository
 
             Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<ApplicationUser> res = await _dbContext.ApplicationUsers.AddAsync(applicationUser).ConfigureAwait(false);
             await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+            
             UserInfo userInfo = new(identityApplicationUser.Id, request.Email, (await _userManager.GetRolesAsync(identityApplicationUser).ConfigureAwait(false)).ToList());
 
             // If everything succeeds, commit the transaction
@@ -105,10 +113,14 @@ public class UserRepository : IUserRepository
 
     public async Task<List<User>> GetAllUsersAsync()
     {
-        List<User> users = (await _dbContext.ApplicationUsers.ToListAsync().ConfigureAwait(false)).Select(user => new User { Id = user.Id, FirstName = user.FirstName, LastName = user.LastName }).ToList();
+        List<User> users = (await _dbContext.ApplicationUsers.ToListAsync().ConfigureAwait(false))
+            .Select(user => new User
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName
+            }).ToList();
         return users;
-
-
     }
 
     public async Task<User?> GetUserByIdAsync(int Id)
@@ -120,6 +132,7 @@ public class UserRepository : IUserRepository
     public async Task<string> LoginUserAsync(LoginRequest request)
     {
         SignInResult signInResult = await _signInManager.PasswordSignInAsync(request.Email, request.Password, false, false).ConfigureAwait(false);
+        
         if (!signInResult.Succeeded)
         {
             throw new Exception("Invalid Email or Password");
@@ -149,6 +162,7 @@ public class UserRepository : IUserRepository
     {
         IdentityApplicationUser user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new Exception("Invalid Email");
         IdentityResult result = await _userManager.ResetPasswordAsync(user, token, newPassword).ConfigureAwait(false);
+        
         if (!result.Succeeded)
         {
             throw new Exception("Invalid token");
@@ -161,10 +175,12 @@ public class UserRepository : IUserRepository
     public async Task<bool> AddUserRoleAsync(string email, Roles role)
     {
         string newRole = role.ToString();
+        
         if (!await _roleManager.RoleExistsAsync(newRole).ConfigureAwait(false))
         {
             await _roleManager.CreateAsync(new IdentityRole(newRole)).ConfigureAwait(false);
         }
+        
         IdentityApplicationUser identityApplicationUser = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new Exception("Error finding user");
         await _userManager.AddToRoleAsync(identityApplicationUser, newRole).ConfigureAwait(false);
         await _userManager.AddClaimAsync(identityApplicationUser, new Claim(ClaimTypes.Role, newRole)).ConfigureAwait(false);
