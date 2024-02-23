@@ -1,5 +1,7 @@
 using DotnetFoundation.Application.Interfaces.Services;
+using DotnetFoundation.Application.Models.Common;
 using DotnetFoundation.Application.Models.DTOs.UserDTO;
+using DotnetFoundation.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,26 +17,38 @@ public class UserController : ControllerBase
         _userService = userService;
     }
 
-
     [HttpGet]
     [Authorize(Roles = "LEAD")]
-    public async Task<IActionResult> GetAllUsersAsync()
+    public async Task<ActionResult<BaseResponse<List<UserResponse>>>> GetAllUsersAsync()
     {
-        List<UserResponse> result = await _userService.GetAllUsersAsync().ConfigureAwait(false);
-        return Ok(result);
+        BaseResponse<List<UserResponse>> response = new(ResponseStatus.Fail);
+
+        response.Data = await _userService.GetAllUsersAsync().ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
+        
+        return Ok(response);
     }
 
     [HttpGet("{userId}")]
-    public async Task<IActionResult> GetUserByIdAsync(int userId)
+    public async Task<ActionResult<BaseResponse<UserResponse>>> GetUserByIdAsync(int userId)
     {
-        UserResponse? result = await _userService.GetUserByIdAsync(userId).ConfigureAwait(false);
-        return Ok(result);
+        BaseResponse<UserResponse> response = new(ResponseStatus.Fail);
+
+        response.Data = await _userService.GetUserByIdAsync(userId).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
+
+        return Ok(response);
     }
+
     [Authorize(Roles = "ADMIN")]
     [HttpPost("add-role")]
-    public async Task<IActionResult> AddUserRoleAsync(UserRoleRequest roleRequest)
+    public async Task<ActionResult<BaseResponse<bool>>> AddUserRoleAsync(UserRoleRequest roleRequest)
     {
-        bool result = await _userService.AddUserRoleAsync(roleRequest.Email, roleRequest.Role).ConfigureAwait(false);
-        return Ok(result);
+        BaseResponse<bool> response = new(ResponseStatus.Fail);
+
+        response.Data = await _userService.AddUserRoleAsync(roleRequest.Email, roleRequest.Role).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
+
+        return Ok(response);
     }
 }

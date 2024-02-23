@@ -1,4 +1,5 @@
 using DotnetFoundation.Application.Interfaces.Services;
+using DotnetFoundation.Application.Models.Common;
 using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,28 +16,46 @@ public class AuthenticationController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> RegisterAsync(RegisterRequest request)
+    public async Task<ActionResult<BaseResponse<AuthenticationResponse>>> RegisterAsync(RegisterRequest request)
     {
-        AuthenticationResponse result = await _authenticationService.RegisterAsync(request).ConfigureAwait(false);
-        return Ok(result);
+        BaseResponse<AuthenticationResponse> response = new(ResponseStatus.Fail);
+        
+        response.Data = await _authenticationService.RegisterAsync(request).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
+
+        return Ok(response);
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> LoginAsync(LoginRequest request)
+    public async Task<ActionResult<BaseResponse<AuthenticationResponse>>> LoginAsync(LoginRequest request)
     {
-        AuthenticationResponse result = await _authenticationService.LoginAsync(request).ConfigureAwait(false);
-        return Ok(result);
+        BaseResponse<AuthenticationResponse> response = new(ResponseStatus.Fail);
+
+        response.Data = await _authenticationService.LoginAsync(request).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
+
+        return Ok(response);
     }
+
     [HttpPost("reset-password")]
-    public async Task<IActionResult> ResetPasswordAsync(PasswordResetRequest request)
+    public async Task<ActionResult<BaseResponse<AuthenticationResponse>>> ResetPasswordAsync(PasswordResetRequest request)
     {
-        AuthenticationResponse result = await _authenticationService.ResetPasswordAsync(request).ConfigureAwait(false);
-        return Ok(result);
+        BaseResponse<AuthenticationResponse> response = new(ResponseStatus.Fail);
+
+        response.Data = await _authenticationService.ResetPasswordAsync(request).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
+
+        return Ok(response);
     }
+
     [HttpPost("forgot-password")]
-    public async Task<IActionResult> ForgotPasswordAsync(string email)
+    public async Task<ActionResult<BaseResponse<string>>> ForgotPasswordAsync(string email)
     {
-        string result = await _authenticationService.ForgotPasswordAsync(email).ConfigureAwait(false);
-        return Ok(result);
+        BaseResponse<string> response = new(ResponseStatus.Fail);
+
+        response.Data = await _authenticationService.ForgotPasswordAsync(email).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
+
+        return Ok(response);
     }
 }
