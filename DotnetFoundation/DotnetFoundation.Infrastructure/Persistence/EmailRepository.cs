@@ -1,10 +1,10 @@
-using System.Net;
-using System.Text;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Domain.Entities;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using Microsoft.Extensions.Configuration;
+using System.Net;
+using System.Text;
 
 namespace DotnetFoundation.Infrastructure.Persistence;
 

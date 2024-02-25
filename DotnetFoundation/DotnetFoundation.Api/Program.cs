@@ -1,7 +1,7 @@
 using DotnetFoundation.Api;
 using DotnetFoundation.Application;
-using DotnetFoundation.Services;
 using DotnetFoundation.Infrastructure;
+using DotnetFoundation.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
