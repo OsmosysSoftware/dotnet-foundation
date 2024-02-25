@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\DotnetFoundation.Application\DotnetFoundation.Application.csproj" />
+    <ProjectReference Include="..\DotnetFoundation.Services\DotnetFoundation.Services.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />

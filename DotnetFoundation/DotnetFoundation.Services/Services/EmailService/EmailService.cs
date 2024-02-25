@@ -1,7 +1,7 @@
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Interfaces.Services;
 
-namespace DotnetFoundation.Application.Services.EmailService;
+namespace DotnetFoundation.Services.Services.EmailService;
 
 public class EmailService : IEmailService
 {

@@ -1,13 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DotnetFoundation.Application.Models.Enums;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DotnetFoundation.Application.Models.Common;
-
-public enum ResponseStatus
-{
-    Success,
-    Fail,
-    Error
-}
 
 public class BaseResponse<T>
 {

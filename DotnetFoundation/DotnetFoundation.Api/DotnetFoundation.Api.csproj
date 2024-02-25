@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DotnetFoundation.Application\DotnetFoundation.Application.csproj" />
     <ProjectReference Include="..\DotnetFoundation.Infrastructure\DotnetFoundation.Infrastructure.csproj" />
+    <ProjectReference Include="..\DotnetFoundation.Services\DotnetFoundation.Services.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="appsettings.json">

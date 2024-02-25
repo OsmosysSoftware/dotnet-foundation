@@ -1,5 +1,6 @@
 using DotnetFoundation.Api;
 using DotnetFoundation.Application;
+using DotnetFoundation.Services;
 using DotnetFoundation.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
@@ -56,6 +57,7 @@ builder.Services.AddHttpContextAccessor();
 
 // Modify builder for different layers
 builder.Services.AddApplication();
+builder.Services.AddServices();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 // Building application

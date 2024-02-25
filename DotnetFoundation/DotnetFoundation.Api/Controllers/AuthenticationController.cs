@@ -1,6 +1,7 @@
 using DotnetFoundation.Application.Interfaces.Services;
 using DotnetFoundation.Application.Models.Common;
 using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
+using DotnetFoundation.Application.Models.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DotnetFoundation.Api.Controllers;

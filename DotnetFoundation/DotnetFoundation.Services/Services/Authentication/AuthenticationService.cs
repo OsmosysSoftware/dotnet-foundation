@@ -1,10 +1,8 @@
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Interfaces.Services;
 using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
-using DotnetFoundation.Domain.Entities;
-using System.Security.Claims;
 
-namespace DotnetFoundation.Application.Services.Authentication;
+namespace DotnetFoundation.Services.Services.Authentication;
 
 public class AuthenticationService : IAuthenticationService
 {

@@ -5,7 +5,7 @@ using DotnetFoundation.Application.Models.DTOs.UserDTO;
 using DotnetFoundation.Domain.Entities;
 using DotnetFoundation.Domain.Enums;
 
-namespace DotnetFoundation.Application.Services.UserService;
+namespace DotnetFoundation.Services.Services.UserService;
 public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
