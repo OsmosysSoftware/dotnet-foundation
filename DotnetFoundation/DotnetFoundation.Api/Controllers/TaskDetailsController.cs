@@ -15,7 +15,7 @@ public class TaskDetailsController : ControllerBase
         _TaskDetailsService = TaskDetailsService;
     }
 
-    [HttpGet("all")]
+    [HttpGet]
     [Authorize]
     public async Task<IActionResult> GetAllTasksAsync()
     {
@@ -31,7 +31,7 @@ public class TaskDetailsController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("insert")]
+    [HttpPost]
     [Authorize]
     public async Task<IActionResult> InsertTaskAsync(TaskDetailsRequest detailRequest)
     {
@@ -39,7 +39,7 @@ public class TaskDetailsController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPut("update/{taskId}")]
+    [HttpPut("{taskId}")]
     [Authorize]
     public async Task<IActionResult> UpdateTaskAsync(int taskId, TaskDetailsRequest modifiedDetails)
     {
@@ -47,7 +47,7 @@ public class TaskDetailsController : ControllerBase
         return Ok(result);
     }
 
-    [HttpDelete("delete/{taskId}")]
+    [HttpDelete("{taskId}")]
     [Authorize]
     public async Task<IActionResult> DeleteTaskAsync(int taskId)
     {
