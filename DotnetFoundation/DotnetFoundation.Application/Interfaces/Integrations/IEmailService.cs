@@ -1,15 +1,15 @@
 ﻿namespace DotnetFoundation.Application.Interfaces.Integrations;
 
 /// <summary>
-/// Represents the repository interface for handling email operations.
+/// Provides functionality to send emails.
 /// </summary>
 public interface IEmailService
 {
     /// <summary>
-    /// Sends a forget password email to the specified email address.
+    /// Sends an email to the specified email address.
     /// </summary>
-    /// <param name="email">The email address to send the forget password email to.</param>
+    /// <param name="email">The email address to send the email to.</param>
     /// <param name="body">The body of the email.</param>
-    /// <returns>A task that represents the asynchronous send operation. The task result contains the email sending status.</returns>
+    /// <returns>A task that represents the asynchronous send operation. The task result contains the send result.</returns>
     public Task<string> SendForgetPasswordEmailAsync(string email, string body);
 }
