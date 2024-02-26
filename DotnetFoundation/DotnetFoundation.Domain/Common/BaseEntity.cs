@@ -6,7 +6,7 @@ public abstract class BaseEntity
     public int Id { get; set; }
     public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
     public int CreatedBy { get; set; }
-    public DateTime ModifiedOn { get; set; }
+    public DateTime ModifiedOn { get; set; } = DateTime.UtcNow;
     public int ModifiedBy { get; set; }
-    public Status Status { get; set; }
+    public Status Status { get; set; } = Status.ACTIVE;
 }
