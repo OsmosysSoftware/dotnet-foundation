@@ -33,7 +33,7 @@ public static class DependencyInjection
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
-                string JWT_KEY = configuration["Jwt:Key"] ?? throw new Exception("No JWT key specified");
+                string JWT_KEY = Environment.GetEnvironmentVariable("JWT_KEY") ?? throw new Exception("No JWT key specified");
 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {

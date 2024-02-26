@@ -44,7 +44,7 @@ public class UserRepository : IUserRepository
         {
             claims.Add(new Claim(ClaimTypes.Role, role));
         }
-        string JWT_KEY = _configuration["Jwt:Key"] ?? throw new Exception("No JWT configuration");
+        string JWT_KEY = Environment.GetEnvironmentVariable("JWT_KEY") ?? throw new Exception("No JWT configuration");
         SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JWT_KEY));
         SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
