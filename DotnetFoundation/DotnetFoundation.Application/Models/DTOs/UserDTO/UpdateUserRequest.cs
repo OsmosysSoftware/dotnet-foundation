@@ -5,4 +5,4 @@ using System.Threading.Tasks;
 
 namespace DotnetFoundation.Application.Models.DTOs.UserDTO;
 
-public record UpdateUserRequest(string FirstName, string? LastName, string? Country, string? PhoneNumber);
+public record UpdateUserRequest(string? FirstName, string? LastName, string? Country, string? PhoneNumber);
