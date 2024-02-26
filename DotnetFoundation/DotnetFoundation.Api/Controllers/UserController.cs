@@ -55,6 +55,48 @@ public class UserController : ControllerBase
     }
 
     /// <summary>
+    ///  Update user details by user id.
+    /// </summary>
+    /// <param name="userId">Id of user record</param>
+    /// <param name="updateUserRequest">user details updation request</param>
+    [HttpPut("{userId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<BaseResponse<UserResponse>>> UpdateUserAsync(int userId, [FromBody] UpdateUserRequest updateUserRequest)
+    {
+        BaseResponse<UserResponse> response = new(ResponseStatus.Fail);
+        if (updateUserRequest == null)
+        {
+            return BadRequest("Invalid request data");
+        }
+        response.Data = await _userService.UpdateUserAsync(userId, updateUserRequest).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
+
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Delete user by id.
+    /// </summary>
+    /// <param name="userId">Id of user record</param>
+    [HttpDelete("{userId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<BaseResponse<UserResponse>>> DeleteUserAsync(int userId)
+    {
+        BaseResponse<bool> response = new(ResponseStatus.Fail);
+
+        response.Data = await _userService.DeleteUserAsync(userId).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
+
+        return Ok(response);
+    }
+
+    /// <summary>
     /// Add new user role.
     /// Authorize - ADMIN role
     /// </summary>

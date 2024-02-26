@@ -1,6 +1,7 @@
 using DotnetFoundation.Application.Interfaces.Integrations;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
+using DotnetFoundation.Application.Models.DTOs.UserDTO;
 using DotnetFoundation.Domain.Entities;
 using DotnetFoundation.Domain.Enums;
 using DotnetFoundation.Infrastructure.Identity;
@@ -88,6 +89,8 @@ public class UserRepository : IUserRepository
             {
                 FirstName = request.FirstName,
                 LastName = request.LastName,
+                Country = request.Country,
+                PhoneNumber = request.PhoneNumber,
                 IdentityApplicationUserId = identityApplicationUser.Id
             };
 
@@ -117,7 +120,9 @@ public class UserRepository : IUserRepository
             {
                 Id = user.Id,
                 FirstName = user.FirstName,
-                LastName = user.LastName
+                LastName = user.LastName,
+                Country = user.Country,
+                PhoneNumber = user.PhoneNumber
             }).ToList();
         return users;
     }
@@ -183,6 +188,47 @@ public class UserRepository : IUserRepository
         IdentityApplicationUser identityApplicationUser = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new Exception("Error finding user");
         await _userManager.AddToRoleAsync(identityApplicationUser, newRole).ConfigureAwait(false);
         await _userManager.AddClaimAsync(identityApplicationUser, new Claim(ClaimTypes.Role, newRole)).ConfigureAwait(false);
+        return true;
+    }
+
+    public async Task<User?> UpdateUserAsync(int userId, UpdateUserRequest request)
+    {
+
+        ApplicationUser? user = await _dbContext.ApplicationUsers.FindAsync(userId).ConfigureAwait(false);
+        if (user == null)
+        {
+            return null; // User not found
+        }
+
+        // Validate and update properties
+        foreach (var property in typeof(UpdateUserRequest).GetProperties())
+        {
+            var requestValue = property.GetValue(request)?.ToString();
+            if (!string.IsNullOrEmpty(requestValue))
+            {
+                typeof(ApplicationUser).GetProperty(property.Name)?.SetValue(user, requestValue);
+            }
+        }
+
+        _dbContext.Entry(user).State = EntityState.Modified;
+        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+        return new User { Id = user.Id, FirstName = user.FirstName, LastName = user.LastName, Country = user.Country, PhoneNumber = user.PhoneNumber };
+    }
+
+
+    public async Task<bool> DeleteUserAsync(int userId)
+    {
+
+        ApplicationUser? user = await _dbContext.ApplicationUsers.FindAsync(userId).ConfigureAwait(false);
+        if (user == null)
+        {
+            return false; // User not found
+        }
+
+        _dbContext.ApplicationUsers.Remove(user);
+        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+
         return true;
     }
 }

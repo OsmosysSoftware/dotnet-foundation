@@ -34,4 +34,14 @@ public class UserService : IUserService
         bool res = await _userRepository.AddUserRoleAsync(email, role).ConfigureAwait(false);
         return res;
     }
+    public async Task<bool> DeleteUserAsync(int Id)
+    {
+        bool res = await _userRepository.DeleteUserAsync(Id).ConfigureAwait(false);
+        return res;
+    }
+    public async Task<UserResponse?> UpdateUserAsync(int Id, UpdateUserRequest request)
+    {
+        User res = await _userRepository.UpdateUserAsync(Id, request).ConfigureAwait(false) ?? throw new Exception("No user found");
+        return _mapper.Map<UserResponse>(res);
+    }
 }
