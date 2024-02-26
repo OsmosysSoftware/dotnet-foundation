@@ -115,21 +115,26 @@ public class UserRepository : IUserRepository
 
     public async Task<List<User>> GetAllUsersAsync()
     {
-        List<User> users = (await _dbContext.ApplicationUsers.ToListAsync().ConfigureAwait(false))
-            .Select(user => new User
-            {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Country = user.Country,
-                PhoneNumber = user.PhoneNumber
-            }).ToList();
+        List<User> users = (await _dbContext.ApplicationUsers
+                                                .Where(u => u.Status == Status.ACTIVE)
+                                                .ToListAsync().ConfigureAwait(false))
+                                                .Select(user => new User
+                                                {
+                                                    Id = user.Id,
+                                                    FirstName = user.FirstName,
+                                                    LastName = user.LastName,
+                                                    Country = user.Country,
+                                                    PhoneNumber = user.PhoneNumber
+                                                }).ToList();
         return users;
     }
 
     public async Task<User?> GetUserByIdAsync(int Id)
     {
-        ApplicationUser? user = await _dbContext.ApplicationUsers.FindAsync(Id).ConfigureAwait(false);
+        ApplicationUser? user = await _dbContext.ApplicationUsers
+                                                    .Where(u => u.Id == Id && u.Status == Status.ACTIVE)
+                                                    .FirstOrDefaultAsync()
+                                                    .ConfigureAwait(false);
         return user;
     }
 
@@ -195,15 +200,15 @@ public class UserRepository : IUserRepository
     {
 
         ApplicationUser? user = await _dbContext.ApplicationUsers.FindAsync(userId).ConfigureAwait(false);
-        if (user == null)
+        if (user == null || user.Status != Status.ACTIVE)
         {
             return null; // User not found
         }
 
         // Validate and update properties
-        foreach (var property in typeof(UpdateUserRequest).GetProperties())
+        foreach (System.Reflection.PropertyInfo property in typeof(UpdateUserRequest).GetProperties())
         {
-            var requestValue = property.GetValue(request)?.ToString();
+            string? requestValue = property.GetValue(request)?.ToString();
             if (!string.IsNullOrEmpty(requestValue))
             {
                 typeof(ApplicationUser).GetProperty(property.Name)?.SetValue(user, requestValue);
@@ -219,14 +224,18 @@ public class UserRepository : IUserRepository
 
     public async Task<bool> DeleteUserAsync(int userId)
     {
-
         ApplicationUser? user = await _dbContext.ApplicationUsers.FindAsync(userId).ConfigureAwait(false);
+
         if (user == null)
         {
             return false; // User not found
         }
 
-        _dbContext.ApplicationUsers.Remove(user);
+        user.Status = Status.INACTIVE;
+
+        // Update the entity state to Modified
+        _dbContext.Entry(user).State = EntityState.Modified;
+
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
 
         return true;
