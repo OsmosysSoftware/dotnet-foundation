@@ -49,10 +49,11 @@ public static class DependencyInjection
                     ValidateLifetime = true,
                     LifetimeValidator = (DateTime? notBefore, DateTime? expires, SecurityToken securityToken, TokenValidationParameters validationParameters) =>
                     {
+                        // Clone the validation parameters, and remove the defult lifetime validator
                         TokenValidationParameters clonedParameters = validationParameters.Clone();
                         clonedParameters.LifetimeValidator = null;
 
-                        // If token expiry time is not null, then validate lifetime
+                        // If token expiry time is not null, then validate lifetime with skewed clock
                         if (expires != null)
                         {
                             Validators.ValidateLifetime(notBefore, expires, securityToken, clonedParameters);

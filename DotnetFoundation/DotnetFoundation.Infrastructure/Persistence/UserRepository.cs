@@ -64,7 +64,7 @@ public class UserRepository : IUserRepository
 
     public async Task<string> AddUserAsync(RegisterRequest request)
     {
-        TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        using TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
         try
         {
