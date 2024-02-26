@@ -1,9 +1,9 @@
-namespace DotnetFoundation.Application.Interfaces.Persistence;
+﻿namespace DotnetFoundation.Application.Interfaces.Integrations;
 
 /// <summary>
 /// Represents the repository interface for handling email operations.
 /// </summary>
-public interface IEmailRepository
+public interface IEmailService
 {
     /// <summary>
     /// Sends a forget password email to the specified email address.
@@ -12,5 +12,4 @@ public interface IEmailRepository
     /// <param name="body">The body of the email.</param>
     /// <returns>A task that represents the asynchronous send operation. The task result contains the email sending status.</returns>
     public Task<string> SendForgetPasswordEmailAsync(string email, string body);
-
 }

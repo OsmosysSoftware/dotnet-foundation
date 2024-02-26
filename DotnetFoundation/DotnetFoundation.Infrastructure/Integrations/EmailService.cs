@@ -1,22 +1,22 @@
-using DotnetFoundation.Application.Interfaces.Persistence;
+﻿using DotnetFoundation.Application.Interfaces.Integrations;
 using DotnetFoundation.Domain.Entities;
+using DotnetFoundation.Domain.Enums;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using System.Net;
 using System.Text;
 
-namespace DotnetFoundation.Infrastructure.Persistence;
+namespace DotnetFoundation.Infrastructure.Integrations;
 
-public class EmailRepository : IEmailRepository
+public class EmailService : IEmailService
 {
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _configuration;
-    public EmailRepository(HttpClient httpClient, IConfiguration configuration)
+
+    public EmailService(HttpClient httpClient, IConfiguration configuration)
     {
         _httpClient = httpClient;
         _configuration = configuration;
-        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12; // Ensure secure connection
     }
 
     public async Task<string> SendForgetPasswordEmailAsync(string email, string body)
@@ -29,7 +29,7 @@ public class EmailRepository : IEmailRepository
         _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
         Notification payload = new Notification
         {
-            ChannelType = ChannelTypeEnum.MailGun,
+            ChannelType = ChannelType.MailGun,
             Data = new NotificationData
             {
                 From = _configuration["Notification:From"] ?? throw new Exception("From Address Missing"),
@@ -61,6 +61,7 @@ public class EmailRepository : IEmailRepository
             throw new Exception($"Failed to send notification. Status code: {response.StatusCode}");
         }
     }
+
     private static string ReadHtmlTemplate(string templatePath, string body)
     {
         string htmlContent = File.ReadAllText(templatePath);

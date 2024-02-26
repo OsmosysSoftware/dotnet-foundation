@@ -1,3 +1,4 @@
+using DotnetFoundation.Application.Interfaces.Integrations;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
 using DotnetFoundation.Domain.Entities;
@@ -21,15 +22,15 @@ public class UserRepository : IUserRepository
     private readonly SignInManager<IdentityApplicationUser> _signInManager;
     private readonly UserManager<IdentityApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
-    private readonly IEmailRepository _emailRepo;
-    public UserRepository(IConfiguration configuration, SqlDatabaseContext sqlDatabaseContext, SignInManager<IdentityApplicationUser> signinManager, RoleManager<IdentityRole> roleManager, UserManager<IdentityApplicationUser> userManager, IEmailRepository emailRepository)
+    private readonly IEmailService _emailService;
+    public UserRepository(IConfiguration configuration, SqlDatabaseContext sqlDatabaseContext, SignInManager<IdentityApplicationUser> signinManager, RoleManager<IdentityRole> roleManager, UserManager<IdentityApplicationUser> userManager, IEmailService emailService)
     {
         _dbContext = sqlDatabaseContext;
         _configuration = configuration;
         _roleManager = roleManager;
         _signInManager = signinManager;
         _userManager = userManager;
-        _emailRepo = emailRepository;
+        _emailService = emailService;
     }
 
     public string GenerateJwtToken(UserInfo user)
@@ -146,7 +147,7 @@ public class UserRepository : IUserRepository
         {
             IdentityApplicationUser user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new Exception("Invalid Email");
             string token = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false);
-            await _emailRepo.SendForgetPasswordEmailAsync(email, token).ConfigureAwait(false);
+            await _emailService.SendForgetPasswordEmailAsync(email, token).ConfigureAwait(false);
 
             return "Success";
         }

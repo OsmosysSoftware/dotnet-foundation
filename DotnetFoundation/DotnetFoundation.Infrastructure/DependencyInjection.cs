@@ -1,5 +1,7 @@
+using DotnetFoundation.Application.Interfaces.Integrations;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Infrastructure.Identity;
+using DotnetFoundation.Infrastructure.Integrations;
 using DotnetFoundation.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -69,7 +71,7 @@ public static class DependencyInjection
 
         // Configure service scope for repositories
         services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IEmailRepository, EmailRepository>();
+        services.AddScoped<IEmailService, EmailService>();
 
         services.AddHttpClient();
 

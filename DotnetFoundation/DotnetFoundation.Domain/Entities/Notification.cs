@@ -1,16 +1,6 @@
+using DotnetFoundation.Domain.Enums;
+
 namespace DotnetFoundation.Domain.Entities;
-
-public enum ChannelTypeEnum
-{
-    SMTP = 1,
-    MailGun = 2,
-    WhatsApp = 3
-}
-
-public enum EmailEvents
-{
-    ForgetPassword
-}
 
 public class NotificationData
 {
@@ -23,7 +13,7 @@ public class NotificationData
 
 public class Notification
 {
-    public ChannelTypeEnum ChannelType { get; set; }
+    public ChannelType ChannelType { get; set; }
     public NotificationData? Data { get; set; }
 }
 
