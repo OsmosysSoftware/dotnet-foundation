@@ -15,6 +15,7 @@ Clean Architecture is a software design philosophy that prioritizes the separati
 Clean architecture philosophy is that innermost core is independent and surrounding outer layers are depending on inner layers.
 
 ![Clean Architecture Diagram Onion View](./images/ca_diagram1.png)
+
 Fig. 1: Clean Architecture Diagram
 
 It is divided into the following parts, going from the innermost layer to the outer parts.
