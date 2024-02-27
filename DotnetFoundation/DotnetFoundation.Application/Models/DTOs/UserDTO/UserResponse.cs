@@ -17,4 +17,7 @@ public record UserResponse
     /// Gets the user's last name.
     /// </summary>
     public string? LastName { get; init; }
+    public string Email { get; init; }
+    public string? Country { get; init; }
+    public string? PhoneNumber { get; init; }
 }

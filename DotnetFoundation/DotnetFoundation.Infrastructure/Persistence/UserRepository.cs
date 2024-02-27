@@ -1,6 +1,7 @@
 using DotnetFoundation.Application.Interfaces.Integrations;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
+using DotnetFoundation.Application.Models.DTOs.UserDTO;
 using DotnetFoundation.Domain.Entities;
 using DotnetFoundation.Domain.Enums;
 using DotnetFoundation.Infrastructure.Identity;
@@ -88,6 +89,9 @@ public class UserRepository : IUserRepository
             {
                 FirstName = request.FirstName,
                 LastName = request.LastName,
+                Country = request.Country,
+                PhoneNumber = request.PhoneNumber,
+                Email = request.Email,
                 IdentityApplicationUserId = identityApplicationUser.Id
             };
 
@@ -112,20 +116,68 @@ public class UserRepository : IUserRepository
 
     public async Task<List<User>> GetAllUsersAsync()
     {
-        List<User> users = (await _dbContext.ApplicationUsers.ToListAsync().ConfigureAwait(false))
-            .Select(user => new User
-            {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName
-            }).ToList();
+        List<User> users = (await _dbContext.ApplicationUsers
+                                                .Where(u => u.Status == Status.ACTIVE)
+                                                .ToListAsync().ConfigureAwait(false))
+                                                .Select(user => new User
+                                                {
+                                                    Id = user.Id,
+                                                    FirstName = user.FirstName,
+                                                    LastName = user.LastName,
+                                                    Country = user.Country,
+                                                    PhoneNumber = user.PhoneNumber
+                                                }).ToList();
         return users;
     }
 
     public async Task<User?> GetUserByIdAsync(int Id)
     {
-        ApplicationUser? user = await _dbContext.ApplicationUsers.FindAsync(Id).ConfigureAwait(false);
+        ApplicationUser? user = await _dbContext.ApplicationUsers
+                                                    .Where(u => u.Id == Id && u.Status == Status.ACTIVE)
+                                                    .FirstOrDefaultAsync()
+                                                    .ConfigureAwait(false);
         return user;
+    }
+    public async Task<User?> UpdateUserAsync(int userId, UpdateUserRequest request)
+    {
+
+        ApplicationUser? user = await _dbContext.ApplicationUsers.FindAsync(userId).ConfigureAwait(false);
+        if (user == null || user.Status != Status.ACTIVE)
+        {
+            return null; // User not found
+        }
+
+        // Validate and update properties
+        foreach (System.Reflection.PropertyInfo property in typeof(UpdateUserRequest).GetProperties())
+        {
+            string? requestValue = property.GetValue(request)?.ToString();
+            if (!string.IsNullOrEmpty(requestValue))
+            {
+                typeof(ApplicationUser).GetProperty(property.Name)?.SetValue(user, requestValue);
+            }
+        }
+
+        _dbContext.Entry(user).State = EntityState.Modified;
+        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+        return new User { Id = user.Id, FirstName = user.FirstName, LastName = user.LastName, Country = user.Country, PhoneNumber = user.PhoneNumber };
+    }
+    public async Task<bool> DeleteUserAsync(int userId)
+    {
+
+        ApplicationUser? user = await _dbContext.ApplicationUsers.FindAsync(userId).ConfigureAwait(false);
+        if (user == null)
+        {
+            return false; // User not found
+        }
+
+        _dbContext.ApplicationUsers.Remove(user);
+        user.Status = Status.INACTIVE;
+        // Update the entity state to Modified
+        _dbContext.Entry(user).State = EntityState.Modified;
+        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+        return true;
     }
 
     public async Task<string> LoginUserAsync(LoginRequest request)
