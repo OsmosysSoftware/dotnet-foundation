@@ -1,10 +1,9 @@
-using System.ComponentModel.DataAnnotations;
+using DotnetFoundation.Domain.Common;
 
 namespace DotnetFoundation.Domain.Entities;
 
-public class User
+public class User : BaseEntity
 {
-    public int Id;
-    public string FirstName { get; set; } = null!;
+    public string FirstName { get; set; }
     public string? LastName { get; set; }
 }

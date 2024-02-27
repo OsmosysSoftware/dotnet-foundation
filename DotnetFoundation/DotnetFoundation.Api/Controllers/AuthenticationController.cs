@@ -1,5 +1,7 @@
-using DotnetFoundation.Application.DTO.AuthenticationDTO;
 using DotnetFoundation.Application.Interfaces.Services;
+using DotnetFoundation.Application.Models.Common;
+using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
+using DotnetFoundation.Application.Models.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DotnetFoundation.Api.Controllers;
@@ -14,29 +16,75 @@ public class AuthenticationController : ControllerBase
         _authenticationService = authenticationService;
     }
 
+    /// <summary>
+    /// User registration.
+    /// </summary>
+    /// <param name="request">New user registration request</param>
     [HttpPost("register")]
-    public async Task<IActionResult> RegisterAsync(RegisterRequest request)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<BaseResponse<AuthenticationResponse>>> RegisterAsync(RegisterRequest request)
     {
-        AuthenticationResponse result = await _authenticationService.RegisterAsync(request).ConfigureAwait(false);
-        return Ok(result);
+        BaseResponse<AuthenticationResponse> response = new(ResponseStatus.Fail);
+
+        response.Data = await _authenticationService.RegisterAsync(request).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
+
+        return Ok(response);
     }
 
+    /// <summary>
+    /// User login.
+    /// </summary>
+    /// <param name="request">User login request</param>
     [HttpPost("login")]
-    public async Task<IActionResult> LoginAsync(LoginRequest request)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<BaseResponse<AuthenticationResponse>>> LoginAsync(LoginRequest request)
     {
-        AuthenticationResponse result = await _authenticationService.LoginAsync(request).ConfigureAwait(false);
-        return Ok(result);
+        BaseResponse<AuthenticationResponse> response = new(ResponseStatus.Fail);
+
+        response.Data = await _authenticationService.LoginAsync(request).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
+
+        return Ok(response);
     }
+
+    /// <summary>
+    /// User password reset using reset token.
+    /// </summary>
+    /// <param name="request">New password details request</param>
     [HttpPost("reset-password")]
-    public async Task<IActionResult> ResetPasswordAsync(PasswordResetRequest request)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<BaseResponse<AuthenticationResponse>>> ResetPasswordAsync(PasswordResetRequest request)
     {
-        AuthenticationResponse result = await _authenticationService.ResetPasswordAsync(request).ConfigureAwait(false);
-        return Ok(result);
+        BaseResponse<AuthenticationResponse> response = new(ResponseStatus.Fail);
+
+        response.Data = await _authenticationService.ResetPasswordAsync(request).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
+
+        return Ok(response);
     }
+
+    /// <summary>
+    /// Forgot user password.
+    /// </summary>
+    /// <param name="email">Email of user to reset password</param>
     [HttpPost("forgot-password")]
-    public async Task<IActionResult> ForgotPasswordAsync(string email)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<BaseResponse<string>>> ForgotPasswordAsync(string email)
     {
-        string result = await _authenticationService.ForgotPasswordAsync(email).ConfigureAwait(false);
-        return Ok(result);
+        BaseResponse<string> response = new(ResponseStatus.Fail);
+
+        response.Data = await _authenticationService.ForgotPasswordAsync(email).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
+
+        return Ok(response);
     }
 }
