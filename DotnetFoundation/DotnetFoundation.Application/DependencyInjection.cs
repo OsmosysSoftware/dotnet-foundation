@@ -1,17 +1,26 @@
+using DotnetFoundation.Application.Models.Common;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace DotnetFoundation.Application;
 
-using DotnetFoundation.Application.Interfaces.Services;
-using DotnetFoundation.Application.Services.Authentication;
-using DotnetFoundation.Application.Services.EmailService;
-using DotnetFoundation.Application.Services.UserService;
-using Microsoft.Extensions.DependencyInjection;
+/// <summary>
+/// Configures services for the application layer.
+/// </summary>
+/// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
+/// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
 public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        services.AddScoped<IAuthenticationService, AuthenticationService>();
-        services.AddScoped<IUserService, UserService>();
-        services.AddScoped<IEmailService, EmailService>();
+        // Configure Error Response from Model Validations
+        services.AddMvc().ConfigureApiBehaviorOptions(options =>
+        {
+            options.InvalidModelStateResponseFactory = actionContext =>
+            {
+                return ModelValidationBadRequest.ModelValidationErrorResponse(actionContext);
+            };
+        });
+
         return services;
     }
 }

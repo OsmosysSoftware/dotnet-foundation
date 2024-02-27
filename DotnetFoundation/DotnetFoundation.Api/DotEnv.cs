@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace DotnetFoundation.Api;
 
 public static class DotEnv

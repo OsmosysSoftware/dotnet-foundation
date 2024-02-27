@@ -1,5 +1,4 @@
-using DotnetFoundation.Application.DTO.AuthenticationDTO;
-using DotnetFoundation.Domain.Entities;
+using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
 
 namespace DotnetFoundation.Application.Interfaces.Services;
 
