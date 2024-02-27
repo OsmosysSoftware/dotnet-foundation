@@ -1,4 +1,3 @@
-using DotnetFoundation.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace DotnetFoundation.Infrastructure.Identity;
