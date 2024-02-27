@@ -1,5 +1,6 @@
 using DotnetFoundation.Application.Models.DTOs.UserDTO;
 using DotnetFoundation.Domain.Enums;
+
 namespace DotnetFoundation.Application.Interfaces.Services;
 
 public interface IUserService

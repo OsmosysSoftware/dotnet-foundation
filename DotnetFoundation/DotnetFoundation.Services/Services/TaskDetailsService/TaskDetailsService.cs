@@ -1,45 +1,35 @@
-using DotnetFoundation.Application.DTO.TaskDetailsDTO;
+using AutoMapper;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Interfaces.Services;
+using DotnetFoundation.Application.Models.DTOs.TaskDetailsDTO;
+using DotnetFoundation.Application.Models.DTOs.UserDTO;
 using DotnetFoundation.Domain.Entities;
-using System.Security.Claims;
+using DotnetFoundation.Domain.Enums;
 
-namespace DotnetFoundation.Application.Services.TaskDetailsService;
+namespace DotnetFoundation.Services.Services.TaskDetailsService;
 
 public class TaskDetailsService : ITaskDetailsService
 {
     private readonly ITaskDetailsRepository _taskDetailsRepository;
-    public TaskDetailsService(ITaskDetailsRepository taskDetailsRepository)
+    private readonly IMapper _mapper;
+
+    public TaskDetailsService(ITaskDetailsRepository taskDetailsRepository, IMapper mapper)
     {
         _taskDetailsRepository = taskDetailsRepository;
+        _mapper = mapper;
     }
 
-    private static TaskDetailsResponse TaskDTOMapper(TaskDetails details)
-    {
-        return new(
-            Id: details.Id,
-            Description: details.Description,
-            BudgetedHours: details.BudgetedHours,
-            AssignedTo: details.AssignedTo,
-            Category: details.Category,
-            Status: details.Status,
-            CreatedOn: details.CreatedOn,
-            CreatedBy: details.CreatedBy,
-            ModifiedOn: details.ModifiedOn,
-            ModifiedBy: details.ModifiedBy
-        );
-    }
 
     public async Task<List<TaskDetailsResponse>> GetAllTasksAsync()
     {
-        List<TaskDetailsResponse> response = (await _taskDetailsRepository.GetAllTasksAsync().ConfigureAwait(false)).Select(TaskDTOMapper).ToList();
-        return response;
+        List<TaskDetails> response = await _taskDetailsRepository.GetAllTasksAsync().ConfigureAwait(false);
+        return _mapper.Map<List<TaskDetailsResponse>>(response);
     }
 
     public async Task<TaskDetailsResponse?> GetTaskByIdAsync(int id)
     {
         TaskDetails res = await _taskDetailsRepository.GetTaskByIdAsync(id).ConfigureAwait(false) ?? throw new Exception($"Task with Id={id} does not exist");
-        return TaskDTOMapper(res);
+        return _mapper.Map<TaskDetailsResponse>(res);
     }
 
     public async Task<string> InsertTaskAsync(TaskDetailsRequest detailsRequest)
@@ -68,7 +58,7 @@ public class TaskDetailsService : ITaskDetailsService
         }
     }
 
-        public async Task<string> DeleteTaskAsync(int id)
+    public async Task<string> DeleteTaskAsync(int id)
     {
         try
         {

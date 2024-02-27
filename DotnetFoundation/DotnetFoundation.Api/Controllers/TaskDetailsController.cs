@@ -1,5 +1,7 @@
-using DotnetFoundation.Application.DTO.TaskDetailsDTO;
 using DotnetFoundation.Application.Interfaces.Services;
+using DotnetFoundation.Application.Models.Common;
+using DotnetFoundation.Application.Models.DTOs.TaskDetailsDTO;
+using DotnetFoundation.Application.Models.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,43 +17,96 @@ public class TaskDetailsController : ControllerBase
         _TaskDetailsService = TaskDetailsService;
     }
 
+    /// <summary>
+    /// Get all task records.
+    /// </summary>
     [HttpGet]
     [Authorize]
-    public async Task<IActionResult> GetAllTasksAsync()
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<BaseResponse<List<TaskDetailsResponse>>>> GetAllTasksAsync()
     {
-        List<TaskDetailsResponse> result = await _TaskDetailsService.GetAllTasksAsync().ConfigureAwait(false);
-        return Ok(result);
+        BaseResponse<List<TaskDetailsResponse>> response = new(ResponseStatus.Fail);
+
+        response.Data = await _TaskDetailsService.GetAllTasksAsync().ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
+
+        return Ok(response);
     }
 
+    /// <summary>
+    /// Get task details by Id.
+    /// </summary>
+    /// <param name="taskId">Id of task record</param>
     [HttpGet("{taskId}")]
     [Authorize]
-    public async Task<IActionResult> GetTaskByIdAsync(int taskId)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<BaseResponse<TaskDetailsResponse>>> GetTaskByIdAsync(int taskId)
     {
-        TaskDetailsResponse? result = await _TaskDetailsService.GetTaskByIdAsync(taskId).ConfigureAwait(false);
-        return Ok(result);
+        BaseResponse<TaskDetailsResponse> response = new(ResponseStatus.Fail);
+
+        response.Data = await _TaskDetailsService.GetTaskByIdAsync(taskId).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
+
+        return Ok(response);
     }
 
+    /// <summary>
+    /// Add new task.
+    /// </summary>
+    /// <param name="detailRequest">Role request details</param>
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> InsertTaskAsync(TaskDetailsRequest detailRequest)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<BaseResponse<string>>> InsertTaskAsync(TaskDetailsRequest detailRequest)
     {
-        string result = await _TaskDetailsService.InsertTaskAsync(detailRequest).ConfigureAwait(false);
-        return Ok(result);
+        BaseResponse<string> response = new(ResponseStatus.Fail);
+
+        response.Data = await _TaskDetailsService.InsertTaskAsync(detailRequest).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
+
+        return Ok(response);
     }
 
+    /// <summary>
+    /// Update details of a task when the Id is passed.
+    /// </summary>
+    /// <param name="taskId">Id of task record</param>
+    /// <param name="modifiedDetails">Modified details for inputted task record</param>
     [HttpPut("{taskId}")]
     [Authorize]
-    public async Task<IActionResult> UpdateTaskAsync(int taskId, TaskDetailsRequest modifiedDetails)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<BaseResponse<string>>> UpdateTaskAsync(int taskId, TaskDetailsRequest modifiedDetails)
     {
-        string result = await _TaskDetailsService.UpdateTaskAsync(taskId, modifiedDetails).ConfigureAwait(false);
-        return Ok(result);
+        BaseResponse<string> response = new(ResponseStatus.Fail);
+
+        response.Data = await _TaskDetailsService.UpdateTaskAsync(taskId, modifiedDetails).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
+
+        return Ok(response);
     }
 
+    /// <summary>
+    /// Delete a task record.
+    /// </summary>
+    /// <param name="taskId">Id of task record</param>
     [HttpDelete("{taskId}")]
     [Authorize]
-    public async Task<IActionResult> DeleteTaskAsync(int taskId)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<BaseResponse<string>>> DeleteTaskAsync(int taskId)
     {
-        string result = await _TaskDetailsService.DeleteTaskAsync(taskId).ConfigureAwait(false);
-        return Ok(result);
+        BaseResponse<string> response = new(ResponseStatus.Fail);
+
+        response.Data = await _TaskDetailsService.DeleteTaskAsync(taskId).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
+
+        return Ok(response);
     }
 }

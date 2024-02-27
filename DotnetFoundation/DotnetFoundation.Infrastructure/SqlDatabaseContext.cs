@@ -12,7 +12,7 @@ public class SqlDatabaseContext : IdentityDbContext<IdentityApplicationUser>
 
     }
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
-    public DbSet<TaskDetails> TaskDetailsDbSet { get; set; }
+    public DbSet<TaskDetails> TaskDetails { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

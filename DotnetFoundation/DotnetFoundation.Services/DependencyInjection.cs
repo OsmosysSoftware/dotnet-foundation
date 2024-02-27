@@ -1,5 +1,6 @@
 ﻿using DotnetFoundation.Application.Interfaces.Services;
 using DotnetFoundation.Services.Services.Authentication;
+using DotnetFoundation.Services.Services.TaskDetailsService;
 using DotnetFoundation.Services.Services.UserService;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,6 +12,7 @@ public static class DependencyInjection
         // Configure service scope for services / BLLs
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<ITaskDetailsService, TaskDetailsService>();
 
         return services;
     }
