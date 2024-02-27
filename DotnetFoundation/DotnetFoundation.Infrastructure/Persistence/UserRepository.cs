@@ -164,16 +164,24 @@ public class UserRepository : IUserRepository
     }
     public async Task<bool> DeleteUserAsync(int userId)
     {
+        IdentityApplicationUser? identityUser = await _userManager.FindByIdAsync(userId.ToString()).ConfigureAwait(false);
+        if (identityUser == null)
+        {
+            return false; // User not found
+        }
 
+        // Disable user login
+        await _userManager.SetLockoutEnabledAsync(identityUser, true).ConfigureAwait(false);
+        await _userManager.SetLockoutEndDateAsync(identityUser, DateTimeOffset.MaxValue).ConfigureAwait(false);
+
+        // Soft delete from the user table
         ApplicationUser? user = await _dbContext.ApplicationUsers.FindAsync(userId).ConfigureAwait(false);
         if (user == null)
         {
             return false; // User not found
         }
 
-        _dbContext.ApplicationUsers.Remove(user);
         user.Status = Status.INACTIVE;
-        // Update the entity state to Modified
         _dbContext.Entry(user).State = EntityState.Modified;
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
 
