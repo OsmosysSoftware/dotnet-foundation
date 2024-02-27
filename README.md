@@ -10,7 +10,7 @@ This project uses modern features of dotnet such as Clean Architecture and AspNe
 
 1. [Clean Architecture](./docs/clean-architecture.md)
 2. [AspNetCore.Identity](./docs/aspnetcore-identity.md)
-3. [ApiDocumetation](./docs/api-documentation.md)
+3. [API Documentation](./docs/api-documentation.md)
 
 ## Development Setup
 
