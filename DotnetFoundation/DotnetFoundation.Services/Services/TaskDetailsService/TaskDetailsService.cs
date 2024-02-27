@@ -2,9 +2,7 @@ using AutoMapper;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Interfaces.Services;
 using DotnetFoundation.Application.Models.DTOs.TaskDetailsDTO;
-using DotnetFoundation.Application.Models.DTOs.UserDTO;
 using DotnetFoundation.Domain.Entities;
-using DotnetFoundation.Domain.Enums;
 
 namespace DotnetFoundation.Services.Services.TaskDetailsService;
 
@@ -23,6 +21,12 @@ public class TaskDetailsService : ITaskDetailsService
     public async Task<List<TaskDetailsResponse>> GetAllTasksAsync()
     {
         List<TaskDetails> response = await _taskDetailsRepository.GetAllTasksAsync().ConfigureAwait(false);
+        return _mapper.Map<List<TaskDetailsResponse>>(response);
+    }
+
+    public async Task<List<TaskDetailsResponse>> GetActiveTasksAsync()
+    {
+        List<TaskDetails> response = await _taskDetailsRepository.GetActiveTasksAsync().ConfigureAwait(false);
         return _mapper.Map<List<TaskDetailsResponse>>(response);
     }
 
@@ -50,6 +54,19 @@ public class TaskDetailsService : ITaskDetailsService
         try
         {
             string res = await _taskDetailsRepository.UpdateTaskAsync(id, modifiedDetails).ConfigureAwait(false);
+            return res;
+        }
+        catch (Exception ex)
+        {
+            return $"An error occurred while updating Task with id = \"{id}\": {ex.Message}";
+        }
+    }
+
+    public async Task<string> InactiveTaskAsync(int id)
+    {
+        try
+        {
+            string res = await _taskDetailsRepository.InactiveTaskAsync(id).ConfigureAwait(false);
             return res;
         }
         catch (Exception ex)

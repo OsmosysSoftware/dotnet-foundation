@@ -36,6 +36,27 @@ public class TaskDetailsRepository : ITaskDetailsRepository
         return taskObj;
     }
 
+    public async Task<List<TaskDetails>> GetActiveTasksAsync()
+    {
+        List<TaskDetails> taskObj = (await _dbContext.TaskDetails
+            .Where(task => task.Status == Status.ACTIVE)
+            .ToListAsync().ConfigureAwait(false))
+            .Select(taskObj => new TaskDetails
+            {
+                Id = taskObj.Id,
+                Description = taskObj.Description,
+                BudgetedHours = taskObj.BudgetedHours,
+                AssignedTo = taskObj.AssignedTo,
+                Category = taskObj.Category,
+                Status = taskObj.Status,
+                CreatedOn = taskObj.CreatedOn,
+                CreatedBy = taskObj.CreatedBy,
+                ModifiedOn = taskObj.ModifiedOn,
+                ModifiedBy = taskObj.ModifiedBy
+            }).ToList();
+        return taskObj;
+    }
+
     public async Task<TaskDetails?> GetTaskByIdAsync(int id)
     {
         TaskDetails? taskObj = await _dbContext.TaskDetails.FindAsync(id).ConfigureAwait(false);
@@ -107,6 +128,21 @@ public class TaskDetailsRepository : ITaskDetailsRepository
 
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
         return $"Successfully updated Task id = \"{id}\" with description: \"{existingDetails.Description}\"";;
+    }
+
+    public async Task<string> InactiveTaskAsync(int id)
+    {
+        TaskDetails? existingDetails = await _dbContext.TaskDetails.FindAsync(id).ConfigureAwait(false);
+        if (existingDetails == null)
+        {
+            throw new Exception($"Task with Id = \"{id}\" does not exist");
+        }
+
+        existingDetails.Status = Status.INACTIVE;
+        existingDetails.ModifiedOn = DateTime.UtcNow;
+
+        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+        return $"Task id = \"{id}\" is INACTIVE";
     }
 
     public async Task<string> DeleteTaskAsync(int id)

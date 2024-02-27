@@ -18,7 +18,7 @@ public class TaskDetailsController : ControllerBase
     }
 
     /// <summary>
-    /// Get all task records.
+    /// Get all tasks.
     /// </summary>
     [HttpGet]
     [Authorize]
@@ -29,6 +29,23 @@ public class TaskDetailsController : ControllerBase
         BaseResponse<List<TaskDetailsResponse>> response = new(ResponseStatus.Fail);
 
         response.Data = await _TaskDetailsService.GetAllTasksAsync().ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
+
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Get all active tasks.
+    /// </summary>
+    [HttpGet("active")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<BaseResponse<List<TaskDetailsResponse>>>> GetActiveTasksAsync()
+    {
+        BaseResponse<List<TaskDetailsResponse>> response = new(ResponseStatus.Fail);
+
+        response.Data = await _TaskDetailsService.GetActiveTasksAsync().ConfigureAwait(false);
         response.Status = ResponseStatus.Success;
 
         return Ok(response);
@@ -77,7 +94,7 @@ public class TaskDetailsController : ControllerBase
     /// Update details of a task when the Id is passed.
     /// </summary>
     /// <param name="taskId">Id of task record</param>
-    /// <param name="modifiedDetails">Modified details for inputted task record</param>
+    /// <param name="modifiedDetails">Modified details for task record</param>
     [HttpPut("{taskId}")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -93,7 +110,25 @@ public class TaskDetailsController : ControllerBase
     }
 
     /// <summary>
-    /// Delete a task record.
+    /// Change status of task to inactive.
+    /// </summary>
+    /// <param name="taskId">Id of task record</param>
+    [HttpPut("inactive/{taskId}")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<BaseResponse<string>>> InactiveTaskAsync(int taskId)
+    {
+        BaseResponse<string> response = new(ResponseStatus.Fail);
+
+        response.Data = await _TaskDetailsService.InactiveTaskAsync(taskId).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
+
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Delete a task.
     /// </summary>
     /// <param name="taskId">Id of task record</param>
     [HttpDelete("{taskId}")]
