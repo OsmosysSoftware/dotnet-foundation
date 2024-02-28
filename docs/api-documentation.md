@@ -114,7 +114,7 @@ Here is a step-by-step breakdown of the user registration flow:
 
 4. **AuthenticationService Processing**
 
-   - The `AuthenticationService` is responsible for processing the registration request.It interacts with the `UserRepository` to handle user-related database operations.
+   The `AuthenticationService` is responsible for processing the registration request.It interacts with the `UserRepository` to handle user-related database operations.
 
 5. **UserRepository Database Interaction**
 
@@ -215,7 +215,7 @@ Here is a step-by-step breakdown of the forgot password flow:
 
 5. **UserRepository Database Interaction**
 
-   The `UserRepository` interacts with the database (Entity Framework) to:
+   The `UserRepository` interacts with the database to:
 
    - Use `UserManager.FindByEmailAsync` to find a user by email.
    - Generate a password reset token using `GeneratePasswordResetTokenAsync` provided by `UserManager` Component of Asp.Net Identity.
@@ -292,7 +292,8 @@ Here is a step-by-step breakdown of the reset password flow:
 
 5. **UserRepository Database Interaction**
 
-   The `UserRepository` interacts with the database (Entity Framework) to:
+   The `UserRepository` interacts with the database to:
+
    - Use `UserManager<IdentityApplicationUser>` to find the user by email.
    - Reset the user's password using `ResetPasswordAsync` function provided by UserManger of Asp.Net Identity.
 
