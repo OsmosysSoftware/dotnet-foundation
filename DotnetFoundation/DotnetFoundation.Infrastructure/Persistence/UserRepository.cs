@@ -131,10 +131,10 @@ public class UserRepository : IUserRepository
         return users;
     }
 
-    public async Task<User?> GetUserByIdAsync(int Id)
+    public async Task<User?> GetUserByIdAsync(int userId)
     {
         ApplicationUser? user = await _dbContext.ApplicationUsers
-                                                    .Where(u => u.Id == Id && u.Status == Status.ACTIVE)
+                                                    .Where(u => u.Id == userId && u.Status == Status.ACTIVE)
                                                     .FirstOrDefaultAsync()
                                                     .ConfigureAwait(false);
         return user;
