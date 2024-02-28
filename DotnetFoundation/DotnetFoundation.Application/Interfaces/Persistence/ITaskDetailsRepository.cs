@@ -13,5 +13,5 @@ public interface ITaskDetailsRepository
     public Task<TaskDetails?> GetTaskByIdAsync(int Id);
     public Task<TaskDetails?> InsertTaskAsync(TaskDetailsRequest request);
     public Task<TaskDetails?> UpdateTaskAsync(int id, TaskDetailsRequest modifiedDetails);
-    public Task<string> InactiveTaskAsync(int id);
+    public Task<TaskDetails?> InactiveTaskAsync(int id);
 }

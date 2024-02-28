@@ -117,9 +117,9 @@ public class TaskDetailsController : ControllerBase
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<string>>> InactiveTaskAsync(int taskId)
+    public async Task<ActionResult<BaseResponse<TaskDetailsResponse>>> InactiveTaskAsync(int taskId)
     {
-        BaseResponse<string> response = new(ResponseStatus.Fail);
+        BaseResponse<TaskDetailsResponse> response = new(ResponseStatus.Fail);
 
         response.Data = await _TaskDetailsService.InactiveTaskAsync(taskId).ConfigureAwait(false);
         response.Status = ResponseStatus.Success;

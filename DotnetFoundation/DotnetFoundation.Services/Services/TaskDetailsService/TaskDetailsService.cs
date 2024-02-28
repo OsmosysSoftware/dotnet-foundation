@@ -51,16 +51,10 @@ public class TaskDetailsService : ITaskDetailsService
         return _mapper.Map<TaskDetailsResponse>(res);
     }
 
-    public async Task<string> InactiveTaskAsync(int id)
+    public async Task<TaskDetailsResponse> InactiveTaskAsync(int id)
     {
-        try
-        {
-            string res = await _taskDetailsRepository.InactiveTaskAsync(id).ConfigureAwait(false);
-            return res;
-        }
-        catch (Exception ex)
-        {
-            return $"Error while deactivating Task id = \"{id}\": {ex.Message}";
-        }
+        TaskDetails? res = await _taskDetailsRepository.InactiveTaskAsync(id).ConfigureAwait(false)
+            ?? throw new Exception($"Error while deactivating Task id = \"{id}\"");
+        return _mapper.Map<TaskDetailsResponse>(res);
     }
 }

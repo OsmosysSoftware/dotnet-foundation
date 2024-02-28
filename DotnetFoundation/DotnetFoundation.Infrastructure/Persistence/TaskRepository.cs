@@ -2,37 +2,21 @@ using DotnetFoundation.Application.Models.DTOs.TaskDetailsDTO;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using DotnetFoundation.Domain.Enums;
 
 namespace DotnetFoundation.Infrastructure.Persistence;
 
 public class TaskDetailsRepository : ITaskDetailsRepository
 {
-    private readonly IConfiguration _configuration;
     private readonly SqlDatabaseContext _dbContext;
-    public TaskDetailsRepository(IConfiguration configuration, SqlDatabaseContext sqlDatabaseContext)
+    public TaskDetailsRepository(SqlDatabaseContext sqlDatabaseContext)
     {
         _dbContext = sqlDatabaseContext;
-        _configuration = configuration;
     }
 
     public async Task<List<TaskDetails>> GetAllTasksAsync()
     {
-        List<TaskDetails> taskObj = (await _dbContext.TaskDetails.ToListAsync().ConfigureAwait(false))
-            .Select(taskObj => new TaskDetails
-            {
-                Id = taskObj.Id,
-                Description = taskObj.Description,
-                BudgetedHours = taskObj.BudgetedHours,
-                AssignedTo = taskObj.AssignedTo,
-                Category = taskObj.Category,
-                Status = taskObj.Status,
-                CreatedOn = taskObj.CreatedOn,
-                CreatedBy = taskObj.CreatedBy,
-                ModifiedOn = taskObj.ModifiedOn,
-                ModifiedBy = taskObj.ModifiedBy
-            }).ToList();
+        List<TaskDetails> taskObj = await _dbContext.TaskDetails.ToListAsync().ConfigureAwait(false);
         return taskObj;
     }
 
@@ -40,20 +24,7 @@ public class TaskDetailsRepository : ITaskDetailsRepository
     {
         List<TaskDetails> taskObj = (await _dbContext.TaskDetails
             .Where(task => task.Status == Status.ACTIVE)
-            .ToListAsync().ConfigureAwait(false))
-            .Select(taskObj => new TaskDetails
-            {
-                Id = taskObj.Id,
-                Description = taskObj.Description,
-                BudgetedHours = taskObj.BudgetedHours,
-                AssignedTo = taskObj.AssignedTo,
-                Category = taskObj.Category,
-                Status = taskObj.Status,
-                CreatedOn = taskObj.CreatedOn,
-                CreatedBy = taskObj.CreatedBy,
-                ModifiedOn = taskObj.ModifiedOn,
-                ModifiedBy = taskObj.ModifiedBy
-            }).ToList();
+            .ToListAsync().ConfigureAwait(false));
         return taskObj;
     }
 
@@ -133,25 +104,18 @@ public class TaskDetailsRepository : ITaskDetailsRepository
         return existingDetails;
     }
 
-    public async Task<string> InactiveTaskAsync(int id)
+    public async Task<TaskDetails?> InactiveTaskAsync(int id)
     {
-        try
+        TaskDetails? existingDetails = await _dbContext.TaskDetails.FindAsync(id).ConfigureAwait(false);
+        if (existingDetails == null)
         {
-            TaskDetails? existingDetails = await _dbContext.TaskDetails.FindAsync(id).ConfigureAwait(false);
-            if (existingDetails == null)
-            {
-                throw new Exception($"Task with Id = \"{id}\" does not exist");
-            }
-
-            existingDetails.Status = Status.INACTIVE;
-            existingDetails.ModifiedOn = DateTime.UtcNow;
-
-            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
-            return $"Task id = \"{id}\" is INACTIVE";
+            throw new Exception($"Task with Id = \"{id}\" does not exist");
         }
-        catch (Exception ex)
-        {
-            return $"Error while deactivating Task id = \"{id}\": {ex.Message}";
-        }
+
+        existingDetails.Status = Status.INACTIVE;
+        existingDetails.ModifiedOn = DateTime.UtcNow;
+
+        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+        return existingDetails;
     }
 }
