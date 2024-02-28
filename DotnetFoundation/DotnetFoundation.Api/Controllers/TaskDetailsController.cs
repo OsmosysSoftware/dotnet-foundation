@@ -80,9 +80,9 @@ public class TaskDetailsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<string>>> InsertTaskAsync(TaskDetailsRequest detailRequest)
+    public async Task<ActionResult<BaseResponse<TaskDetailsResponse>>> InsertTaskAsync(TaskDetailsRequest detailRequest)
     {
-        BaseResponse<string> response = new(ResponseStatus.Fail);
+        BaseResponse<TaskDetailsResponse> response = new(ResponseStatus.Fail);
 
         response.Data = await _TaskDetailsService.InsertTaskAsync(detailRequest).ConfigureAwait(false);
         response.Status = ResponseStatus.Success;
@@ -99,9 +99,9 @@ public class TaskDetailsController : ControllerBase
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<string>>> UpdateTaskAsync(int taskId, TaskDetailsRequest modifiedDetails)
+    public async Task<ActionResult<BaseResponse<TaskDetailsResponse>>> UpdateTaskAsync(int taskId, TaskDetailsRequest modifiedDetails)
     {
-        BaseResponse<string> response = new(ResponseStatus.Fail);
+        BaseResponse<TaskDetailsResponse> response = new(ResponseStatus.Fail);
 
         response.Data = await _TaskDetailsService.UpdateTaskAsync(taskId, modifiedDetails).ConfigureAwait(false);
         response.Status = ResponseStatus.Success;
@@ -113,7 +113,7 @@ public class TaskDetailsController : ControllerBase
     /// Change status of task to inactive.
     /// </summary>
     /// <param name="taskId">Id of task record</param>
-    [HttpPut("inactive/{taskId}")]
+    [HttpDelete("{taskId}")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -122,24 +122,6 @@ public class TaskDetailsController : ControllerBase
         BaseResponse<string> response = new(ResponseStatus.Fail);
 
         response.Data = await _TaskDetailsService.InactiveTaskAsync(taskId).ConfigureAwait(false);
-        response.Status = ResponseStatus.Success;
-
-        return Ok(response);
-    }
-
-    /// <summary>
-    /// Delete a task.
-    /// </summary>
-    /// <param name="taskId">Id of task record</param>
-    [HttpDelete("{taskId}")]
-    [Authorize]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<string>>> DeleteTaskAsync(int taskId)
-    {
-        BaseResponse<string> response = new(ResponseStatus.Fail);
-
-        response.Data = await _TaskDetailsService.DeleteTaskAsync(taskId).ConfigureAwait(false);
         response.Status = ResponseStatus.Success;
 
         return Ok(response);

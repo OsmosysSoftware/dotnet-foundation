@@ -30,36 +30,25 @@ public class TaskDetailsService : ITaskDetailsService
         return _mapper.Map<List<TaskDetailsResponse>>(response);
     }
 
-    public async Task<TaskDetailsResponse?> GetTaskByIdAsync(int id)
+    public async Task<TaskDetailsResponse> GetTaskByIdAsync(int id)
     {
-        TaskDetails res = await _taskDetailsRepository.GetTaskByIdAsync(id).ConfigureAwait(false) ?? throw new Exception($"Task with Id={id} does not exist");
+        TaskDetails res = await _taskDetailsRepository.GetTaskByIdAsync(id).ConfigureAwait(false) 
+            ?? throw new Exception($"Task with Id={id} does not exist");
         return _mapper.Map<TaskDetailsResponse>(res);
     }
 
-    public async Task<string> InsertTaskAsync(TaskDetailsRequest detailsRequest)
+    public async Task<TaskDetailsResponse> InsertTaskAsync(TaskDetailsRequest detailsRequest)
     {
-        try
-        {
-            string res = await _taskDetailsRepository.InsertTaskAsync(detailsRequest).ConfigureAwait(false);
-            return res;
-        }
-        catch (Exception ex)
-        {
-            return $"An error inserting TaskDetails: {ex.Message}";
-        }
+        TaskDetails? res = await _taskDetailsRepository.InsertTaskAsync(detailsRequest).ConfigureAwait(false) 
+            ?? throw new Exception($"Error inserting TaskDetails for \"{detailsRequest.Description}\"");
+        return _mapper.Map<TaskDetailsResponse>(res);
     }
 
-    public async Task<string> UpdateTaskAsync(int id, TaskDetailsRequest modifiedDetails)
+    public async Task<TaskDetailsResponse> UpdateTaskAsync(int id, TaskDetailsRequest modifiedDetails)
     {
-        try
-        {
-            string res = await _taskDetailsRepository.UpdateTaskAsync(id, modifiedDetails).ConfigureAwait(false);
-            return res;
-        }
-        catch (Exception ex)
-        {
-            return $"An error occurred while updating Task with id = \"{id}\": {ex.Message}";
-        }
+        TaskDetails? res = await _taskDetailsRepository.UpdateTaskAsync(id, modifiedDetails).ConfigureAwait(false) 
+            ?? throw new Exception($"An error occurred while updating Task with id = \"{id}\"");
+        return _mapper.Map<TaskDetailsResponse>(res);
     }
 
     public async Task<string> InactiveTaskAsync(int id)
@@ -71,20 +60,7 @@ public class TaskDetailsService : ITaskDetailsService
         }
         catch (Exception ex)
         {
-            return $"An error occurred while updating Task with id = \"{id}\": {ex.Message}";
-        }
-    }
-
-    public async Task<string> DeleteTaskAsync(int id)
-    {
-        try
-        {
-            string res = await _taskDetailsRepository.DeleteTaskAsync(id).ConfigureAwait(false);
-            return res;
-        }
-        catch (Exception ex)
-        {
-            return $"An error occurred while deleting Task with id = \"{id}\": {ex.Message}";
+            return $"Error while deactivating Task id = \"{id}\": {ex.Message}";
         }
     }
 }
