@@ -5,7 +5,7 @@
 namespace DotnetFoundation.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class UPDATE_USER_TABLE : Migration
+    public partial class UpdateUserTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
