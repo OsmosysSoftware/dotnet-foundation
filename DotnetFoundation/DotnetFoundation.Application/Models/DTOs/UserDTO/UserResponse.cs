@@ -12,7 +12,7 @@ public record UserResponse
     /// <summary>
     /// Gets the user's first name.
     /// </summary>
-    public string FirstName { get; init; } = null!;
+    public string FirstName { get; init; } = String.Empty;
     /// <summary>
     /// Gets the user's last name.
     /// </summary>
