@@ -8,5 +8,5 @@ public record AuthenticationResponse
     /// <summary>
     /// Gets the authentication token.
     /// </summary>
-    public string Token { get; init; }
+    public string? Token { get; init; }
 }

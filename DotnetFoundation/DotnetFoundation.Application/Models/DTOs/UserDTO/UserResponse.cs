@@ -12,12 +12,12 @@ public record UserResponse
     /// <summary>
     /// Gets the user's first name.
     /// </summary>
-    public string FirstName { get; init; }
+    public string FirstName { get; init; } = null!;
     /// <summary>
     /// Gets the user's last name.
     /// </summary>
     public string? LastName { get; init; }
-    public string Email { get; init; }
+    public string? Email { get; init; }
     public string? Country { get; init; }
     public string? PhoneNumber { get; init; }
 }

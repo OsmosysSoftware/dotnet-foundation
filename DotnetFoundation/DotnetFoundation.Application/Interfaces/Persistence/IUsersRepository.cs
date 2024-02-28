@@ -15,5 +15,5 @@ public interface IUserRepository
     public Task<string> ResetPasswordAsync(string email, string token, string newPassword);
     public Task<bool> AddUserRoleAsync(string email, Roles role);
     public Task<User?> UpdateUserAsync(int userId, UpdateUserRequest request);
-    public Task<bool> DeleteUserAsync(int userId);
+    public Task<User?> DeleteUserAsync(int userId);
 }

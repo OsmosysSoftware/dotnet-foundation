@@ -106,9 +106,9 @@ public class UserController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<bool>>> DeleteUserAsync(int userId)
+    public async Task<ActionResult<BaseResponse<UserResponse>>> DeleteUserAsync(int userId)
     {
-        BaseResponse<bool> response = new(ResponseStatus.Fail);
+        BaseResponse<UserResponse> response = new(ResponseStatus.Fail);
 
         response.Data = await _userService.DeleteUserAsync(userId).ConfigureAwait(false);
         response.Status = ResponseStatus.Success;

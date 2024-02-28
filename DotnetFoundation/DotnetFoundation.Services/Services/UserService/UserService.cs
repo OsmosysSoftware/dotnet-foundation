@@ -34,10 +34,10 @@ public class UserService : IUserService
         bool res = await _userRepository.AddUserRoleAsync(email, role).ConfigureAwait(false);
         return res;
     }
-    public async Task<bool> DeleteUserAsync(int userId)
+    public async Task<UserResponse?> DeleteUserAsync(int userId)
     {
-        bool res = await _userRepository.DeleteUserAsync(userId).ConfigureAwait(false);
-        return res;
+        User res = await _userRepository.DeleteUserAsync(userId).ConfigureAwait(false) ?? throw new Exception("No user found");
+        return _mapper.Map<UserResponse>(res);
     }
     public async Task<UserResponse?> UpdateUserAsync(int userId, UpdateUserRequest request)
     {

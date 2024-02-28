@@ -163,18 +163,18 @@ public class UserRepository : IUserRepository
 
         return new User { Id = user.Id, FirstName = user.FirstName, LastName = user.LastName, Country = user.Country, PhoneNumber = user.PhoneNumber };
     }
-    public async Task<bool> DeleteUserAsync(int userId)
+    public async Task<User?> DeleteUserAsync(int userId)
     {
         ApplicationUser? user = await _dbContext.ApplicationUsers.FindAsync(userId).ConfigureAwait(false);
         if (user == null)
         {
-            return false; // User not found
+            return null; // User not found
         }
 
-        IdentityApplicationUser? identityUser = await _userManager.FindByIdAsync(user.IdentityApplicationUserId.ToString()).ConfigureAwait(false);
+        IdentityApplicationUser? identityUser = await _userManager.FindByIdAsync(user.IdentityApplicationUserId!.ToString()).ConfigureAwait(false);
         if (identityUser == null)
         {
-            return false; // User not found
+            return null; // User not found
         }
 
         // Disable user login
@@ -185,7 +185,7 @@ public class UserRepository : IUserRepository
         _dbContext.Entry(user).State = EntityState.Modified;
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
 
-        return true;
+        return user;
     }
 
     public async Task<string> LoginUserAsync(LoginRequest request)

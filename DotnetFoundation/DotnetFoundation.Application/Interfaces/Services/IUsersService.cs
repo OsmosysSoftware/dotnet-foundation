@@ -8,5 +8,5 @@ public interface IUserService
     public Task<List<UserResponse>> GetAllUsersAsync();
     public Task<bool> AddUserRoleAsync(string email, Roles role);
     public Task<UserResponse?> UpdateUserAsync(int userId, UpdateUserRequest request);
-    public Task<bool> DeleteUserAsync(int userId);
+    public Task<UserResponse?> DeleteUserAsync(int userId);
 }
