@@ -11,10 +11,10 @@ namespace DotnetFoundation.Api.Controllers;
 [Route("api/tasks")]
 public class TaskController : ControllerBase
 {
-    private readonly ITaskDetailsService _TaskDetailsService;
+    private readonly ITaskDetailsService _taskDetailsService;
     public TaskController(ITaskDetailsService TaskDetailsService)
     {
-        _TaskDetailsService = TaskDetailsService;
+        _taskDetailsService = TaskDetailsService;
     }
 
     /// <summary>
@@ -28,7 +28,7 @@ public class TaskController : ControllerBase
     {
         BaseResponse<List<TaskDetailsResponse>> response = new(ResponseStatus.Fail);
 
-        response.Data = await _TaskDetailsService.GetAllTasksAsync().ConfigureAwait(false);
+        response.Data = await _taskDetailsService.GetAllTasksAsync().ConfigureAwait(false);
         response.Status = ResponseStatus.Success;
 
         return Ok(response);
@@ -45,7 +45,7 @@ public class TaskController : ControllerBase
     {
         BaseResponse<List<TaskDetailsResponse>> response = new(ResponseStatus.Fail);
 
-        response.Data = await _TaskDetailsService.GetActiveTasksAsync().ConfigureAwait(false);
+        response.Data = await _taskDetailsService.GetActiveTasksAsync().ConfigureAwait(false);
         response.Status = ResponseStatus.Success;
 
         return Ok(response);
@@ -65,7 +65,7 @@ public class TaskController : ControllerBase
     {
         BaseResponse<TaskDetailsResponse> response = new(ResponseStatus.Fail);
 
-        response.Data = await _TaskDetailsService.GetTaskByIdAsync(taskId).ConfigureAwait(false);
+        response.Data = await _taskDetailsService.GetTaskByIdAsync(taskId).ConfigureAwait(false);
         response.Status = ResponseStatus.Success;
 
         return Ok(response);
@@ -84,7 +84,7 @@ public class TaskController : ControllerBase
     {
         BaseResponse<TaskDetailsResponse> response = new(ResponseStatus.Fail);
 
-        response.Data = await _TaskDetailsService.InsertTaskAsync(detailRequest).ConfigureAwait(false);
+        response.Data = await _taskDetailsService.InsertTaskAsync(detailRequest).ConfigureAwait(false);
         response.Status = ResponseStatus.Success;
 
         return Ok(response);
@@ -103,7 +103,7 @@ public class TaskController : ControllerBase
     {
         BaseResponse<TaskDetailsResponse> response = new(ResponseStatus.Fail);
 
-        response.Data = await _TaskDetailsService.UpdateTaskAsync(taskId, modifiedDetails).ConfigureAwait(false);
+        response.Data = await _taskDetailsService.UpdateTaskAsync(taskId, modifiedDetails).ConfigureAwait(false);
         response.Status = ResponseStatus.Success;
 
         return Ok(response);
@@ -121,7 +121,7 @@ public class TaskController : ControllerBase
     {
         BaseResponse<TaskDetailsResponse> response = new(ResponseStatus.Fail);
 
-        response.Data = await _TaskDetailsService.InactiveTaskAsync(taskId).ConfigureAwait(false);
+        response.Data = await _taskDetailsService.InactiveTaskAsync(taskId).ConfigureAwait(false);
         response.Status = ResponseStatus.Success;
 
         return Ok(response);
