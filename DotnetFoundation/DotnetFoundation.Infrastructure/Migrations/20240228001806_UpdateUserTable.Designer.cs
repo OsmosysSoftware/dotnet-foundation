@@ -3,6 +3,7 @@ using System;
 using DotnetFoundation.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,53 +11,16 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DotnetFoundation.Infrastructure.Migrations
 {
     [DbContext(typeof(SqlDatabaseContext))]
-    partial class SqlDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20240228001806_UpdateUserTable")]
+    partial class UpdateUserTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
-
-            modelBuilder.Entity("DotnetFoundation.Domain.Entities.TaskDetails", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("AssignedTo")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BudgetedHours")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Category")
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ModifiedOn")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("tasks", (string)null);
-                });
 
             modelBuilder.Entity("DotnetFoundation.Infrastructure.Identity.ApplicationUser", b =>
                 {

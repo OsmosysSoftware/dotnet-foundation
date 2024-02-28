@@ -10,8 +10,8 @@ public record UserRoleRequest
     /// <summary>
     /// Gets the email address of the user.
     /// </summary>
-    public string Email { get; init; }
-    
+    public string Email { get; init; } = String.Empty;
+
     /// <summary>
     /// Gets the role to be assigned to the user.
     /// </summary>
