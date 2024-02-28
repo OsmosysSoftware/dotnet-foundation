@@ -34,69 +34,20 @@ public class TaskDetailsRepository : ITaskDetailsRepository
         return taskObj;
     }
 
-    public async Task<TaskDetails?> InsertTaskAsync(TaskDetailsRequest request)
+    public async Task<int?> InsertTaskAsync(TaskDetails taskDetails)
     {
-        User? userExists = await _dbContext.ApplicationUsers.FindAsync(request.AssignedTo).ConfigureAwait(false);
-        if (userExists == null)
-        {
-            throw new Exception($"AssignedTo with userId = \"{request.AssignedTo}\" does not exist. Cannot add task.");
-        }
-        if (request.BudgetedHours < 0)
-        {
-            throw new Exception($"Hours cannot be less than 0");
-        }
-        TaskDetails inputTaskDetails = new TaskDetails
-        {
-            Description = request.Description,
-            BudgetedHours = request.BudgetedHours,
-            AssignedTo = request.AssignedTo,
-            Category = request.Category,
-            Status = Status.ACTIVE,
-            CreatedBy = request.AssignedTo,
-            ModifiedBy = request.AssignedTo,
-            ModifiedOn = DateTime.UtcNow
-        };
-
-        _dbContext.TaskDetails.Add(inputTaskDetails);
+         _dbContext.TaskDetails.Add(taskDetails);
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
 
-        TaskDetails? newlyCreatedtask = await _dbContext.TaskDetails.FindAsync(inputTaskDetails.Id).ConfigureAwait(false)
-            ?? throw new Exception("Newly added task is not present in DB");
-
-        return newlyCreatedtask;
+        return taskDetails.Id;
     }
 
-    public async Task<TaskDetails?> UpdateTaskAsync(int id, TaskDetailsRequest modifiedDetails)
+    public async Task<TaskDetails?> UpdateTaskAsync(TaskDetailsRequest modifiedDetails, TaskDetails existingDetails)
     {
-        TaskDetails? existingDetails = await _dbContext.TaskDetails.FindAsync(id).ConfigureAwait(false);
-        if (existingDetails == null)
-        {
-            throw new Exception($"Task with Id = {id} does not exist");
-        }
-
-        User? userExists = await _dbContext.ApplicationUsers.FindAsync(modifiedDetails.AssignedTo).ConfigureAwait(false);
-        if (userExists == null)
-        {
-            throw new Exception($"AssignedTo with userId = \"{modifiedDetails.AssignedTo}\" does not exist. Cannot add task.");
-        }
-
-        // Modify data when strings are NOT null and hours >= 0
-        if (!string.IsNullOrEmpty(modifiedDetails.Description))
-        {
-            existingDetails.Description = modifiedDetails.Description;
-        }
-
-        if (modifiedDetails.BudgetedHours >= 0)
-        {
-            existingDetails.BudgetedHours = modifiedDetails.BudgetedHours;
-        }
-
-        if (!string.IsNullOrEmpty(modifiedDetails.Category))
-        {
-            existingDetails.Category = modifiedDetails.Category;
-        }
-
-        // Successfully modified items
+        // Modify data
+        existingDetails.Description = modifiedDetails.Description;
+        existingDetails.Category = modifiedDetails.Category;
+        existingDetails.BudgetedHours = modifiedDetails.BudgetedHours;
         existingDetails.AssignedTo = modifiedDetails.AssignedTo;
         existingDetails.ModifiedOn = DateTime.UtcNow;
 
@@ -104,14 +55,9 @@ public class TaskDetailsRepository : ITaskDetailsRepository
         return existingDetails;
     }
 
-    public async Task<TaskDetails?> InactiveTaskAsync(int id)
+    public async Task<TaskDetails?> InactiveTaskAsync(TaskDetails existingDetails)
     {
-        TaskDetails? existingDetails = await _dbContext.TaskDetails.FindAsync(id).ConfigureAwait(false);
-        if (existingDetails == null)
-        {
-            throw new Exception($"Task with Id = \"{id}\" does not exist");
-        }
-
+        // Modify task to INACTIVE
         existingDetails.Status = Status.INACTIVE;
         existingDetails.ModifiedOn = DateTime.UtcNow;
 

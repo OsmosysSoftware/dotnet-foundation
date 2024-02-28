@@ -8,13 +8,12 @@ public record TaskDetailsRequest
     /// Gets the Description of the task.
     /// </summary>
     [Required(ErrorMessage = "Description is required")]
-    public string Description { get; init; }
+    public string Description { get; init; } = string.Empty;
     /// <summary>
     /// Gets the Budgeted Hours of the task.
     /// </summary>
     [Required(ErrorMessage = "BudgetedHours is required")]
-    [RegularExpression(@"^\d*$",
-        ErrorMessage = "BudgetedHours should be number greater than or equal to 0")]
+    [Range(0, int.MaxValue, ErrorMessage = "BudgetedHours should be in range of 0 to int.Maxvalue")]
     public int BudgetedHours { get; init; }
     /// <summary>
     /// Gets the user Id of the user the task is assigned to.

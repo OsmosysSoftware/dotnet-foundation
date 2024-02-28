@@ -8,7 +8,7 @@ namespace DotnetFoundation.Application.Models.DTOs.TaskDetailsDTO;
 public record TaskDetailsResponse
 {
     public int Id { get; init; }
-    public string Description { get; init; }
+    public required string Description { get; init; }
     public int BudgetedHours { get; init; }
     public int AssignedTo { get; init; }
     public string? Category { get; init; }

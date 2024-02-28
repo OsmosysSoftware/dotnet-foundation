@@ -10,8 +10,8 @@ public interface ITaskDetailsRepository
 {
     public Task<List<TaskDetails>> GetAllTasksAsync();
     public Task<List<TaskDetails>> GetActiveTasksAsync();
-    public Task<TaskDetails?> GetTaskByIdAsync(int Id);
-    public Task<TaskDetails?> InsertTaskAsync(TaskDetailsRequest request);
-    public Task<TaskDetails?> UpdateTaskAsync(int id, TaskDetailsRequest modifiedDetails);
-    public Task<TaskDetails?> InactiveTaskAsync(int id);
+    public Task<TaskDetails?> GetTaskByIdAsync(int id);
+    public Task<int?> InsertTaskAsync(TaskDetails taskDetails);
+    public Task<TaskDetails?> UpdateTaskAsync(TaskDetailsRequest modifiedDetails, TaskDetails existingDetails);
+    public Task<TaskDetails?> InactiveTaskAsync(TaskDetails existingDetails);
 }
