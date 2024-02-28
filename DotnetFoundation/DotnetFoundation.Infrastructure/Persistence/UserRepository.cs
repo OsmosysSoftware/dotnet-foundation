@@ -1,6 +1,7 @@
 using DotnetFoundation.Application.Interfaces.Integrations;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
+using DotnetFoundation.Application.Models.DTOs.UserDTO;
 using DotnetFoundation.Domain.Entities;
 using DotnetFoundation.Domain.Enums;
 using DotnetFoundation.Infrastructure.Identity;
@@ -88,6 +89,9 @@ public class UserRepository : IUserRepository
             {
                 FirstName = request.FirstName,
                 LastName = request.LastName,
+                Country = request.Country,
+                PhoneNumber = request.PhoneNumber,
+                Email = request.Email,
                 IdentityApplicationUserId = identityApplicationUser.Id
             };
 
@@ -112,19 +116,75 @@ public class UserRepository : IUserRepository
 
     public async Task<List<User>> GetAllUsersAsync()
     {
-        List<User> users = (await _dbContext.ApplicationUsers.ToListAsync().ConfigureAwait(false))
-            .Select(user => new User
-            {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName
-            }).ToList();
+        List<User> users = (await _dbContext.ApplicationUsers
+                                                .Where(u => u.Status == Status.ACTIVE)
+                                                .ToListAsync().ConfigureAwait(false))
+                                                .Select(user => new User
+                                                {
+                                                    Id = user.Id,
+                                                    Email = user.Email,
+                                                    FirstName = user.FirstName,
+                                                    LastName = user.LastName,
+                                                    Country = user.Country,
+                                                    PhoneNumber = user.PhoneNumber
+                                                }).ToList();
         return users;
     }
 
-    public async Task<User?> GetUserByIdAsync(int Id)
+    public async Task<User?> GetUserByIdAsync(int userId)
     {
-        ApplicationUser? user = await _dbContext.ApplicationUsers.FindAsync(Id).ConfigureAwait(false);
+        ApplicationUser? user = await _dbContext.ApplicationUsers
+                                                    .Where(u => u.Id == userId && u.Status == Status.ACTIVE)
+                                                    .FirstOrDefaultAsync()
+                                                    .ConfigureAwait(false);
+        return user;
+    }
+    public async Task<User?> UpdateUserAsync(int userId, UpdateUserRequest request)
+    {
+
+        ApplicationUser? user = await _dbContext.ApplicationUsers.FindAsync(userId).ConfigureAwait(false);
+        if (user == null || user.Status != Status.ACTIVE)
+        {
+            return null; // User not found
+        }
+
+        // Validate and update properties
+        foreach (System.Reflection.PropertyInfo property in typeof(UpdateUserRequest).GetProperties())
+        {
+            string? requestValue = property.GetValue(request)?.ToString();
+            if (!string.IsNullOrEmpty(requestValue))
+            {
+                typeof(ApplicationUser).GetProperty(property.Name)?.SetValue(user, requestValue);
+            }
+        }
+
+        _dbContext.Entry(user).State = EntityState.Modified;
+        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+        return new User { Id = user.Id, FirstName = user.FirstName, LastName = user.LastName, Country = user.Country, PhoneNumber = user.PhoneNumber };
+    }
+    public async Task<User?> DeleteUserAsync(int userId)
+    {
+        ApplicationUser? user = await _dbContext.ApplicationUsers.FindAsync(userId).ConfigureAwait(false);
+        if (user == null)
+        {
+            return null; // User not found
+        }
+
+        IdentityApplicationUser? identityUser = await _userManager.FindByIdAsync(user.IdentityApplicationUserId!.ToString()).ConfigureAwait(false);
+        if (identityUser == null)
+        {
+            return null; // User not found
+        }
+
+        // Disable user login
+        await _userManager.SetLockoutEnabledAsync(identityUser, true).ConfigureAwait(false);
+        await _userManager.SetLockoutEndDateAsync(identityUser, DateTimeOffset.MaxValue).ConfigureAwait(false);
+
+        user.Status = Status.INACTIVE;
+        _dbContext.Entry(user).State = EntityState.Modified;
+        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+
         return user;
     }
 

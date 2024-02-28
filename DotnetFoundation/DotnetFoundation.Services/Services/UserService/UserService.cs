@@ -23,9 +23,9 @@ public class UserService : IUserService
         return _mapper.Map<List<UserResponse>>(users);
     }
 
-    public async Task<UserResponse?> GetUserByIdAsync(int Id)
+    public async Task<UserResponse?> GetUserByIdAsync(int userId)
     {
-        User res = await _userRepository.GetUserByIdAsync(Id).ConfigureAwait(false) ?? throw new Exception("No user found");
+        User res = await _userRepository.GetUserByIdAsync(userId).ConfigureAwait(false) ?? throw new Exception("No user found");
         return _mapper.Map<UserResponse>(res);
     }
 
@@ -33,5 +33,15 @@ public class UserService : IUserService
     {
         bool res = await _userRepository.AddUserRoleAsync(email, role).ConfigureAwait(false);
         return res;
+    }
+    public async Task<UserResponse?> DeleteUserAsync(int userId)
+    {
+        User res = await _userRepository.DeleteUserAsync(userId).ConfigureAwait(false) ?? throw new Exception("No user found");
+        return _mapper.Map<UserResponse>(res);
+    }
+    public async Task<UserResponse?> UpdateUserAsync(int userId, UpdateUserRequest request)
+    {
+        User res = await _userRepository.UpdateUserAsync(userId, request).ConfigureAwait(false) ?? throw new Exception("No user found");
+        return _mapper.Map<UserResponse>(res);
     }
 }

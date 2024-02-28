@@ -36,7 +36,7 @@ public class EmailService : IEmailService
                 To = email,
                 Subject = _configuration["Emails:ForgetPassword:Subject"],
                 Text = "Forget password Token",
-                Html = ReadHtmlTemplate(_configuration["Emails:ForgetPassword:Path"], body)
+                Html = ReadHtmlTemplate(_configuration["Emails:ForgetPassword:Path"]!, body)
             }
         };
 
