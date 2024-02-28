@@ -4,5 +4,5 @@ namespace DotnetFoundation.Infrastructure.Identity;
 
 public class IdentityApplicationUser : IdentityUser
 {
-    public ApplicationUser ApplicationUser { get; set; } = String.Empty;
+    public ApplicationUser ApplicationUser { get; set; } = null!;
 }
