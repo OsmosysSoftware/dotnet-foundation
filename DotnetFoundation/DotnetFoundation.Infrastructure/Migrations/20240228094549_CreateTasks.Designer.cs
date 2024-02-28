@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DotnetFoundation.Infrastructure.Migrations
 {
     [DbContext(typeof(SqlDatabaseContext))]
-    [Migration("20240227132817_CreateTaskDetails")]
-    partial class CreateTaskDetails
+    [Migration("20240228094549_CreateTasks")]
+    partial class CreateTasks
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -58,7 +58,7 @@ namespace DotnetFoundation.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("taskdetails", (string)null);
+                    b.ToTable("tasks", (string)null);
                 });
 
             modelBuilder.Entity("DotnetFoundation.Infrastructure.Identity.ApplicationUser", b =>

@@ -55,7 +55,7 @@ namespace DotnetFoundation.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("taskdetails", (string)null);
+                    b.ToTable("tasks", (string)null);
                 });
 
             modelBuilder.Entity("DotnetFoundation.Infrastructure.Identity.ApplicationUser", b =>

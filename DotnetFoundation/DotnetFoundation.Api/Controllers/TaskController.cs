@@ -9,10 +9,10 @@ namespace DotnetFoundation.Api.Controllers;
 
 [ApiController]
 [Route("api/tasks")]
-public class TaskDetailsController : ControllerBase
+public class TaskController : ControllerBase
 {
     private readonly ITaskDetailsService _TaskDetailsService;
-    public TaskDetailsController(ITaskDetailsService TaskDetailsService)
+    public TaskController(ITaskDetailsService TaskDetailsService)
     {
         _TaskDetailsService = TaskDetailsService;
     }
