@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using DotnetFoundation.Application.Interfaces.Integrations;
 using DotnetFoundation.Application.Models.DTOs.UserDTO;
 using Microsoft.Extensions.Configuration;

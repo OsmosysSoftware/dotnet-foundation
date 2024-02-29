@@ -1,3 +1,5 @@
+using System.Net;
+using DotnetFoundation.Application.Exceptions;
 using DotnetFoundation.Application.Interfaces.Services;
 using DotnetFoundation.Application.Models.Common;
 using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
@@ -27,11 +29,27 @@ public class AuthenticationController : ControllerBase
     public async Task<ActionResult<BaseResponse<AuthenticationResponse>>> RegisterAsync(RegisterRequest request)
     {
         BaseResponse<AuthenticationResponse> response = new(ResponseStatus.Fail);
+        try
+        {
+            response.Data = await _authenticationService.RegisterAsync(request).ConfigureAwait(false);
+            response.Status = ResponseStatus.Success;
 
-        response.Data = await _authenticationService.RegisterAsync(request).ConfigureAwait(false);
-        response.Status = ResponseStatus.Success;
-
-        return Ok(response);
+            return Ok(response);
+        }
+        catch (IdentityUserCreationException ex)
+        {
+            response.Message = ex.Message;
+            response.Data = null;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (Exception ex)
+        {
+            response.Message = ex.Message;
+            response.Data = null;
+            response.Status = ResponseStatus.Error;
+            return StatusCode((int)HttpStatusCode.InternalServerError, response);
+        }
     }
 
     /// <summary>
@@ -45,46 +63,108 @@ public class AuthenticationController : ControllerBase
     public async Task<ActionResult<BaseResponse<AuthenticationResponse>>> LoginAsync(LoginRequest request)
     {
         BaseResponse<AuthenticationResponse> response = new(ResponseStatus.Fail);
+        try
+        {
+            response.Data = await _authenticationService.LoginAsync(request).ConfigureAwait(false);
+            response.Status = ResponseStatus.Success;
 
-        response.Data = await _authenticationService.LoginAsync(request).ConfigureAwait(false);
-        response.Status = ResponseStatus.Success;
-
-        return Ok(response);
+            return Ok(response);
+        }
+        catch (InvalidCredentialsException ex)
+        {
+            response.Message = ex.Message;
+            response.Data = null;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (LockoutException ex)
+        {
+            response.Message = ex.Message;
+            response.Data = null;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (Exception ex)
+        {
+            response.Message = ex.Message;
+            response.Data = null;
+            response.Status = ResponseStatus.Error;
+            return StatusCode((int)HttpStatusCode.InternalServerError, response);
+        }
     }
 
     /// <summary>
     /// User password reset using reset token.
     /// </summary>
     /// <param name="request">New password details request</param>
-    [HttpPost("reset-password")]
+    [HttpPost("resetpassword")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<BaseResponse<bool>>> ResetPasswordAsync(PasswordResetRequest request)
     {
         BaseResponse<bool> response = new(ResponseStatus.Fail);
+        try
+        {
+            response.Data = await _authenticationService.ResetPasswordAsync(request).ConfigureAwait(false);
+            response.Status = ResponseStatus.Success;
 
-        response.Data = await _authenticationService.ResetPasswordAsync(request).ConfigureAwait(false);
-        response.Status = ResponseStatus.Success;
-
-        return Ok(response);
+            return Ok(response);
+        }
+        catch (UserNotFoundException ex)
+        {
+            response.Message = ex.Message;
+            response.Data = false;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (InvalidResetPasswordTokenException ex)
+        {
+            response.Message = ex.Message;
+            response.Data = false;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (Exception ex)
+        {
+            response.Message = ex.Message;
+            response.Data = false;
+            response.Status = ResponseStatus.Error;
+            return StatusCode((int)HttpStatusCode.InternalServerError, response);
+        }
     }
 
     /// <summary>
     /// Forgot user password.
     /// </summary>
     /// <param name="email">Email of user to reset password</param>
-    [HttpPost("forgot-password")]
+    [HttpPost("forgotpassword")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<BaseResponse<bool>>> ForgotPasswordAsync(string email)
     {
         BaseResponse<bool> response = new(ResponseStatus.Fail);
+        try
+        {
+            response.Data = await _authenticationService.ForgotPasswordAsync(email).ConfigureAwait(false);
+            response.Status = ResponseStatus.Success;
 
-        response.Data = await _authenticationService.ForgotPasswordAsync(email).ConfigureAwait(false);
-        response.Status = ResponseStatus.Success;
-
-        return Ok(response);
+            return Ok(response);
+        }
+        catch (UserNotFoundException ex)
+        {
+            response.Message = ex.Message;
+            response.Data = false;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (Exception ex)
+        {
+            response.Message = ex.Message;
+            response.Data = false;
+            response.Status = ResponseStatus.Error;
+            return StatusCode((int)HttpStatusCode.InternalServerError, response);
+        }
     }
 }
