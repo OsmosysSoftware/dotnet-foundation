@@ -60,9 +60,9 @@ public class AuthenticationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<AuthenticationResponse>>> ResetPasswordAsync(PasswordResetRequest request)
+    public async Task<ActionResult<BaseResponse<bool>>> ResetPasswordAsync(PasswordResetRequest request)
     {
-        BaseResponse<AuthenticationResponse> response = new(ResponseStatus.Fail);
+        BaseResponse<bool> response = new(ResponseStatus.Fail);
 
         response.Data = await _authenticationService.ResetPasswordAsync(request).ConfigureAwait(false);
         response.Status = ResponseStatus.Success;
@@ -78,9 +78,9 @@ public class AuthenticationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<string>>> ForgotPasswordAsync(string email)
+    public async Task<ActionResult<BaseResponse<bool>>> ForgotPasswordAsync(string email)
     {
-        BaseResponse<string> response = new(ResponseStatus.Fail);
+        BaseResponse<bool> response = new(ResponseStatus.Fail);
 
         response.Data = await _authenticationService.ForgotPasswordAsync(email).ConfigureAwait(false);
         response.Status = ResponseStatus.Success;

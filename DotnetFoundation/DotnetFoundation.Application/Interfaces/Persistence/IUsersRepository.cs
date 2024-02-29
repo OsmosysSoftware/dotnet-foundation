@@ -8,12 +8,14 @@ namespace DotnetFoundation.Application.Interfaces.Persistence;
 public interface IUserRepository
 {
     public Task<string> AddUserAsync(RegisterRequest request);
-    public Task<string> LoginUserAsync(LoginRequest request);
+    public Task<UserInfo> LoginUserAsync(LoginRequest request);
     public Task<List<User>> GetAllUsersAsync();
     public Task<User?> GetUserByIdAsync(int userId);
     public Task<string> ForgotPasswordAsync(string email);
-    public Task<string> ResetPasswordAsync(string email, string token, string newPassword);
+    public Task ResetPasswordAsync(string email, string token, string newPassword);
     public Task<bool> AddUserRoleAsync(string email, Roles role);
     public Task<User?> UpdateUserAsync(int userId, UpdateUserRequest request);
     public Task<User?> DeleteUserAsync(int userId);
+    public Task<List<string>> GetUserRoleAsync(string email);
+
 }
