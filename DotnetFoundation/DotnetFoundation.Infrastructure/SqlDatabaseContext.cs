@@ -29,6 +29,13 @@ public class SqlDatabaseContext : IdentityDbContext<IdentityApplicationUser>
         // for tasks
         builder.Entity<TaskDetails>()
         .HasKey(t => t.Id);
+
+        builder.Entity<TaskDetails>()
+        .HasIndex(t => t.Status);
+
+        builder.Entity<TaskDetails>()
+        .HasIndex(t => t.AssignedTo);
+
         builder.Entity<TaskDetails>().ToTable("tasks");
     }
 }
