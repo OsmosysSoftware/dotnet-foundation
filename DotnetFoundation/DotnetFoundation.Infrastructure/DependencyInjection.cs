@@ -1,5 +1,6 @@
 using DotnetFoundation.Application.Interfaces.Integrations;
 using DotnetFoundation.Application.Interfaces.Persistence;
+using DotnetFoundation.Application.Interfaces.Services;
 using DotnetFoundation.Infrastructure.Identity;
 using DotnetFoundation.Infrastructure.Integrations;
 using DotnetFoundation.Infrastructure.Persistence;
@@ -73,7 +74,7 @@ public static class DependencyInjection
         // Configure service scope for repositories
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IEmailService, EmailService>();
-
+        services.AddScoped<ITaskDetailsRepository, TaskDetailsRepository>();
         services.AddHttpClient();
 
         return services;
