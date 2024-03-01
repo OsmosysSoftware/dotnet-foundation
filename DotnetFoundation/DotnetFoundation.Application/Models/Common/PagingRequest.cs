@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace DotnetFoundation.Application.Models.Common;
+﻿namespace DotnetFoundation.Application.Models.Common;
 public class PagingRequest
 {
     const int MaxPageSize = 50;

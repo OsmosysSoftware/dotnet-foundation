@@ -15,23 +15,22 @@ public class TaskDetailsRepository : ITaskDetailsRepository
         _dbContext = sqlDatabaseContext;
     }
 
-    public async Task<List<TaskDetails>> GetAllTasksAsync(PagingRequest pagingRequest)
+    public async Task<PagedList<TaskDetails>> GetAllTasksAsync(PagingRequest pagingRequest)
     {
-        List<TaskDetails> taskObj = await _dbContext.TaskDetails
-            .Skip((pagingRequest.PageNumber -1) * pagingRequest.PageSize)
-            .Take(pagingRequest.PageSize)
-            .ToListAsync().ConfigureAwait(false);
-        return taskObj;
+        IQueryable<TaskDetails> taskDetailsQueryable = _dbContext.TaskDetails.AsQueryable();
+
+        PagedList<TaskDetails> taskDetailsPagination = await PagedList<TaskDetails>.ToPagedListAsync(taskDetailsQueryable, 
+            pagingRequest.PageNumber, pagingRequest.PageSize).ConfigureAwait(false);
+        return taskDetailsPagination;
     }
 
-    public async Task<List<TaskDetails>> GetActiveTasksAsync(PagingRequest pagingRequest)
+    public async Task<PagedList<TaskDetails>> GetActiveTasksAsync(PagingRequest pagingRequest)
     {
-        List<TaskDetails> taskObj = (await _dbContext.TaskDetails
-            .Where(task => task.Status == Status.ACTIVE)
-            .Skip((pagingRequest.PageNumber - 1) * pagingRequest.PageSize)
-            .Take(pagingRequest.PageSize)
-            .ToListAsync().ConfigureAwait(false));
-        return taskObj;
+        IQueryable<TaskDetails> taskDetailsQueryable = _dbContext.TaskDetails.Where(task => task.Status == Status.ACTIVE).AsQueryable();
+
+        PagedList<TaskDetails> taskDetailsPagination = await PagedList<TaskDetails>.ToPagedListAsync(taskDetailsQueryable,
+            pagingRequest.PageNumber, pagingRequest.PageSize).ConfigureAwait(false);
+        return taskDetailsPagination;
     }
 
     public async Task<TaskDetails?> GetTaskByIdAsync(int id)

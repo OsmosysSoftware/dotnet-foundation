@@ -1,4 +1,5 @@
 using AutoMapper;
+using DotnetFoundation.Application.Exceptions;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Interfaces.Services;
 using DotnetFoundation.Application.Models.Common;
@@ -22,29 +23,55 @@ public class TaskDetailsService : ITaskDetailsService
     }
 
 
-    public async Task<List<TaskDetailsResponse>> GetAllTasksAsync(PagingRequest pagingRequest)
+    public async Task<PagedList<TaskDetailsResponse>> GetAllTasksAsync(PagingRequest pagingRequest)
     {
-        List<TaskDetails> response = await _taskDetailsRepository.GetAllTasksAsync(pagingRequest).ConfigureAwait(false);
-        return _mapper.Map<List<TaskDetailsResponse>>(response);
+        PagedList<TaskDetails> response = await _taskDetailsRepository.GetAllTasksAsync(pagingRequest).ConfigureAwait(false);
+
+        if (!response.Items.Any())
+        {
+            throw new NotFoundException($"No data fetched on PageNumber = {response.PageNumber} for PageSize = {response.PageSize}");
+        }
+
+        PagedList<TaskDetailsResponse> pagingResponse = new PagedList<TaskDetailsResponse>(
+            _mapper.Map<List<TaskDetailsResponse>>(response.Items), 
+            response.PageNumber, 
+            response.PageSize, 
+            response.TotalCount
+        );
+        
+        return pagingResponse;
     }
 
-    public async Task<List<TaskDetailsResponse>> GetActiveTasksAsync(PagingRequest pagingRequest)
+    public async Task<PagedList<TaskDetailsResponse>> GetActiveTasksAsync(PagingRequest pagingRequest)
     {
-        List<TaskDetails> response = await _taskDetailsRepository.GetActiveTasksAsync(pagingRequest).ConfigureAwait(false);
-        return _mapper.Map<List<TaskDetailsResponse>>(response);
+        PagedList<TaskDetails> response = await _taskDetailsRepository.GetActiveTasksAsync(pagingRequest).ConfigureAwait(false);
+
+        if (!response.Items.Any())
+        {
+            throw new NotFoundException($"No data fetched on PageNumber = {response.PageNumber} for PageSize = {response.PageSize}");
+        }
+
+        PagedList<TaskDetailsResponse> pagingResponse = new PagedList<TaskDetailsResponse>(
+            _mapper.Map<List<TaskDetailsResponse>>(response.Items),
+            response.PageNumber,
+            response.PageSize,
+            response.TotalCount
+        );
+
+        return pagingResponse;
     }
 
     public async Task<TaskDetailsResponse> GetTaskByIdAsync(int id)
     {
         TaskDetails response = await _taskDetailsRepository.GetTaskByIdAsync(id).ConfigureAwait(false) 
-            ?? throw new Exception($"Task with Id={id} does not exist");
+            ?? throw new NotFoundException($"Task with Id={id} does not exist");
         return _mapper.Map<TaskDetailsResponse>(response);
     }
 
     public async Task<TaskDetailsResponse> InsertTaskAsync(TaskDetailsRequest detailsRequest)
     {
         User? user = await _userRepository.GetUserByIdAsync(detailsRequest.AssignedTo).ConfigureAwait(false)
-            ?? throw new Exception($"AssignedTo with userId = \"{detailsRequest.AssignedTo}\" does not exist. Cannot add task.");
+            ?? throw new NotFoundException($"AssignedTo with userId = \"{detailsRequest.AssignedTo}\" does not exist. Cannot add task.");
 
         // Create new TaskDetails object and add relevant details
         TaskDetails taskDetails = new TaskDetails
@@ -70,10 +97,10 @@ public class TaskDetailsService : ITaskDetailsService
     public async Task<TaskDetailsResponse> UpdateTaskAsync(int id, TaskDetailsRequest modifiedDetails)
     {
         TaskDetails? existingDetails = await _taskDetailsRepository.GetTaskByIdAsync(id).ConfigureAwait(false)
-            ?? throw new Exception($"Task with Id={id} does not exist");
+            ?? throw new NotFoundException($"Task with Id={id} does not exist");
 
         User? user = await _userRepository.GetUserByIdAsync(modifiedDetails.AssignedTo).ConfigureAwait(false)
-            ?? throw new Exception($"AssignedTo with userId = \"{modifiedDetails.AssignedTo}\" does not exist. Cannot add task.");
+            ?? throw new NotFoundException($"AssignedTo with userId = \"{modifiedDetails.AssignedTo}\" does not exist. Cannot add task.");
 
         TaskDetails? modifiedTask = await _taskDetailsRepository.UpdateTaskAsync(modifiedDetails, existingDetails).ConfigureAwait(false)
             ?? throw new Exception($"An error occurred while updating Task with id = \"{id}\"");
@@ -86,7 +113,7 @@ public class TaskDetailsService : ITaskDetailsService
         TaskDetails? existingDetails = await _taskDetailsRepository.GetTaskByIdAsync(id).ConfigureAwait(false);
         if (existingDetails == null)
         {
-            throw new Exception($"Task with Id = \"{id}\" does not exist");
+            throw new NotFoundException($"Task with Id = \"{id}\" does not exist");
         }
 
         TaskDetails? response = await _taskDetailsRepository.InactiveTaskAsync(existingDetails).ConfigureAwait(false)

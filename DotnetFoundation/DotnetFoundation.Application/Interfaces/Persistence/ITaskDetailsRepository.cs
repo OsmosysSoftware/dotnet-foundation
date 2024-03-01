@@ -9,8 +9,8 @@ namespace DotnetFoundation.Application.Interfaces.Persistence;
 /// </summary>
 public interface ITaskDetailsRepository
 {
-    public Task<List<TaskDetails>> GetAllTasksAsync(PagingRequest pagingRequest);
-    public Task<List<TaskDetails>> GetActiveTasksAsync(PagingRequest pagingRequest);
+    public Task<PagedList<TaskDetails>> GetAllTasksAsync(PagingRequest pagingRequest);
+    public Task<PagedList<TaskDetails>> GetActiveTasksAsync(PagingRequest pagingRequest);
     public Task<TaskDetails?> GetTaskByIdAsync(int id);
     public Task<int?> InsertTaskAsync(TaskDetails taskDetails);
     public Task<TaskDetails?> UpdateTaskAsync(TaskDetailsRequest modifiedDetails, TaskDetails existingDetails);
