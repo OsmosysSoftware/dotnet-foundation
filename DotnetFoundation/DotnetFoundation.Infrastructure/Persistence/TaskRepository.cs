@@ -10,18 +10,18 @@ namespace DotnetFoundation.Infrastructure.Persistence;
 public class TaskDetailsRepository : ITaskDetailsRepository
 {
     private readonly SqlDatabaseContext _dbContext;
-    private readonly IPagiationServices<TaskDetails> _pagiationServices;
-    public TaskDetailsRepository(SqlDatabaseContext sqlDatabaseContext, IPagiationServices<TaskDetails> pagiationServices)
+    private readonly IPaginationService<TaskDetails> _paginationService;
+    public TaskDetailsRepository(SqlDatabaseContext sqlDatabaseContext, IPaginationService<TaskDetails> paginationService)
     {
         _dbContext = sqlDatabaseContext;
-        _pagiationServices = pagiationServices;
+        _paginationService = paginationService;
     }
 
     public async Task<PagedList<TaskDetails>> GetAllTasksAsync(PagingRequest pagingRequest)
     {
         IQueryable<TaskDetails> taskDetailsQueryable = _dbContext.TaskDetails.AsQueryable();
 
-        PagedList<TaskDetails> taskDetailsPagination = await _pagiationServices.ToPagedListAsync(taskDetailsQueryable,
+        PagedList<TaskDetails> taskDetailsPagination = await _paginationService.ToPagedListAsync(taskDetailsQueryable,
             pagingRequest.PageNumber, pagingRequest.PageSize).ConfigureAwait(false);
         return taskDetailsPagination;
     }
@@ -30,7 +30,7 @@ public class TaskDetailsRepository : ITaskDetailsRepository
     {
         IQueryable<TaskDetails> taskDetailsQueryable = _dbContext.TaskDetails.Where(task => task.Status == Status.ACTIVE).AsQueryable();
 
-        PagedList<TaskDetails> taskDetailsPagination = await _pagiationServices.ToPagedListAsync(taskDetailsQueryable,
+        PagedList<TaskDetails> taskDetailsPagination = await _paginationService.ToPagedListAsync(taskDetailsQueryable,
             pagingRequest.PageNumber, pagingRequest.PageSize).ConfigureAwait(false);
         return taskDetailsPagination;
     }
