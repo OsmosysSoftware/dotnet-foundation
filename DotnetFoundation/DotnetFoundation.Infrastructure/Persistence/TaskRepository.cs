@@ -1,25 +1,27 @@
 using DotnetFoundation.Application.Models.DTOs.TaskDetailsDTO;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 using DotnetFoundation.Domain.Enums;
 using DotnetFoundation.Application.Models.Common;
+using DotnetFoundation.Application.Interfaces.Integrations;
 
 namespace DotnetFoundation.Infrastructure.Persistence;
 
 public class TaskDetailsRepository : ITaskDetailsRepository
 {
     private readonly SqlDatabaseContext _dbContext;
-    public TaskDetailsRepository(SqlDatabaseContext sqlDatabaseContext)
+    private readonly IPagiationServices<TaskDetails> _pagiationServices;
+    public TaskDetailsRepository(SqlDatabaseContext sqlDatabaseContext, IPagiationServices<TaskDetails> pagiationServices)
     {
         _dbContext = sqlDatabaseContext;
+        _pagiationServices = pagiationServices;
     }
 
     public async Task<PagedList<TaskDetails>> GetAllTasksAsync(PagingRequest pagingRequest)
     {
         IQueryable<TaskDetails> taskDetailsQueryable = _dbContext.TaskDetails.AsQueryable();
 
-        PagedList<TaskDetails> taskDetailsPagination = await PagedList<TaskDetails>.ToPagedListAsync(taskDetailsQueryable, 
+        PagedList<TaskDetails> taskDetailsPagination = await _pagiationServices.ToPagedListAsync(taskDetailsQueryable,
             pagingRequest.PageNumber, pagingRequest.PageSize).ConfigureAwait(false);
         return taskDetailsPagination;
     }
@@ -28,7 +30,7 @@ public class TaskDetailsRepository : ITaskDetailsRepository
     {
         IQueryable<TaskDetails> taskDetailsQueryable = _dbContext.TaskDetails.Where(task => task.Status == Status.ACTIVE).AsQueryable();
 
-        PagedList<TaskDetails> taskDetailsPagination = await PagedList<TaskDetails>.ToPagedListAsync(taskDetailsQueryable,
+        PagedList<TaskDetails> taskDetailsPagination = await _pagiationServices.ToPagedListAsync(taskDetailsQueryable,
             pagingRequest.PageNumber, pagingRequest.PageSize).ConfigureAwait(false);
         return taskDetailsPagination;
     }
