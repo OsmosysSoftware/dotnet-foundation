@@ -26,7 +26,7 @@ public class UserService : IUserService
 
     public async Task<UserResponse?> GetUserByIdAsync(int userId)
     {
-        User res = await _userRepository.GetUserByIdAsync(userId).ConfigureAwait(false) ?? throw new UserNotFoundException("No user found");
+        User res = await _userRepository.GetUserByIdAsync(userId).ConfigureAwait(false) ?? throw new NotFoundException("No user found");
         return _mapper.Map<UserResponse>(res);
     }
 
@@ -35,16 +35,27 @@ public class UserService : IUserService
         bool res = await _userRepository.AddUserRoleAsync(email, role).ConfigureAwait(false);
         return res;
     }
+
     public async Task<UserResponse?> DeleteUserAsync(int userId)
     {
-
-        User res = await _userRepository.DeleteUserAsync(userId).ConfigureAwait(false) ?? throw new UserNotFoundException("No user found");
+        User res = await _userRepository.DeleteUserAsync(userId).ConfigureAwait(false) ?? throw new NotFoundException("No user found");
         return _mapper.Map<UserResponse>(res);
     }
+
     public async Task<UserResponse?> UpdateUserAsync(int userId, UpdateUserRequest request)
     {
-        User existingUser = await _userRepository.GetUserByIdAsync(userId).ConfigureAwait(false) ?? throw new UserNotFoundException("No user found");
-        User newUser = await _userRepository.UpdateUserAsync(existingUser, request).ConfigureAwait(false) ?? throw new UserUpdateException("Error updating user");
-        return _mapper.Map<UserResponse>(newUser);
+        User user = await _userRepository.GetUserByIdAsync(userId).ConfigureAwait(false) ?? throw new NotFoundException("No user found");
+
+        user.FirstName = request.FirstName;
+        user.LastName = request.LastName;
+        user.PhoneNumber = request.PhoneNumber;
+        user.Country = request.Country;
+
+        int affectedRows = await _userRepository.UpdateUserAsync(user).ConfigureAwait(false);
+        if (affectedRows == 0)
+        {
+            throw new UserUpdateException("Error updating user");
+        }
+        return _mapper.Map<UserResponse>(user);
     }
 }

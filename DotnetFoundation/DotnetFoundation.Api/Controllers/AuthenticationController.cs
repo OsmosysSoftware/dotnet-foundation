@@ -111,7 +111,7 @@ public class AuthenticationController : ControllerBase
 
             return Ok(response);
         }
-        catch (UserNotFoundException ex)
+        catch (NotFoundException ex)
         {
             response.Message = ex.Message;
             response.Data = false;
@@ -152,7 +152,7 @@ public class AuthenticationController : ControllerBase
 
             return Ok(response);
         }
-        catch (UserNotFoundException ex)
+        catch (NotFoundException ex)
         {
             response.Message = ex.Message;
             response.Data = false;

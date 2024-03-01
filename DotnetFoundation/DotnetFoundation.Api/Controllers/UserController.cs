@@ -65,7 +65,7 @@ public class UserController : ControllerBase
 
             return Ok(response);
         }
-        catch (UserNotFoundException ex)
+        catch (NotFoundException ex)
         {
             response.Message = ex.Message;
             response.Data = null;
@@ -101,7 +101,7 @@ public class UserController : ControllerBase
 
             return Ok(response);
         }
-        catch (UserNotFoundException ex)
+        catch (NotFoundException ex)
         {
             response.Message = ex.Message;
             response.Data = false;
@@ -141,7 +141,7 @@ public class UserController : ControllerBase
 
             return Ok(response);
         }
-        catch (UserNotFoundException ex)
+        catch (NotFoundException ex)
         {
             response.Message = ex.Message;
             response.Data = null;
@@ -183,7 +183,7 @@ public class UserController : ControllerBase
 
             return Ok(response);
         }
-        catch (UserNotFoundException ex)
+        catch (NotFoundException ex)
         {
             response.Message = ex.Message;
             response.Data = null;
