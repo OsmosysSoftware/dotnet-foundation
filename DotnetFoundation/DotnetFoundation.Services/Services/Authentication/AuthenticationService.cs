@@ -51,16 +51,14 @@ public class AuthenticationService : IAuthenticationService
         };
     }
 
-    public async Task<bool> ForgotPasswordAsync(string email)
+    public async Task ForgotPasswordAsync(string email)
     {
         string token = await _userRepository.ForgotPasswordAsync(email).ConfigureAwait(false);
         await _emailService.SendForgetPasswordEmailAsync(email, token).ConfigureAwait(false);
-        return true;
     }
 
-    public async Task<bool> ResetPasswordAsync(PasswordResetRequest request)
+    public async Task ResetPasswordAsync(PasswordResetRequest request)
     {
         await _userRepository.ResetPasswordAsync(request.Email, request.Token, request.Password).ConfigureAwait(false);
-        return true;
     }
 }

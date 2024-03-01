@@ -6,6 +6,6 @@ public interface IAuthenticationService
 {
     public Task<AuthenticationResponse> RegisterAsync(RegisterRequest request);
     public Task<AuthenticationResponse> LoginAsync(LoginRequest request);
-    public Task<bool> ForgotPasswordAsync(string email);
-    public Task<bool> ResetPasswordAsync(PasswordResetRequest request);
+    public Task ForgotPasswordAsync(string email);
+    public Task ResetPasswordAsync(PasswordResetRequest request);
 }

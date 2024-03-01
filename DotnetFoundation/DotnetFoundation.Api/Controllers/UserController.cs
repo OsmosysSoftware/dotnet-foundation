@@ -40,7 +40,6 @@ public class UserController : ControllerBase
         catch (Exception ex)
         {
             response.Message = ex.Message;
-            response.Data = null;
             response.Status = ResponseStatus.Error;
             return BadRequest(response);
         }
@@ -68,16 +67,14 @@ public class UserController : ControllerBase
         catch (NotFoundException ex)
         {
             response.Message = ex.Message;
-            response.Data = null;
             response.Status = ResponseStatus.Error;
             return BadRequest(response);
         }
         catch (Exception ex)
         {
             response.Message = ex.Message;
-            response.Data = null;
             response.Status = ResponseStatus.Error;
-            return StatusCode((int)HttpStatusCode.InternalServerError, response);
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
     }
 
@@ -104,16 +101,14 @@ public class UserController : ControllerBase
         catch (NotFoundException ex)
         {
             response.Message = ex.Message;
-            response.Data = false;
             response.Status = ResponseStatus.Error;
             return BadRequest(response);
         }
         catch (Exception ex)
         {
             response.Message = ex.Message;
-            response.Data = false;
             response.Status = ResponseStatus.Error;
-            return StatusCode((int)HttpStatusCode.InternalServerError, response);
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
     }
 
@@ -144,23 +139,20 @@ public class UserController : ControllerBase
         catch (NotFoundException ex)
         {
             response.Message = ex.Message;
-            response.Data = null;
             response.Status = ResponseStatus.Error;
             return BadRequest(response);
         }
         catch (UserUpdateException ex)
         {
             response.Message = ex.Message;
-            response.Data = null;
             response.Status = ResponseStatus.Error;
             return BadRequest(response);
         }
         catch (Exception ex)
         {
             response.Message = ex.Message;
-            response.Data = null;
             response.Status = ResponseStatus.Error;
-            return StatusCode((int)HttpStatusCode.InternalServerError, response);
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
     }
 
@@ -186,16 +178,14 @@ public class UserController : ControllerBase
         catch (NotFoundException ex)
         {
             response.Message = ex.Message;
-            response.Data = null;
             response.Status = ResponseStatus.Error;
             return BadRequest(response);
         }
         catch (Exception ex)
         {
             response.Message = ex.Message;
-            response.Data = null;
             response.Status = ResponseStatus.Error;
-            return StatusCode((int)HttpStatusCode.InternalServerError, response);
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
     }
 }

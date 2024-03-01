@@ -39,16 +39,14 @@ public class AuthenticationController : ControllerBase
         catch (IdentityUserCreationException ex)
         {
             response.Message = ex.Message;
-            response.Data = null;
             response.Status = ResponseStatus.Error;
             return BadRequest(response);
         }
         catch (Exception ex)
         {
             response.Message = ex.Message;
-            response.Data = null;
             response.Status = ResponseStatus.Error;
-            return StatusCode((int)HttpStatusCode.InternalServerError, response);
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
     }
 
@@ -73,23 +71,21 @@ public class AuthenticationController : ControllerBase
         catch (InvalidCredentialsException ex)
         {
             response.Message = ex.Message;
-            response.Data = null;
+
             response.Status = ResponseStatus.Error;
             return BadRequest(response);
         }
         catch (LockoutException ex)
         {
             response.Message = ex.Message;
-            response.Data = null;
             response.Status = ResponseStatus.Error;
             return BadRequest(response);
         }
         catch (Exception ex)
         {
             response.Message = ex.Message;
-            response.Data = null;
             response.Status = ResponseStatus.Error;
-            return StatusCode((int)HttpStatusCode.InternalServerError, response);
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
     }
 
@@ -101,12 +97,12 @@ public class AuthenticationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<bool>>> ResetPasswordAsync(PasswordResetRequest request)
+    public async Task<ActionResult<BaseResponse<int>>> ResetPasswordAsync(PasswordResetRequest request)
     {
-        BaseResponse<bool> response = new(ResponseStatus.Fail);
+        BaseResponse<int> response = new(ResponseStatus.Fail);
         try
         {
-            response.Data = await _authenticationService.ResetPasswordAsync(request).ConfigureAwait(false);
+            await _authenticationService.ResetPasswordAsync(request).ConfigureAwait(false);
             response.Status = ResponseStatus.Success;
 
             return Ok(response);
@@ -114,23 +110,20 @@ public class AuthenticationController : ControllerBase
         catch (NotFoundException ex)
         {
             response.Message = ex.Message;
-            response.Data = false;
             response.Status = ResponseStatus.Error;
             return BadRequest(response);
         }
         catch (InvalidResetPasswordTokenException ex)
         {
             response.Message = ex.Message;
-            response.Data = false;
             response.Status = ResponseStatus.Error;
             return BadRequest(response);
         }
         catch (Exception ex)
         {
             response.Message = ex.Message;
-            response.Data = false;
             response.Status = ResponseStatus.Error;
-            return StatusCode((int)HttpStatusCode.InternalServerError, response);
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
     }
 
@@ -142,12 +135,12 @@ public class AuthenticationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<bool>>> ForgotPasswordAsync(string email)
+    public async Task<ActionResult<BaseResponse<int>>> ForgotPasswordAsync(string email)
     {
-        BaseResponse<bool> response = new(ResponseStatus.Fail);
+        BaseResponse<int> response = new(ResponseStatus.Fail);
         try
         {
-            response.Data = await _authenticationService.ForgotPasswordAsync(email).ConfigureAwait(false);
+            await _authenticationService.ForgotPasswordAsync(email).ConfigureAwait(false);
             response.Status = ResponseStatus.Success;
 
             return Ok(response);
@@ -155,16 +148,14 @@ public class AuthenticationController : ControllerBase
         catch (NotFoundException ex)
         {
             response.Message = ex.Message;
-            response.Data = false;
             response.Status = ResponseStatus.Error;
             return BadRequest(response);
         }
         catch (Exception ex)
         {
             response.Message = ex.Message;
-            response.Data = false;
             response.Status = ResponseStatus.Error;
-            return StatusCode((int)HttpStatusCode.InternalServerError, response);
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
     }
 }
