@@ -2,13 +2,12 @@ using DotnetFoundation.Application.Interfaces.Services;
 using DotnetFoundation.Application.Models.Common;
 using DotnetFoundation.Application.Models.DTOs.TaskDetailsDTO;
 using DotnetFoundation.Application.Models.Enums;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DotnetFoundation.Api.Controllers;
 
 [ApiController]
-[Route("api/tasks")]
+[Route("api")]
 public class TaskController : ControllerBase
 {
     private readonly ITaskDetailsService _taskDetailsService;
@@ -20,7 +19,7 @@ public class TaskController : ControllerBase
     /// <summary>
     /// Get all tasks.
     /// </summary>
-    [HttpGet]    
+    [HttpGet("tasks")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<BaseResponse<List<TaskDetailsResponse>>>> GetAllTasksAsync()
@@ -36,7 +35,7 @@ public class TaskController : ControllerBase
     /// <summary>
     /// Get all active tasks.
     /// </summary>
-    [HttpGet("active")]    
+    [HttpGet("tasks/active")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<BaseResponse<List<TaskDetailsResponse>>>> GetActiveTasksAsync()
@@ -53,7 +52,7 @@ public class TaskController : ControllerBase
     /// Get task details by Id.
     /// </summary>
     /// <param name="taskId">Id of task record</param>
-    [HttpGet("{taskId}")]    
+    [HttpGet("tasks/{taskId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -72,7 +71,7 @@ public class TaskController : ControllerBase
     /// Add new task.
     /// </summary>
     /// <param name="detailRequest">Role request details</param>
-    [HttpPost]    
+    [HttpPost("task")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -91,7 +90,7 @@ public class TaskController : ControllerBase
     /// </summary>
     /// <param name="taskId">Id of task record</param>
     /// <param name="modifiedDetails">Modified details for task record</param>
-    [HttpPut("{taskId}")]    
+    [HttpPut("tasks/{taskId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<BaseResponse<TaskDetailsResponse>>> UpdateTaskAsync(int taskId, TaskDetailsRequest modifiedDetails)
@@ -108,7 +107,7 @@ public class TaskController : ControllerBase
     /// Change status of task to inactive.
     /// </summary>
     /// <param name="taskId">Id of task record</param>
-    [HttpDelete("{taskId}")]    
+    [HttpDelete("tasks/{taskId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<BaseResponse<TaskDetailsResponse>>> InactiveTaskAsync(int taskId)

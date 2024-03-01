@@ -8,6 +8,7 @@ public record TaskDetailsRequest
     /// Gets the Description of the task.
     /// </summary>
     [Required(ErrorMessage = "Description is required")]
+    [StringLength(100, ErrorMessage = "Description Max Length is 100")]
     public string Description { get; init; } = string.Empty;
     /// <summary>
     /// Gets the Budgeted Hours of the task.
@@ -23,5 +24,6 @@ public record TaskDetailsRequest
     /// <summary>
     /// Gets the Category of the task.
     /// </summary>
+    [StringLength(100, ErrorMessage = "Category Max Length is 100")]
     public string? Category { get; init; }
 }
