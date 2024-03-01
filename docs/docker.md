@@ -1,4 +1,4 @@
-Certainly! Below are step-by-step instructions to set up a development environment using Visual Studio Code Dev Containers:
+Below are step-by-step instructions to set up a development environment using Visual Studio Code Dev Containers:
 
 ### Step 1: Install Prerequisites
 

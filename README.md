@@ -44,7 +44,7 @@ The development of this application happens using Visual Studio IDE on a Windows
 
 ## Setup Application for Development using Dev Container
 
-To develop the application using the dev containers follow this [file](docs/docker.md)
+To develop the application using the dev containers follow this [guide](docs/docker.md)
 
 # License
 
