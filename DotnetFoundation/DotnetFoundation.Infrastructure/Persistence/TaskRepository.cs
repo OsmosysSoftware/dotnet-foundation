@@ -3,6 +3,7 @@ using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using DotnetFoundation.Domain.Enums;
+using DotnetFoundation.Application.Models.Common;
 
 namespace DotnetFoundation.Infrastructure.Persistence;
 
@@ -14,16 +15,21 @@ public class TaskDetailsRepository : ITaskDetailsRepository
         _dbContext = sqlDatabaseContext;
     }
 
-    public async Task<List<TaskDetails>> GetAllTasksAsync()
+    public async Task<List<TaskDetails>> GetAllTasksAsync(PagingRequest pagingRequest)
     {
-        List<TaskDetails> taskObj = await _dbContext.TaskDetails.ToListAsync().ConfigureAwait(false);
+        List<TaskDetails> taskObj = await _dbContext.TaskDetails
+            .Skip((pagingRequest.PageNumber -1) * pagingRequest.PageSize)
+            .Take(pagingRequest.PageSize)
+            .ToListAsync().ConfigureAwait(false);
         return taskObj;
     }
 
-    public async Task<List<TaskDetails>> GetActiveTasksAsync()
+    public async Task<List<TaskDetails>> GetActiveTasksAsync(PagingRequest pagingRequest)
     {
         List<TaskDetails> taskObj = (await _dbContext.TaskDetails
             .Where(task => task.Status == Status.ACTIVE)
+            .Skip((pagingRequest.PageNumber - 1) * pagingRequest.PageSize)
+            .Take(pagingRequest.PageSize)
             .ToListAsync().ConfigureAwait(false));
         return taskObj;
     }

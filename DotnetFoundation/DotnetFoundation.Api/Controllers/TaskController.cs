@@ -23,11 +23,11 @@ public class TaskController : ControllerBase
     [HttpGet]    
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<List<TaskDetailsResponse>>>> GetAllTasksAsync()
+    public async Task<ActionResult<BaseResponse<List<TaskDetailsResponse>>>> GetAllTasksAsync([FromQuery] PagingRequest pagingRequest)
     {
         BaseResponse<List<TaskDetailsResponse>> response = new(ResponseStatus.Fail);
 
-        response.Data = await _taskDetailsService.GetAllTasksAsync().ConfigureAwait(false);
+        response.Data = await _taskDetailsService.GetAllTasksAsync(pagingRequest).ConfigureAwait(false);
         response.Status = ResponseStatus.Success;
 
         return Ok(response);
@@ -39,11 +39,11 @@ public class TaskController : ControllerBase
     [HttpGet("active")]    
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<List<TaskDetailsResponse>>>> GetActiveTasksAsync()
+    public async Task<ActionResult<BaseResponse<List<TaskDetailsResponse>>>> GetActiveTasksAsync([FromQuery] PagingRequest pagingRequest)
     {
         BaseResponse<List<TaskDetailsResponse>> response = new(ResponseStatus.Fail);
 
-        response.Data = await _taskDetailsService.GetActiveTasksAsync().ConfigureAwait(false);
+        response.Data = await _taskDetailsService.GetActiveTasksAsync(pagingRequest).ConfigureAwait(false);
         response.Status = ResponseStatus.Success;
 
         return Ok(response);

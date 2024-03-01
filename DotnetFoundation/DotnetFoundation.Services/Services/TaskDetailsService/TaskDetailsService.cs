@@ -1,6 +1,7 @@
 using AutoMapper;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Interfaces.Services;
+using DotnetFoundation.Application.Models.Common;
 using DotnetFoundation.Application.Models.DTOs.TaskDetailsDTO;
 using DotnetFoundation.Domain.Entities;
 using DotnetFoundation.Domain.Enums;
@@ -21,15 +22,15 @@ public class TaskDetailsService : ITaskDetailsService
     }
 
 
-    public async Task<List<TaskDetailsResponse>> GetAllTasksAsync()
+    public async Task<List<TaskDetailsResponse>> GetAllTasksAsync(PagingRequest pagingRequest)
     {
-        List<TaskDetails> response = await _taskDetailsRepository.GetAllTasksAsync().ConfigureAwait(false);
+        List<TaskDetails> response = await _taskDetailsRepository.GetAllTasksAsync(pagingRequest).ConfigureAwait(false);
         return _mapper.Map<List<TaskDetailsResponse>>(response);
     }
 
-    public async Task<List<TaskDetailsResponse>> GetActiveTasksAsync()
+    public async Task<List<TaskDetailsResponse>> GetActiveTasksAsync(PagingRequest pagingRequest)
     {
-        List<TaskDetails> response = await _taskDetailsRepository.GetActiveTasksAsync().ConfigureAwait(false);
+        List<TaskDetails> response = await _taskDetailsRepository.GetActiveTasksAsync(pagingRequest).ConfigureAwait(false);
         return _mapper.Map<List<TaskDetailsResponse>>(response);
     }
 
