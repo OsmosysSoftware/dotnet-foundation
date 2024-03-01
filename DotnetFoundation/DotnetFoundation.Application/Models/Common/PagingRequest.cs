@@ -12,7 +12,7 @@ public class PagingRequest
         }
         set
         {
-            pageSize = value > MaxPageSize ? MaxPageSize : value;
+            pageSize = (value > MaxPageSize ? MaxPageSize : value) < 1 ? 1 : value;
         }
     }
 }
