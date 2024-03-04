@@ -46,7 +46,7 @@ public class TaskDetailsService : ITaskDetailsService
             ?? throw new Exception($"AssignedTo with userId = \"{detailsRequest.AssignedTo}\" does not exist. Cannot add task.");
 
         // Create new TaskDetails object and add relevant details
-        TaskDetails taskDetails = new TaskDetails
+        TaskDetails taskDetails = new()
         {
             Description = detailsRequest.Description,
             BudgetedHours = detailsRequest.BudgetedHours,

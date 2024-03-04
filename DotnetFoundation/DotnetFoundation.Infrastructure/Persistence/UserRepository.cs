@@ -1,10 +1,12 @@
 using DotnetFoundation.Application.Exceptions;
+using DotnetFoundation.Application.Interfaces.Integrations;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
 using DotnetFoundation.Application.Models.DTOs.UserDTO;
 using DotnetFoundation.Domain.Entities;
 using DotnetFoundation.Domain.Enums;
 using DotnetFoundation.Infrastructure.Identity;
+using DotnetFoundation.Infrastructure.Integrations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -123,7 +125,7 @@ public class UserRepository : IUserRepository
             throw new InvalidCredentialsException("Invalid Email or Password");
         }
         IdentityApplicationUser user = await _userManager.FindByEmailAsync(request.Email).ConfigureAwait(false) ?? throw new NotFoundException("User does not exist");
-        return new(user.Id, request.Email, (await _userManager.GetRolesAsync(user).ConfigureAwait(false)).ToList());
+        return new(null, user.Id, request.Email, (await _userManager.GetRolesAsync(user).ConfigureAwait(false)).ToList());
     }
 
     public async Task<string> ForgotPasswordAsync(string email)
@@ -141,6 +143,18 @@ public class UserRepository : IUserRepository
             throw new InvalidTokenException("Invalid token");
         }
     }
+    public async Task ChangePasswordAsync(string userId, UserChangePassword request)
+    {
+        IdentityApplicationUser user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false) ?? throw new NotFoundException("Error finding user");
+        IdentityResult result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword).ConfigureAwait(false);
+        if (!result.Succeeded)
+        {
+            string errorDetails = string.Join(", ", result.Errors.Select(e => e.Description));
+            throw new IdentityUserException($"Error changing user password: {errorDetails}");
+        }
+        await _signInManager.RefreshSignInAsync(user).ConfigureAwait(false);
+    }
+
     public async Task<bool> AddUserRoleAsync(string email, Roles role)
     {
         string newRole = role.ToString();
@@ -154,5 +168,13 @@ public class UserRepository : IUserRepository
         await _userManager.AddToRoleAsync(identityApplicationUser, newRole).ConfigureAwait(false);
         await _userManager.AddClaimAsync(identityApplicationUser, new Claim(ClaimTypes.Role, newRole)).ConfigureAwait(false);
         return true;
+    }
+    public async Task<int> GetUserIdByIdentityId(string IdentityId)
+    {
+        return await _dbContext.ApplicationUsers
+            .Where(u => u.IdentityApplicationUserId == IdentityId)
+            .Select(u => u.Id)
+            .FirstOrDefaultAsync()
+            .ConfigureAwait(false);
     }
 }
