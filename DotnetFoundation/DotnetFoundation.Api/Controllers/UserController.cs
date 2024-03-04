@@ -188,4 +188,43 @@ public class UserController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
     }
+    /// <summary>
+    /// Change user Password.
+    /// </summary>
+    /// <param name="request">Change password request</param>
+    [HttpPut("changepassword")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<BaseResponse<int>>> ChangePasswordAsync(UserChangePassword request)
+    {
+        BaseResponse<int> response = new(ResponseStatus.Fail);
+        try
+        {
+            await _userService.ChangePasswordAsync(request).ConfigureAwait(false);
+            response.Status = ResponseStatus.Success;
+
+            return Ok(response);
+        }
+        catch (NotFoundException ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (IdentityUserException ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (Exception ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
+        }
+    }
 }
+
