@@ -38,7 +38,7 @@ public class UserRepository : IUserRepository
         if (!identityResult.Succeeded)
         {
             string errorDetails = string.Join(", ", identityResult.Errors.Select(e => e.Description));
-            throw new IdentityUserCreationException($"Error creating identity user: {errorDetails}");
+            throw new IdentityUserException($"Error creating identity user: {errorDetails}");
         }
 
         ApplicationUser applicationUser = new()
@@ -138,7 +138,7 @@ public class UserRepository : IUserRepository
 
         if (!result.Succeeded)
         {
-            throw new InvalidResetPasswordTokenException("Invalid token");
+            throw new InvalidTokenException("Invalid token");
         }
     }
     public async Task<bool> AddUserRoleAsync(string email, Roles role)

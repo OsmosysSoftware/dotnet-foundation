@@ -142,7 +142,7 @@ public class UserController : ControllerBase
             response.Status = ResponseStatus.Error;
             return BadRequest(response);
         }
-        catch (UserUpdateException ex)
+        catch (UserException ex)
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;

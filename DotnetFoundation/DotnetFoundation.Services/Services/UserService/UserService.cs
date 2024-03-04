@@ -54,7 +54,7 @@ public class UserService : IUserService
         int affectedRows = await _userRepository.UpdateUserAsync(user).ConfigureAwait(false);
         if (affectedRows == 0)
         {
-            throw new UserUpdateException("Error updating user");
+            throw new UserException("Error updating user");
         }
         return _mapper.Map<UserResponse>(user);
     }

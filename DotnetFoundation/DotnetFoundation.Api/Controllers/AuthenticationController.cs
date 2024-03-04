@@ -36,7 +36,7 @@ public class AuthenticationController : ControllerBase
 
             return Ok(response);
         }
-        catch (IdentityUserCreationException ex)
+        catch (IdentityUserException ex)
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
@@ -113,7 +113,7 @@ public class AuthenticationController : ControllerBase
             response.Status = ResponseStatus.Error;
             return BadRequest(response);
         }
-        catch (InvalidResetPasswordTokenException ex)
+        catch (InvalidTokenException ex)
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
