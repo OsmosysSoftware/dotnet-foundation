@@ -1,15 +1,20 @@
-namespace DotnetFoundation.Infrastructure;
+namespace DotnetFoundation.Infrastructure.DatabaseContext;
 
 using DotnetFoundation.Domain.Entities;
 using DotnetFoundation.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+// using Microsoft.Extensions.Configuration;
 
 public class SqlDatabaseContext : IdentityDbContext<IdentityApplicationUser>
 {
-    public SqlDatabaseContext(DbContextOptions<SqlDatabaseContext> options) : base(options)
+    // private readonly IConfiguration _configuration;
+    public SqlDatabaseContext(DbContextOptions<SqlDatabaseContext> options
+    // , IConfiguration configuration
+    ) : base(options)
     {
-
+        // _configuration = configuration;
     }
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     public DbSet<TaskDetails> TaskDetails { get; set; }
@@ -37,6 +42,10 @@ public class SqlDatabaseContext : IdentityDbContext<IdentityApplicationUser>
         .HasIndex(t => t.AssignedTo);
 
         builder.Entity<TaskDetails>().ToTable("tasks");
+
+        // NOTE: Ensure Seed function is the last line
+        // All migrations should be done before seeding
+        builder.Seed();
     }
 }
 
