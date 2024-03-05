@@ -131,11 +131,15 @@ public class UserRepository : IUserRepository
     public async Task<string> ForgotPasswordAsync(string email)
     {
         IdentityApplicationUser user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new NotFoundException("Invalid Email");
+        int userId = await GetUserIdByIdentityId(user.Id).ConfigureAwait(false);
+        _ = await GetUserByIdAsync(userId).ConfigureAwait(false) ?? throw new NotFoundException("No user found with given Email");
         return await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false);
     }
     public async Task ResetPasswordAsync(string email, string token, string newPassword)
     {
         IdentityApplicationUser user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new NotFoundException("Invalid Email");
+        int userId = await GetUserIdByIdentityId(user.Id).ConfigureAwait(false);
+        _ = await GetUserByIdAsync(userId).ConfigureAwait(false) ?? throw new NotFoundException("No user found with given Email");
         IdentityResult result = await _userManager.ResetPasswordAsync(user, token, newPassword).ConfigureAwait(false);
 
         if (!result.Succeeded)

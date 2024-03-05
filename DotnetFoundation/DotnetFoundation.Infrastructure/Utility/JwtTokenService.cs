@@ -27,6 +27,14 @@ public class JwtTokenService : IJwtTokenService
     {
         return _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Email) ?? string.Empty;
     }
+    public string GetUserId()
+    {
+        return _httpContextAccessor.HttpContext?.User.FindFirstValue("UserId") ?? string.Empty;
+    }
+    public List<string> GetUserRoles()
+    {
+        return _httpContextAccessor.HttpContext?.User.FindAll(ClaimTypes.Role)?.Select(c => c.Value).ToList() ?? new List<string>();
+    }
 
     public string GenerateJwtToken(UserInfo user)
     {

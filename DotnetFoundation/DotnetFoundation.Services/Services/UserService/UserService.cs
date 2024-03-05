@@ -52,7 +52,6 @@ public class UserService : IUserService
         string email = _jwtService.GetUserEmail();
         await _userRepository.ChangePasswordAsync(userId, request).ConfigureAwait(false);
         await _emailService.SendChangePasswordEmailAsync(email).ConfigureAwait(false);
-
     }
 
     public async Task<UserResponse?> UpdateUserAsync(int userId, UpdateUserRequest request)
