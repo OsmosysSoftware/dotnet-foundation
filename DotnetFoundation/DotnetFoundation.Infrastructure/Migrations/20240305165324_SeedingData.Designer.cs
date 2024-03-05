@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using DotnetFoundation.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
 
 #nullable disable
 
@@ -18,6 +20,24 @@ namespace DotnetFoundation.Infrastructure.Migrations
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
+
+            #region variables to be imported from .env files
+            // Get Role Ids
+            string developerRoleId = Environment.GetEnvironmentVariable("DEVELOPER_ROLE_ID") ?? throw new Exception("No DEVELOPER_ROLE_ID specified");
+            string leadRoleId = Environment.GetEnvironmentVariable("LEAD_ROLE_ID") ?? throw new Exception("No LEAD_ROLE_ID specified");
+            string adminRoleId = Environment.GetEnvironmentVariable("ADMIN_ROLE_ID") ?? throw new Exception("No ADMIN_ROLE_ID specified");
+            string superAdminRoleId = Environment.GetEnvironmentVariable("SUPER_ADMIN_ROLE_ID") ?? throw new Exception("No SUPER_ADMIN_ROLE_ID specified");
+
+            // Get superadmin variables
+            string superAdminId = Environment.GetEnvironmentVariable("SUPER_ADMIN_ID") ?? throw new Exception("No SUPER_ADMIN_ID specified");
+            string superAdminEmail = Environment.GetEnvironmentVariable("SUPER_ADMIN_EMAIL") ?? throw new Exception("No SUPER_ADMIN_EMAIL specified");
+            string superAdminPassword = Environment.GetEnvironmentVariable("SUPER_ADMIN_PASSWORD") ?? throw new Exception("No SUPER_ADMIN_PASSWORD specified");
+            string claimType = Environment.GetEnvironmentVariable("CLAIM_TYPE") ?? throw new Exception("No CLAIM_TYPE specified");
+
+            PasswordHasher<IdentityApplicationUser> hasher = new();
+            string hashedPassword = hasher.HashPassword(null, superAdminPassword);
+            #endregion
+
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
@@ -120,9 +140,9 @@ namespace DotnetFoundation.Infrastructure.Migrations
                             Country = "India",
                             CreatedBy = 1,
                             CreatedOn = new DateTime(2024, 3, 5, 16, 53, 24, 172, DateTimeKind.Utc).AddTicks(4141),
-                            Email = "admin@osmox.co",
+                            Email = superAdminEmail,
                             FirstName = "Super",
-                            IdentityApplicationUserId = "b109c28a-6c6f-43d2-bc49-9fba25cb6e72",
+                            IdentityApplicationUserId = superAdminId,
                             LastName = "Admin",
                             ModifiedBy = 1,
                             ModifiedOn = new DateTime(2024, 3, 5, 16, 53, 24, 172, DateTimeKind.Utc).AddTicks(4142),
@@ -197,15 +217,15 @@ namespace DotnetFoundation.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "b109c28a-6c6f-43d2-bc49-9fba25cb6e72",
+                            Id = superAdminId,
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "385aeb70-97c7-4bc6-becc-f2668afce720",
-                            Email = "admin@osmox.co",
+                            Email = superAdminEmail,
                             EmailConfirmed = true,
                             LockoutEnabled = false,
-                            NormalizedEmail = "ADMIN@OSMOX.CO",
-                            NormalizedUserName = "ADMIN@OSMOX.CO",
-                            PasswordHash = "AQAAAAIAAYagAAAAENAt0HNxZQuZEe7wQ42pp7gaDsOIxrrFmmgegH6h0E4HrGCtDDS0O7iZ3CHzjKznOw==",
+                            NormalizedEmail = superAdminEmail.ToUpper(),
+                            NormalizedUserName = superAdminEmail.ToUpper(),
+                            PasswordHash = hashedPassword,
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "f7a1d5fd-4265-4be5-adeb-e20eb1f8d9d3",
                             TwoFactorEnabled = false,
@@ -241,25 +261,25 @@ namespace DotnetFoundation.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "05d341d9-ee1a-4357-ad46-60633e1f60a6",
+                            Id = developerRoleId,
                             Name = "DEVELOPER",
                             NormalizedName = "DEVELOPER"
                         },
                         new
                         {
-                            Id = "343abb08-4cbd-4a9b-93e1-dca377b5d984",
+                            Id = leadRoleId,
                             Name = "LEAD",
                             NormalizedName = "LEAD"
                         },
                         new
                         {
-                            Id = "e2136d42-58a2-4b50-ad76-a34466d2d3d5",
+                            Id = adminRoleId,
                             Name = "ADMIN",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "c08d9a4b-72f5-4eab-8c9a-6fb17a3e92a1",
+                            Id = superAdminRoleId,
                             Name = "SUPERADMIN",
                             NormalizedName = "SUPERADMIN"
                         });
@@ -314,9 +334,9 @@ namespace DotnetFoundation.Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            ClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+                            ClaimType = claimType,
                             ClaimValue = "SUPERADMIN",
-                            UserId = "b109c28a-6c6f-43d2-bc49-9fba25cb6e72"
+                            UserId = superAdminId
                         });
                 });
 
@@ -359,8 +379,8 @@ namespace DotnetFoundation.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            UserId = "b109c28a-6c6f-43d2-bc49-9fba25cb6e72",
-                            RoleId = "c08d9a4b-72f5-4eab-8c9a-6fb17a3e92a1"
+                            UserId = superAdminId,
+                            RoleId = superAdminRoleId
                         });
                 });
 
