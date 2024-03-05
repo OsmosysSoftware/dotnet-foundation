@@ -2,19 +2,14 @@ namespace DotnetFoundation.Infrastructure.DatabaseContext;
 
 using DotnetFoundation.Domain.Entities;
 using DotnetFoundation.Infrastructure.Identity;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-// using Microsoft.Extensions.Configuration;
 
 public class SqlDatabaseContext : IdentityDbContext<IdentityApplicationUser>
 {
-    // private readonly IConfiguration _configuration;
-    public SqlDatabaseContext(DbContextOptions<SqlDatabaseContext> options
-    // , IConfiguration configuration
-    ) : base(options)
+    public SqlDatabaseContext(DbContextOptions<SqlDatabaseContext> options) : base(options)
     {
-        // _configuration = configuration;
+
     }
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     public DbSet<TaskDetails> TaskDetails { get; set; }
