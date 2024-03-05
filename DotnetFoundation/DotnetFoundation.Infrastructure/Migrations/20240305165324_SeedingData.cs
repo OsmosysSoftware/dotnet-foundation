@@ -1,4 +1,6 @@
 ﻿using System;
+using DotnetFoundation.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -13,55 +15,80 @@ namespace DotnetFoundation.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            #region variables to be imported from .env files
+            // Get Role Ids
+            string developerRoleId = Environment.GetEnvironmentVariable("DEVELOPER_ROLE_ID") ?? throw new Exception("No DEVELOPER_ROLE_ID specified");
+            string leadRoleId = Environment.GetEnvironmentVariable("LEAD_ROLE_ID") ?? throw new Exception("No LEAD_ROLE_ID specified");
+            string adminRoleId = Environment.GetEnvironmentVariable("ADMIN_ROLE_ID") ?? throw new Exception("No ADMIN_ROLE_ID specified");
+            string superAdminRoleId = Environment.GetEnvironmentVariable("SUPER_ADMIN_ROLE_ID") ?? throw new Exception("No SUPER_ADMIN_ROLE_ID specified");
+
+            // Get superadmin variables
+            string superAdminId = Environment.GetEnvironmentVariable("SUPER_ADMIN_ID") ?? throw new Exception("No SUPER_ADMIN_ID specified");
+            string superAdminEmail = Environment.GetEnvironmentVariable("SUPER_ADMIN_EMAIL") ?? throw new Exception("No SUPER_ADMIN_EMAIL specified");
+            string superAdminPassword = Environment.GetEnvironmentVariable("SUPER_ADMIN_PASSWORD") ?? throw new Exception("No SUPER_ADMIN_PASSWORD specified");
+            string claimType = Environment.GetEnvironmentVariable("CLAIM_TYPE") ?? throw new Exception("No CLAIM_TYPE specified");
+
+            PasswordHasher<IdentityApplicationUser> hasher = new();
+            string hashedPassword = hasher.HashPassword(null, superAdminPassword);
+            #endregion
+
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "05d341d9-ee1a-4357-ad46-60633e1f60a6", null, "DEVELOPER", "DEVELOPER" },
-                    { "343abb08-4cbd-4a9b-93e1-dca377b5d984", null, "LEAD", "LEAD" },
-                    { "c08d9a4b-72f5-4eab-8c9a-6fb17a3e92a1", null, "SUPERADMIN", "SUPERADMIN" },
-                    { "e2136d42-58a2-4b50-ad76-a34466d2d3d5", null, "ADMIN", "ADMIN" }
+                    { developerRoleId, null, "DEVELOPER", "DEVELOPER" },
+                    { leadRoleId, null, "LEAD", "LEAD" },
+                    { adminRoleId, null, "ADMIN", "ADMIN" },
+                    { superAdminRoleId, null, "SUPERADMIN", "SUPERADMIN" }
                 });
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "b109c28a-6c6f-43d2-bc49-9fba25cb6e72", 0, "385aeb70-97c7-4bc6-becc-f2668afce720", "admin@osmox.co", true, false, null, "ADMIN@OSMOX.CO", "ADMIN@OSMOX.CO", "AQAAAAIAAYagAAAAENAt0HNxZQuZEe7wQ42pp7gaDsOIxrrFmmgegH6h0E4HrGCtDDS0O7iZ3CHzjKznOw==", null, false, "f7a1d5fd-4265-4be5-adeb-e20eb1f8d9d3", false, "admin@osmox.co" });
+                values: new object[] { superAdminId, 0, "385aeb70-97c7-4bc6-becc-f2668afce720", superAdminEmail, true, false, null, superAdminEmail.ToUpper(), superAdminEmail.ToUpper(), hashedPassword, null, false, "f7a1d5fd-4265-4be5-adeb-e20eb1f8d9d3", false, superAdminEmail });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserClaims",
                 columns: new[] { "Id", "ClaimType", "ClaimValue", "UserId" },
-                values: new object[] { 1, "http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "SUPERADMIN", "b109c28a-6c6f-43d2-bc49-9fba25cb6e72" });
+                values: new object[] { 1, claimType, "SUPERADMIN", superAdminId });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",
                 columns: new[] { "RoleId", "UserId" },
-                values: new object[] { "c08d9a4b-72f5-4eab-8c9a-6fb17a3e92a1", "b109c28a-6c6f-43d2-bc49-9fba25cb6e72" });
+                values: new object[] { superAdminRoleId, superAdminId });
 
             migrationBuilder.InsertData(
                 table: "users",
                 columns: new[] { "Id", "Country", "CreatedBy", "CreatedOn", "Email", "FirstName", "IdentityApplicationUserId", "LastName", "ModifiedBy", "ModifiedOn", "PhoneNumber", "Status" },
-                values: new object[] { 1, "India", 1, new DateTime(2024, 3, 5, 16, 53, 24, 172, DateTimeKind.Utc).AddTicks(4141), "admin@osmox.co", "Super", "b109c28a-6c6f-43d2-bc49-9fba25cb6e72", "Admin", 1, new DateTime(2024, 3, 5, 16, 53, 24, 172, DateTimeKind.Utc).AddTicks(4142), "0000000000", 1 });
+                values: new object[] { 1, "India", 1, new DateTime(2024, 3, 5, 16, 53, 24, 172, DateTimeKind.Utc).AddTicks(4141), superAdminEmail, "Super", superAdminId, "Admin", 1, new DateTime(2024, 3, 5, 16, 53, 24, 172, DateTimeKind.Utc).AddTicks(4142), "0000000000", 1 });
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DeleteData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: "05d341d9-ee1a-4357-ad46-60633e1f60a6");
+            #region Ids to be imported from .env files
+            string developerRoleId = Environment.GetEnvironmentVariable("DEVELOPER_ROLE_ID") ?? throw new Exception("No DEVELOPER_ROLE_ID specified");
+            string leadRoleId = Environment.GetEnvironmentVariable("LEAD_ROLE_ID") ?? throw new Exception("No LEAD_ROLE_ID specified");
+            string adminRoleId = Environment.GetEnvironmentVariable("ADMIN_ROLE_ID") ?? throw new Exception("No ADMIN_ROLE_ID specified");
+            string superAdminRoleId = Environment.GetEnvironmentVariable("SUPER_ADMIN_ROLE_ID") ?? throw new Exception("No SUPER_ADMIN_ROLE_ID specified");
+            string superAdminId = Environment.GetEnvironmentVariable("SUPER_ADMIN_ID") ?? throw new Exception("No SUPER_ADMIN_ID specified");     
+            #endregion
 
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "343abb08-4cbd-4a9b-93e1-dca377b5d984");
+                keyValue: developerRoleId);
 
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "e2136d42-58a2-4b50-ad76-a34466d2d3d5");
+                keyValue: leadRoleId);
+
+            migrationBuilder.DeleteData(
+                table: "AspNetRoles",
+                keyColumn: "Id",
+                keyValue: adminRoleId);
 
             migrationBuilder.DeleteData(
                 table: "AspNetUserClaims",
@@ -71,7 +98,7 @@ namespace DotnetFoundation.Infrastructure.Migrations
             migrationBuilder.DeleteData(
                 table: "AspNetUserRoles",
                 keyColumns: new[] { "RoleId", "UserId" },
-                keyValues: new object[] { "c08d9a4b-72f5-4eab-8c9a-6fb17a3e92a1", "b109c28a-6c6f-43d2-bc49-9fba25cb6e72" });
+                keyValues: new object[] { superAdminRoleId, superAdminId });
 
             migrationBuilder.DeleteData(
                 table: "users",
@@ -81,12 +108,12 @@ namespace DotnetFoundation.Infrastructure.Migrations
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "c08d9a4b-72f5-4eab-8c9a-6fb17a3e92a1");
+                keyValue: superAdminRoleId);
 
             migrationBuilder.DeleteData(
                 table: "AspNetUsers",
                 keyColumn: "Id",
-                keyValue: "b109c28a-6c6f-43d2-bc49-9fba25cb6e72");
+                keyValue: superAdminId);
         }
     }
 }
