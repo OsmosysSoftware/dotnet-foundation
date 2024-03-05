@@ -116,13 +116,13 @@ namespace DotnetFoundation.Infrastructure.Migrations
                             Id = 1,
                             Country = "India",
                             CreatedBy = 1,
-                            CreatedOn = new DateTime(2024, 3, 5, 10, 36, 56, 578, DateTimeKind.Utc).AddTicks(9597),
+                            CreatedOn = new DateTime(2024, 3, 5, 16, 53, 24, 172, DateTimeKind.Utc).AddTicks(4141),
                             Email = "admin@osmox.co",
                             FirstName = "Super",
                             IdentityApplicationUserId = "b109c28a-6c6f-43d2-bc49-9fba25cb6e72",
                             LastName = "Admin",
                             ModifiedBy = 1,
-                            ModifiedOn = new DateTime(2024, 3, 5, 10, 36, 56, 578, DateTimeKind.Utc).AddTicks(9598),
+                            ModifiedOn = new DateTime(2024, 3, 5, 16, 53, 24, 172, DateTimeKind.Utc).AddTicks(4142),
                             PhoneNumber = "0000000000",
                             Status = 1
                         });
@@ -196,15 +196,15 @@ namespace DotnetFoundation.Infrastructure.Migrations
                         {
                             Id = "b109c28a-6c6f-43d2-bc49-9fba25cb6e72",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "a6e8eb2a-663f-462c-ad93-15e6eedd6d51",
+                            ConcurrencyStamp = "385aeb70-97c7-4bc6-becc-f2668afce720",
                             Email = "admin@osmox.co",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@OSMOX.CO",
                             NormalizedUserName = "ADMIN@OSMOX.CO",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBZe2umUuQwh6SVsiq9M6NdghOTqVt1Ce2LkvAaIABuTZevSFqoX/NuEPXCIy9g2RQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENAt0HNxZQuZEe7wQ42pp7gaDsOIxrrFmmgegH6h0E4HrGCtDDS0O7iZ3CHzjKznOw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "ffab8fa2-2906-4a19-bcd9-ffb4dcd39933",
+                            SecurityStamp = "f7a1d5fd-4265-4be5-adeb-e20eb1f8d9d3",
                             TwoFactorEnabled = false,
                             UserName = "admin@osmox.co"
                         });
@@ -236,6 +236,24 @@ namespace DotnetFoundation.Infrastructure.Migrations
                     b.ToTable("AspNetRoles", (string)null);
 
                     b.HasData(
+                        new
+                        {
+                            Id = "05d341d9-ee1a-4357-ad46-60633e1f60a6",
+                            Name = "DEVELOPER",
+                            NormalizedName = "DEVELOPER"
+                        },
+                        new
+                        {
+                            Id = "343abb08-4cbd-4a9b-93e1-dca377b5d984",
+                            Name = "LEAD",
+                            NormalizedName = "LEAD"
+                        },
+                        new
+                        {
+                            Id = "e2136d42-58a2-4b50-ad76-a34466d2d3d5",
+                            Name = "ADMIN",
+                            NormalizedName = "ADMIN"
+                        },
                         new
                         {
                             Id = "c08d9a4b-72f5-4eab-8c9a-6fb17a3e92a1",

@@ -8,16 +8,38 @@ public static class ModelBuilderExtensions
 {
     public static void Seed(this ModelBuilder modelBuilder)
     {
+        // Get Role Ids
+        string developerRoleId = Environment.GetEnvironmentVariable("DEVELOPER_ROLE_ID") ?? throw new Exception("No DEVELOPER_ROLE_ID specified");
+        string leadRoleId = Environment.GetEnvironmentVariable("LEAD_ROLE_ID") ?? throw new Exception("No LEAD_ROLE_ID specified");
+        string adminRoleId = Environment.GetEnvironmentVariable("ADMIN_ROLE_ID") ?? throw new Exception("No ADMIN_ROLE_ID specified");
+        string superAdminRoleId = Environment.GetEnvironmentVariable("SUPER_ADMIN_ROLE_ID") ?? throw new Exception("No SUPER_ADMIN_ROLE_ID specified");
+
         // Get superadmin variables
         string superAdminId = Environment.GetEnvironmentVariable("SUPER_ADMIN_ID") ?? throw new Exception("No SUPER_ADMIN_ID specified");
-        string superAdminRoleId = Environment.GetEnvironmentVariable("SUPER_ADMIN_ROLE_ID") ?? throw new Exception("No SUPER_ADMIN_ROLE_ID specified");
         string superAdminEmail = Environment.GetEnvironmentVariable("SUPER_ADMIN_EMAIL") ?? throw new Exception("No SUPER_ADMIN_EMAIL specified");
         string superAdminPassword = Environment.GetEnvironmentVariable("SUPER_ADMIN_PASSWORD") ?? throw new Exception("No SUPER_ADMIN_PASSWORD specified");
         string claimType = Environment.GetEnvironmentVariable("CLAIM_TYPE") ?? throw new Exception("No CLAIM_TYPE specified");
 
         // Seeding roles
-        modelBuilder.Entity<IdentityRole>()
-        .HasData(
+        modelBuilder.Entity<IdentityRole>().HasData(
+            new IdentityRole
+            {
+                Id = developerRoleId,
+                Name = Roles.DEVELOPER.ToString().ToUpper(),
+                NormalizedName = Roles.DEVELOPER.ToString().ToUpper()
+            },
+            new IdentityRole
+            {
+                Id = leadRoleId,
+                Name = Roles.LEAD.ToString().ToUpper(),
+                NormalizedName = Roles.LEAD.ToString().ToUpper()
+            },
+            new IdentityRole
+            {
+                Id = adminRoleId,
+                Name = Roles.ADMIN.ToString().ToUpper(),
+                NormalizedName = Roles.ADMIN.ToString().ToUpper()
+            },
             new IdentityRole
             {
                 Id = superAdminRoleId,
@@ -40,7 +62,7 @@ public static class ModelBuilderExtensions
         PasswordHasher<IdentityApplicationUser> hasher = new();
         identityApplicationUser.PasswordHash = hasher.HashPassword(identityApplicationUser, superAdminPassword);
 
-        // Seeding a superadmin user to AspNetUsers table 
+        // Seeding a superadmin user to AspNetUsers table
         modelBuilder.Entity<IdentityApplicationUser>().HasData(identityApplicationUser);
 
         // Seeding the relation between our user and role to AspNetUserRoles table
