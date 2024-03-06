@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Password Update Confirmation</title>
+    <title>Confirm Email</title>
     <style>
       table {
         width: 100%;
@@ -58,18 +58,12 @@
       </thead>
       <tbody>
         <tr>
-          <td colspan="2">
+          <td colspan="2" style="padding: 20px">
             <p>Hello,</p>
-            <p>
-              This is to confirm that the password for your account has been
-              successfully changed. Your account is now secured with the new
-              password that you have set.
-            </p>
-            <p>
-              If you did not change your password, please
-              <strong>contact us immediately</strong>
-              to report any unauthorized access to your account.
-            </p>
+            <div>
+              <strong>Use this token to Confirm your email.</strong>
+              <p><strong>Token :</strong> {body}</p>
+            </div>
             <br />
             <p>Thank you,<br />FoundationX Team</p>
           </td>
