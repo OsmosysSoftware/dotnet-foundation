@@ -8,5 +8,4 @@ public interface IAuthenticationService
     public Task<AuthenticationResponse> LoginAsync(LoginRequest request);
     public Task ForgotPasswordAsync(string email);
     public Task ResetPasswordAsync(PasswordResetRequest request);
-    public Task ConfirmEmailAsync(ConfirmEmailRequest request);
 }

@@ -27,13 +27,9 @@ public static class DependencyInjection
         });
 
         // Configure indentity service
-        services.AddIdentity<IdentityApplicationUser, IdentityRole>(options =>
-        {
-            options.SignIn.RequireConfirmedEmail = true;
-
-        })
-        .AddEntityFrameworkStores<SqlDatabaseContext>()
-        .AddDefaultTokenProviders();
+        services.AddIdentity<IdentityApplicationUser, IdentityRole>()
+            .AddEntityFrameworkStores<SqlDatabaseContext>()
+            .AddDefaultTokenProviders();
 
         services.Configure<DataProtectionTokenProviderOptions>(options => options.TokenLifespan = TimeSpan.FromMinutes(Convert.ToDouble(configuration["Appsettings:IdentityTokenLifespanInMinutes"])));
 

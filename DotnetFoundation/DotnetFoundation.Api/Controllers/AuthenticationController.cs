@@ -158,41 +158,4 @@ public class AuthenticationController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
     }
-    /// <summary>
-    /// Confirm user email using token.
-    /// </summary>
-    /// <param name="request">Confirm email request</param>
-    [HttpPut("confirmemail")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<int>>> ConfirmEmailAsync(ConfirmEmailRequest request)
-    {
-        BaseResponse<int> response = new(ResponseStatus.Fail);
-        try
-        {
-            await _authenticationService.ConfirmEmailAsync(request).ConfigureAwait(false);
-            response.Status = ResponseStatus.Success;
-
-            return Ok(response);
-        }
-        catch (NotFoundException ex)
-        {
-            response.Message = ex.Message;
-            response.Status = ResponseStatus.Error;
-            return BadRequest(response);
-        }
-        catch (InvalidTokenException ex)
-        {
-            response.Message = ex.Message;
-            response.Status = ResponseStatus.Error;
-            return BadRequest(response);
-        }
-        catch (Exception ex)
-        {
-            response.Message = ex.Message;
-            response.Status = ResponseStatus.Error;
-            return StatusCode(StatusCodes.Status500InternalServerError, response);
-        }
-    }
 }

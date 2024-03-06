@@ -13,6 +13,4 @@ public interface IEmailService
     /// <returns>A task that represents the asynchronous send operation. The task result contains the send result.</returns>
     public Task<string> SendForgetPasswordEmailAsync(string email, string body);
     public Task<string> SendChangePasswordEmailAsync(string email);
-    public Task<string> SendConfirmationEmailAsync(string email, string body);
-    public Task<string> SendCompleteRegistrationEmailAsync(string email);
 }
