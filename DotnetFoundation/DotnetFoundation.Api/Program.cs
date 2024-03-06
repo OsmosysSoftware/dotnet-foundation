@@ -4,6 +4,7 @@ using DotnetFoundation.Infrastructure;
 using DotnetFoundation.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -51,6 +52,13 @@ builder.Services.AddSwaggerGen(options =>
     string filePath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     options.IncludeXmlComments(filePath);
 });
+
+// logging using serilog
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+   .CreateLogger();
+Log.Logger.Information("Logging has started");
+builder.Host.UseSerilog();
 
 // Adding HTTP Context
 builder.Services.AddHttpContextAccessor();
