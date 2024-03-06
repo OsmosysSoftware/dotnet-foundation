@@ -37,6 +37,25 @@ public class EmailService : IEmailService
 
         return await SendNotificationAsync(payload).ConfigureAwait(false);
     }
+
+    public async Task<string> SendConfirmationEmailAsync(string email, string body)
+    {
+        string templatePath = _configuration["Emails:ConfirmEmail:Path"] ?? throw new Exception("ConfirmEmail template path Missing");
+        string subject = _configuration["Emails:ConfirmEmail:Subject"] ?? throw new Exception("ConfirmEmail subject Missing");
+
+        Notification payload = CreateNotificationPayload(email, subject, ReadHtmlTemplate(templatePath, body));
+        return await SendNotificationAsync(payload).ConfigureAwait(false);
+    }
+    public async Task<string> SendCompleteRegistrationEmailAsync(string email)
+    {
+        string templatePath = _configuration["Emails:CompleteRegistration:Path"] ?? throw new Exception("CompleteRegistration template path Missing");
+        string subject = _configuration["Emails:CompleteRegistration:Subject"] ?? throw new Exception("CompleteRegistration subject Missing");
+
+        Notification payload = CreateNotificationPayload(email, subject, ReadHtmlTemplate(templatePath, ""));
+
+        return await SendNotificationAsync(payload).ConfigureAwait(false);
+    }
+
     private Notification CreateNotificationPayload(string to, string subject, string htmlBody)
     {
         return new Notification

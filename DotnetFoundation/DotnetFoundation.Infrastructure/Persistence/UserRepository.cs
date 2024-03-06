@@ -1,12 +1,10 @@
 using DotnetFoundation.Application.Exceptions;
-using DotnetFoundation.Application.Interfaces.Integrations;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
 using DotnetFoundation.Application.Models.DTOs.UserDTO;
 using DotnetFoundation.Domain.Entities;
 using DotnetFoundation.Domain.Enums;
 using DotnetFoundation.Infrastructure.Identity;
-using DotnetFoundation.Infrastructure.Integrations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -115,6 +113,7 @@ public class UserRepository : IUserRepository
     public async Task<UserInfo> LoginUserAsync(LoginRequest request)
     {
         SignInResult signInResult = await _signInManager.PasswordSignInAsync(request.Email, request.Password, false, false).ConfigureAwait(false);
+        IdentityApplicationUser user = await _userManager.FindByEmailAsync(request.Email).ConfigureAwait(false) ?? throw new NotFoundException("User does not exist");
 
         if (!signInResult.Succeeded)
         {
@@ -122,9 +121,12 @@ public class UserRepository : IUserRepository
             {
                 throw new LockoutException("Account is locked out");
             }
+            if (!await _userManager.IsEmailConfirmedAsync(user).ConfigureAwait(false))
+            {
+                throw new InvalidCredentialsException("Email is not confirmed");
+            }
             throw new InvalidCredentialsException("Invalid Email or Password");
         }
-        IdentityApplicationUser user = await _userManager.FindByEmailAsync(request.Email).ConfigureAwait(false) ?? throw new NotFoundException("User does not exist");
         return new(null, user.Id, request.Email, (await _userManager.GetRolesAsync(user).ConfigureAwait(false)).ToList());
     }
 
@@ -135,6 +137,7 @@ public class UserRepository : IUserRepository
         _ = await GetUserByIdAsync(userId).ConfigureAwait(false) ?? throw new NotFoundException("No user found with given Email");
         return await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false);
     }
+
     public async Task ResetPasswordAsync(string email, string token, string newPassword)
     {
         IdentityApplicationUser user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new NotFoundException("Invalid Email");
@@ -173,6 +176,7 @@ public class UserRepository : IUserRepository
         await _userManager.AddClaimAsync(identityApplicationUser, new Claim(ClaimTypes.Role, newRole)).ConfigureAwait(false);
         return true;
     }
+
     public async Task<int> GetUserIdByIdentityId(string IdentityId)
     {
         return await _dbContext.ApplicationUsers
@@ -180,5 +184,21 @@ public class UserRepository : IUserRepository
             .Select(u => u.Id)
             .FirstOrDefaultAsync()
             .ConfigureAwait(false);
+    }
+
+    public async Task<string> GetConfirmationToken(string Id)
+    {
+        IdentityApplicationUser? user = await _userManager.FindByIdAsync(Id).ConfigureAwait(false) ?? throw new NotFoundException("Error finding user");
+        return await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
+    }
+
+    public async Task ConfirmEmailAsync(string email, string token)
+    {
+        IdentityApplicationUser user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new NotFoundException("Error finding user");
+        IdentityResult result = await _userManager.ConfirmEmailAsync(user, token).ConfigureAwait(false);
+        if (!result.Succeeded)
+        {
+            throw new InvalidTokenException($"Invalid token");
+        }
     }
 }
