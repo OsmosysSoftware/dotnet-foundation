@@ -23,7 +23,6 @@ public class UserController : ControllerBase
     /// </summary>
     [HttpGet]
     [Authorize]
-    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<BaseResponse<PagedList<UserResponse>>>> GetAllUsersAsync([FromQuery] PagingRequest pagingRequest)
@@ -81,11 +80,11 @@ public class UserController : ControllerBase
 
     /// <summary>
     /// Add new user role.
-    /// Authorize - ADMIN role
+    /// Authorize - SUPERADMIN role
     /// </summary>
     /// <param name="roleRequest">Role request details</param>
-    [HttpPost("addrole")]
-    [Authorize(Roles = "ADMIN")]
+    [HttpPost("add-role")]
+    [Authorize(Roles = "SUPERADMIN")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
