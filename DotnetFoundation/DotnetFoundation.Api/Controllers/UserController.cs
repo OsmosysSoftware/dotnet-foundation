@@ -20,19 +20,18 @@ public class UserController : ControllerBase
 
     /// <summary>
     /// Get all user records.
-    /// Authorize - LEAD role
     /// </summary>
     [HttpGet]
-    [Authorize(Roles = "LEAD")]
+    [Authorize]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<List<UserResponse>>>> GetAllUsersAsync()
+    public async Task<ActionResult<BaseResponse<PagedList<UserResponse>>>> GetAllUsersAsync([FromQuery] PagingRequest pagingRequest)
     {
-        BaseResponse<List<UserResponse>> response = new(ResponseStatus.Fail);
+        BaseResponse<PagedList<UserResponse>> response = new(ResponseStatus.Fail);
         try
         {
-            response.Data = await _userService.GetAllUsersAsync().ConfigureAwait(false);
+            response.Data = await _userService.GetAllUsersAsync(pagingRequest).ConfigureAwait(false);
             response.Status = ResponseStatus.Success;
 
             return Ok(response);
@@ -47,10 +46,11 @@ public class UserController : ControllerBase
 
     /// <summary>
     /// Get user by id.
+    /// Authorize - LEAD role
     /// </summary>
     /// <param name="userId">Id of user record</param>
     [HttpGet("{userId}")]
-    [Authorize]
+    [Authorize(Roles = "LEAD")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

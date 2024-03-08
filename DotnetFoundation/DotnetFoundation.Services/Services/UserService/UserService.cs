@@ -4,6 +4,7 @@ using DotnetFoundation.Application.Interfaces.Integrations;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Interfaces.Services;
 using DotnetFoundation.Application.Interfaces.Utility;
+using DotnetFoundation.Application.Models.Common;
 using DotnetFoundation.Application.Models.DTOs.UserDTO;
 using DotnetFoundation.Domain.Entities;
 using DotnetFoundation.Domain.Enums;
@@ -23,10 +24,23 @@ public class UserService : IUserService
         _emailService = emailService;
     }
 
-    public async Task<List<UserResponse>> GetAllUsersAsync()
+    public async Task<PagedList<UserResponse>> GetAllUsersAsync(PagingRequest pagingRequest)
     {
-        List<User> users = await _userRepository.GetAllUsersAsync().ConfigureAwait(false);
-        return _mapper.Map<List<UserResponse>>(users);
+        PagedList<User> response = await _userRepository.GetAllUsersAsync(pagingRequest).ConfigureAwait(false);
+
+        if (!response.Items.Any())
+        {
+            throw new NotFoundException($"No data fetched on PageNumber = {response.PageNumber} for PageSize = {response.PageSize}");
+        }
+
+        PagedList<UserResponse> pagingResponse = new PagedList<UserResponse>(
+            _mapper.Map<List<UserResponse>>(response.Items),
+            response.PageNumber,
+            response.PageSize,
+            response.TotalCount
+        );
+
+        return pagingResponse;
     }
 
     public async Task<UserResponse?> GetUserByIdAsync(int userId)
