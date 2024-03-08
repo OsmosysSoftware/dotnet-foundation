@@ -116,13 +116,13 @@ namespace DotnetFoundation.Infrastructure.Migrations
                             Id = 1,
                             Country = "India",
                             CreatedBy = 1,
-                            CreatedOn = new DateTime(2024, 3, 5, 16, 53, 24, 172, DateTimeKind.Utc).AddTicks(4141),
-                            Email = "admin@osmox.co",
+                            CreatedOn = new DateTime(2024, 3, 8, 10, 54, 33, 198, DateTimeKind.Utc).AddTicks(5932),
+                            Email = "osmox@admin.com",
                             FirstName = "Super",
-                            IdentityApplicationUserId = "b109c28a-6c6f-43d2-bc49-9fba25cb6e72",
+                            IdentityApplicationUserId = "343abb08-4cbd-4a9b-93e1-dca377b5d984",
                             LastName = "Admin",
                             ModifiedBy = 1,
-                            ModifiedOn = new DateTime(2024, 3, 5, 16, 53, 24, 172, DateTimeKind.Utc).AddTicks(4142),
+                            ModifiedOn = new DateTime(2024, 3, 8, 10, 54, 33, 198, DateTimeKind.Utc).AddTicks(5933),
                             PhoneNumber = "0000000000",
                             Status = 1
                         });
@@ -194,19 +194,19 @@ namespace DotnetFoundation.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "b109c28a-6c6f-43d2-bc49-9fba25cb6e72",
+                            Id = "343abb08-4cbd-4a9b-93e1-dca377b5d984",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "385aeb70-97c7-4bc6-becc-f2668afce720",
-                            Email = "admin@osmox.co",
+                            ConcurrencyStamp = "26085b3f-071d-4feb-bf47-a58d1b1b2ad4",
+                            Email = "osmox@admin.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
-                            NormalizedEmail = "ADMIN@OSMOX.CO",
-                            NormalizedUserName = "ADMIN@OSMOX.CO",
-                            PasswordHash = "AQAAAAIAAYagAAAAENAt0HNxZQuZEe7wQ42pp7gaDsOIxrrFmmgegH6h0E4HrGCtDDS0O7iZ3CHzjKznOw==",
+                            NormalizedEmail = "OSMOX@ADMIN.COM",
+                            NormalizedUserName = "OSMOX@ADMIN.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBS0gzyuTTqyBCz3+Gjc4XcQ6izhvEsRUWlAlKv/OLHgbPVWyDI7CKR9nrQYElX1IA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "f7a1d5fd-4265-4be5-adeb-e20eb1f8d9d3",
+                            SecurityStamp = "c496f24f-7e1b-449c-90d3-885490a07388",
                             TwoFactorEnabled = false,
-                            UserName = "admin@osmox.co"
+                            UserName = "osmox@admin.com"
                         });
                 });
 
@@ -238,25 +238,7 @@ namespace DotnetFoundation.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "05d341d9-ee1a-4357-ad46-60633e1f60a6",
-                            Name = "DEVELOPER",
-                            NormalizedName = "DEVELOPER"
-                        },
-                        new
-                        {
-                            Id = "343abb08-4cbd-4a9b-93e1-dca377b5d984",
-                            Name = "LEAD",
-                            NormalizedName = "LEAD"
-                        },
-                        new
-                        {
                             Id = "e2136d42-58a2-4b50-ad76-a34466d2d3d5",
-                            Name = "ADMIN",
-                            NormalizedName = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = "c08d9a4b-72f5-4eab-8c9a-6fb17a3e92a1",
                             Name = "SUPERADMIN",
                             NormalizedName = "SUPERADMIN"
                         });
@@ -313,7 +295,7 @@ namespace DotnetFoundation.Infrastructure.Migrations
                             Id = 1,
                             ClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
                             ClaimValue = "SUPERADMIN",
-                            UserId = "b109c28a-6c6f-43d2-bc49-9fba25cb6e72"
+                            UserId = "343abb08-4cbd-4a9b-93e1-dca377b5d984"
                         });
                 });
 
@@ -356,8 +338,8 @@ namespace DotnetFoundation.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            UserId = "b109c28a-6c6f-43d2-bc49-9fba25cb6e72",
-                            RoleId = "c08d9a4b-72f5-4eab-8c9a-6fb17a3e92a1"
+                            UserId = "343abb08-4cbd-4a9b-93e1-dca377b5d984",
+                            RoleId = "e2136d42-58a2-4b50-ad76-a34466d2d3d5"
                         });
                 });
 
