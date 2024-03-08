@@ -1,4 +1,3 @@
-using System.Net;
 using DotnetFoundation.Application.Exceptions;
 using DotnetFoundation.Application.Interfaces.Services;
 using DotnetFoundation.Application.Models.Common;
@@ -197,6 +196,7 @@ public class UserController : ControllerBase
     /// </summary>
     /// <param name="request">Change password request</param>
     [HttpPut("changepassword")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
