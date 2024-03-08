@@ -1,3 +1,5 @@
+using System.Net;
+using DotnetFoundation.Application.Exceptions;
 using DotnetFoundation.Application.Interfaces.Services;
 using DotnetFoundation.Application.Models.Common;
 using DotnetFoundation.Application.Models.DTOs.UserDTO;
@@ -29,11 +31,19 @@ public class UserController : ControllerBase
     public async Task<ActionResult<BaseResponse<List<UserResponse>>>> GetAllUsersAsync()
     {
         BaseResponse<List<UserResponse>> response = new(ResponseStatus.Fail);
+        try
+        {
+            response.Data = await _userService.GetAllUsersAsync().ConfigureAwait(false);
+            response.Status = ResponseStatus.Success;
 
-        response.Data = await _userService.GetAllUsersAsync().ConfigureAwait(false);
-        response.Status = ResponseStatus.Success;
-
-        return Ok(response);
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
     }
 
     /// <summary>
@@ -49,30 +59,59 @@ public class UserController : ControllerBase
     public async Task<ActionResult<BaseResponse<UserResponse>>> GetUserByIdAsync(int userId)
     {
         BaseResponse<UserResponse> response = new(ResponseStatus.Fail);
+        try
+        {
+            response.Data = await _userService.GetUserByIdAsync(userId).ConfigureAwait(false);
+            response.Status = ResponseStatus.Success;
 
-        response.Data = await _userService.GetUserByIdAsync(userId).ConfigureAwait(false);
-        response.Status = ResponseStatus.Success;
-
-        return Ok(response);
+            return Ok(response);
+        }
+        catch (NotFoundException ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (Exception ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
+        }
     }
 
     /// <summary>
     /// Add new user role.
+    /// Authorize - ADMIN role
     /// </summary>
     /// <param name="roleRequest">Role request details</param>
-    [HttpPost("add-role")]
-    [Authorize]
+    [HttpPost("addrole")]
+    [Authorize(Roles = "ADMIN")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<BaseResponse<bool>>> AddUserRoleAsync(UserRoleRequest roleRequest)
     {
         BaseResponse<bool> response = new(ResponseStatus.Fail);
+        try
+        {
+            response.Data = await _userService.AddUserRoleAsync(roleRequest.Email, roleRequest.Role).ConfigureAwait(false);
+            response.Status = ResponseStatus.Success;
 
-        response.Data = await _userService.AddUserRoleAsync(roleRequest.Email, roleRequest.Role).ConfigureAwait(false);
-        response.Status = ResponseStatus.Success;
-
-        return Ok(response);
+            return Ok(response);
+        }
+        catch (NotFoundException ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (Exception ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
+        }
     }
 
     /// <summary>
@@ -86,17 +125,38 @@ public class UserController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<UserResponse>>> UpdateUserAsync(int userId, [FromBody] UpdateUserRequest updateUserRequest)
+    public async Task<ActionResult<BaseResponse<UserResponse>>> UpdateUserAsync(int userId, UpdateUserRequest updateUserRequest)
     {
         BaseResponse<UserResponse> response = new(ResponseStatus.Fail);
         if (updateUserRequest == null)
         {
             return BadRequest("Invalid request data");
         }
-        response.Data = await _userService.UpdateUserAsync(userId, updateUserRequest).ConfigureAwait(false);
-        response.Status = ResponseStatus.Success;
+        try
+        {
+            response.Data = await _userService.UpdateUserAsync(userId, updateUserRequest).ConfigureAwait(false);
+            response.Status = ResponseStatus.Success;
 
-        return Ok(response);
+            return Ok(response);
+        }
+        catch (NotFoundException ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (UserException ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (Exception ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
+        }
     }
 
     /// <summary>
@@ -112,10 +172,63 @@ public class UserController : ControllerBase
     public async Task<ActionResult<BaseResponse<UserResponse>>> DeleteUserAsync(int userId)
     {
         BaseResponse<UserResponse> response = new(ResponseStatus.Fail);
+        try
+        {
+            response.Data = await _userService.DeleteUserAsync(userId).ConfigureAwait(false);
+            response.Status = ResponseStatus.Success;
 
-        response.Data = await _userService.DeleteUserAsync(userId).ConfigureAwait(false);
-        response.Status = ResponseStatus.Success;
+            return Ok(response);
+        }
+        catch (NotFoundException ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (Exception ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
+        }
+    }
+    /// <summary>
+    /// Change user Password.
+    /// </summary>
+    /// <param name="request">Change password request</param>
+    [HttpPut("changepassword")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<BaseResponse<int>>> ChangePasswordAsync(UserChangePassword request)
+    {
+        BaseResponse<int> response = new(ResponseStatus.Fail);
+        try
+        {
+            await _userService.ChangePasswordAsync(request).ConfigureAwait(false);
+            response.Status = ResponseStatus.Success;
 
-        return Ok(response);
+            return Ok(response);
+        }
+        catch (NotFoundException ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (IdentityUserException ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (Exception ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
+        }
     }
 }
+

@@ -1,3 +1,5 @@
+using System.Net;
+using DotnetFoundation.Application.Exceptions;
 using DotnetFoundation.Application.Interfaces.Services;
 using DotnetFoundation.Application.Models.Common;
 using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
@@ -27,11 +29,25 @@ public class AuthenticationController : ControllerBase
     public async Task<ActionResult<BaseResponse<AuthenticationResponse>>> RegisterAsync(RegisterRequest request)
     {
         BaseResponse<AuthenticationResponse> response = new(ResponseStatus.Fail);
+        try
+        {
+            response.Data = await _authenticationService.RegisterAsync(request).ConfigureAwait(false);
+            response.Status = ResponseStatus.Success;
 
-        response.Data = await _authenticationService.RegisterAsync(request).ConfigureAwait(false);
-        response.Status = ResponseStatus.Success;
-
-        return Ok(response);
+            return Ok(response);
+        }
+        catch (IdentityUserException ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (Exception ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
+        }
     }
 
     /// <summary>
@@ -45,46 +61,138 @@ public class AuthenticationController : ControllerBase
     public async Task<ActionResult<BaseResponse<AuthenticationResponse>>> LoginAsync(LoginRequest request)
     {
         BaseResponse<AuthenticationResponse> response = new(ResponseStatus.Fail);
+        try
+        {
+            response.Data = await _authenticationService.LoginAsync(request).ConfigureAwait(false);
+            response.Status = ResponseStatus.Success;
 
-        response.Data = await _authenticationService.LoginAsync(request).ConfigureAwait(false);
-        response.Status = ResponseStatus.Success;
+            return Ok(response);
+        }
+        catch (InvalidCredentialsException ex)
+        {
+            response.Message = ex.Message;
 
-        return Ok(response);
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (LockoutException ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (Exception ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
+        }
     }
 
     /// <summary>
     /// User password reset using reset token.
     /// </summary>
     /// <param name="request">New password details request</param>
-    [HttpPost("reset-password")]
+    [HttpPost("resetpassword")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<AuthenticationResponse>>> ResetPasswordAsync(PasswordResetRequest request)
+    public async Task<ActionResult<BaseResponse<int>>> ResetPasswordAsync(PasswordResetRequest request)
     {
-        BaseResponse<AuthenticationResponse> response = new(ResponseStatus.Fail);
+        BaseResponse<int> response = new(ResponseStatus.Fail);
+        try
+        {
+            await _authenticationService.ResetPasswordAsync(request).ConfigureAwait(false);
+            response.Status = ResponseStatus.Success;
 
-        response.Data = await _authenticationService.ResetPasswordAsync(request).ConfigureAwait(false);
-        response.Status = ResponseStatus.Success;
-
-        return Ok(response);
+            return Ok(response);
+        }
+        catch (NotFoundException ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (InvalidTokenException ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (Exception ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
+        }
     }
 
     /// <summary>
     /// Forgot user password.
     /// </summary>
     /// <param name="email">Email of user to reset password</param>
-    [HttpPost("forgot-password")]
+    [HttpPost("forgotpassword")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<string>>> ForgotPasswordAsync(string email)
+    public async Task<ActionResult<BaseResponse<int>>> ForgotPasswordAsync(string email)
     {
-        BaseResponse<string> response = new(ResponseStatus.Fail);
+        BaseResponse<int> response = new(ResponseStatus.Fail);
+        try
+        {
+            await _authenticationService.ForgotPasswordAsync(email).ConfigureAwait(false);
+            response.Status = ResponseStatus.Success;
 
-        response.Data = await _authenticationService.ForgotPasswordAsync(email).ConfigureAwait(false);
-        response.Status = ResponseStatus.Success;
+            return Ok(response);
+        }
+        catch (NotFoundException ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (Exception ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
+        }
+    }
+    /// <summary>
+    /// Confirm user email using token.
+    /// </summary>
+    /// <param name="request">Confirm email request</param>
+    [HttpPut("confirmemail")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<BaseResponse<int>>> ConfirmEmailAsync(ConfirmEmailRequest request)
+    {
+        BaseResponse<int> response = new(ResponseStatus.Fail);
+        try
+        {
+            await _authenticationService.ConfirmEmailAsync(request).ConfigureAwait(false);
+            response.Status = ResponseStatus.Success;
 
-        return Ok(response);
+            return Ok(response);
+        }
+        catch (NotFoundException ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (InvalidTokenException ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return BadRequest(response);
+        }
+        catch (Exception ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
+        }
     }
 }

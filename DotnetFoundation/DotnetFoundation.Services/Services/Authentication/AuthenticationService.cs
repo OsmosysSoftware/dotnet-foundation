@@ -1,48 +1,76 @@
+using System.Transactions;
+using DotnetFoundation.Application.Interfaces.Integrations;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Interfaces.Services;
+using DotnetFoundation.Application.Interfaces.Utility;
 using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
+using DotnetFoundation.Application.Models.DTOs.UserDTO;
+
 
 namespace DotnetFoundation.Services.Services.Authentication;
 
 public class AuthenticationService : IAuthenticationService
 {
     private readonly IUserRepository _userRepository;
-    public AuthenticationService(IUserRepository userRepository)
+    private readonly IJwtTokenService _jwtService;
+    private readonly IEmailService _emailService;
+
+    public AuthenticationService(IUserRepository userRepository, IJwtTokenService jwtService, IEmailService emailService)
     {
         _userRepository = userRepository;
-
+        _jwtService = jwtService;
+        _emailService = emailService;
     }
 
     public async Task<AuthenticationResponse> LoginAsync(LoginRequest request)
     {
-        string res = await _userRepository.LoginUserAsync(request).ConfigureAwait(false);
+        UserInfo userInfo = await _userRepository.LoginUserAsync(request).ConfigureAwait(false);
+        userInfo.Id = await _userRepository.GetUserIdByIdentityId(userInfo.IdentityId).ConfigureAwait(false);
+
         return new AuthenticationResponse
         {
-            Token = res,
+            Token = _jwtService.GenerateJwtToken(userInfo),
         };
     }
 
     public async Task<AuthenticationResponse> RegisterAsync(RegisterRequest request)
     {
-        string res = await _userRepository.AddUserAsync(request).ConfigureAwait(false);
+        using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
+
+        string identityUserId = await _userRepository.AddUserAsync(request).ConfigureAwait(false);
+        int userId = await _userRepository.GetUserIdByIdentityId(identityUserId).ConfigureAwait(false);
+        await _userRepository.AddUserRoleAsync(request.Email, 0).ConfigureAwait(false);
+        string token = await _userRepository.GetConfirmationToken(identityUserId).ConfigureAwait(false);
+
+        List<string> userRoles = await _userRepository.GetUserRoleAsync(request.Email).ConfigureAwait(false);
+
+        UserInfo userInfo = new(userId, identityUserId, request.Email, userRoles);
+
+        // Send confirmation email
+        await _emailService.SendConfirmationEmailAsync(request.Email, token).ConfigureAwait(false);
+        // If everything succeeds, commit the transaction
+        scope.Complete();
+
         return new AuthenticationResponse
         {
-            Token = res,
+            Token = _jwtService.GenerateJwtToken(userInfo),
         };
-
-    }
-    public async Task<string> ForgotPasswordAsync(string email)
-    {
-        string res = await _userRepository.ForgotPasswordAsync(email).ConfigureAwait(false);
-        return res;
     }
 
-    public async Task<AuthenticationResponse> ResetPasswordAsync(PasswordResetRequest request)
+    public async Task ConfirmEmailAsync(ConfirmEmailRequest request)
     {
-        string res = await _userRepository.ResetPasswordAsync(request.Email, request.Token, request.Password).ConfigureAwait(false);
-        return new AuthenticationResponse
-        {
-            Token = res,
-        };
+        await _userRepository.ConfirmEmailAsync(request.Email, request.Token).ConfigureAwait(false);
+        await _emailService.SendCompleteRegistrationEmailAsync(request.Email).ConfigureAwait(false);
+    }
+
+    public async Task ForgotPasswordAsync(string email)
+    {
+        string token = await _userRepository.ForgotPasswordAsync(email).ConfigureAwait(false);
+        await _emailService.SendForgetPasswordEmailAsync(email, token).ConfigureAwait(false);
+    }
+
+    public async Task ResetPasswordAsync(PasswordResetRequest request)
+    {
+        await _userRepository.ResetPasswordAsync(request.Email, request.Token, request.Password).ConfigureAwait(false);
     }
 }
