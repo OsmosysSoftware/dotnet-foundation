@@ -23,6 +23,7 @@ public class UserController : ControllerBase
     /// </summary>
     [HttpGet]
     [Authorize(Roles = "LEAD")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<BaseResponse<List<UserResponse>>>> GetAllUsersAsync()
@@ -40,6 +41,7 @@ public class UserController : ControllerBase
     /// </summary>
     /// <param name="userId">Id of user record</param>
     [HttpGet("{userId}")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -56,11 +58,10 @@ public class UserController : ControllerBase
 
     /// <summary>
     /// Add new user role.
-    /// Authorize - ADMIN role
     /// </summary>
     /// <param name="roleRequest">Role request details</param>
     [HttpPost("add-role")]
-    [Authorize(Roles = "ADMIN")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -80,6 +81,7 @@ public class UserController : ControllerBase
     /// <param name="userId">Id of user record</param>
     /// <param name="updateUserRequest">user details updation request</param>
     [HttpPut("{userId}")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -102,6 +104,7 @@ public class UserController : ControllerBase
     /// </summary>
     /// <param name="userId">Id of user record</param>
     [HttpDelete("{userId}")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
