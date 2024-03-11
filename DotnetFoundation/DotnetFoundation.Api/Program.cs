@@ -82,6 +82,8 @@ app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 
+app.UseSerilogRequestLogging();
+
 app.UseAuthentication();
 
 app.UseAuthorization();
