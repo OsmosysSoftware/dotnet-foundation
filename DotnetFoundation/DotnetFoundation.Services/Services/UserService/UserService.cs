@@ -26,7 +26,7 @@ public class UserService : IUserService
 
     public async Task<UserResponse?> GetUserByIdAsync(int userId)
     {
-        User res = await _userRepository.GetUserByIdAsync(userId).ConfigureAwait(false) ?? throw new NotFoundException("No user found");
+        User res = await _userRepository.GetUserByIdAsync(userId).ConfigureAwait(false) ?? throw new UserNotFoundException("No user found");
         return _mapper.Map<UserResponse>(res);
     }
 
@@ -38,24 +38,19 @@ public class UserService : IUserService
 
     public async Task<UserResponse?> DeleteUserAsync(int userId)
     {
-        User res = await _userRepository.DeleteUserAsync(userId).ConfigureAwait(false) ?? throw new NotFoundException("No user found");
+        User res = await _userRepository.DeleteUserAsync(userId).ConfigureAwait(false) ?? throw new UserNotFoundException("No user found");
         return _mapper.Map<UserResponse>(res);
     }
 
     public async Task<UserResponse?> UpdateUserAsync(int userId, UpdateUserRequest request)
     {
-        User user = await _userRepository.GetUserByIdAsync(userId).ConfigureAwait(false) ?? throw new NotFoundException("No user found");
-
+        User user = await _userRepository.GetUserByIdAsync(userId).ConfigureAwait(false) ?? throw new UserNotFoundException("No user found");
         user.FirstName = request.FirstName;
         user.LastName = request.LastName;
         user.PhoneNumber = request.PhoneNumber;
         user.Country = request.Country;
 
-        int affectedRows = await _userRepository.UpdateUserAsync(user).ConfigureAwait(false);
-        if (affectedRows == 0)
-        {
-            throw new UserException("Error updating user");
-        }
+        await _userRepository.UpdateUserAsync(user).ConfigureAwait(false);
         return _mapper.Map<UserResponse>(user);
     }
 }

@@ -75,12 +75,6 @@ public class AuthenticationController : ControllerBase
             response.Status = ResponseStatus.Error;
             return BadRequest(response);
         }
-        catch (LockoutException ex)
-        {
-            response.Message = ex.Message;
-            response.Status = ResponseStatus.Error;
-            return BadRequest(response);
-        }
         catch (Exception ex)
         {
             response.Message = ex.Message;
@@ -107,7 +101,7 @@ public class AuthenticationController : ControllerBase
 
             return Ok(response);
         }
-        catch (NotFoundException ex)
+        catch (UserNotFoundException ex)
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
@@ -145,7 +139,7 @@ public class AuthenticationController : ControllerBase
 
             return Ok(response);
         }
-        catch (NotFoundException ex)
+        catch (UserNotFoundException ex)
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;

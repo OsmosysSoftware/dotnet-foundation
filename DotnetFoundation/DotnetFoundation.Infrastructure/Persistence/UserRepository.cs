@@ -58,7 +58,7 @@ public class UserRepository : IUserRepository
     }
     public async Task<List<string>> GetUserRoleAsync(string email)
     {
-        IdentityApplicationUser identityApplicationUser = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new NotFoundException("Error finding user");
+        IdentityApplicationUser identityApplicationUser = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new UserNotFoundException("Error finding user");
         return (await _userManager.GetRolesAsync(identityApplicationUser).ConfigureAwait(false)).ToList();
     }
 
@@ -96,8 +96,8 @@ public class UserRepository : IUserRepository
         ApplicationUser? user = await _dbContext.ApplicationUsers
             .Where(u => u.Id == userId && u.Status == Status.ACTIVE)
             .FirstOrDefaultAsync()
-            .ConfigureAwait(false) ?? throw new NotFoundException("Error finding user");
-        IdentityApplicationUser? identityUser = await _userManager.FindByIdAsync(user.IdentityApplicationUserId!.ToString()).ConfigureAwait(false) ?? throw new NotFoundException("Error finding user");
+            .ConfigureAwait(false) ?? throw new UserNotFoundException("Error finding user");
+        IdentityApplicationUser? identityUser = await _userManager.FindByIdAsync(user.IdentityApplicationUserId!.ToString()).ConfigureAwait(false) ?? throw new UserNotFoundException("Error finding user");
 
         // Disable user login
         await _userManager.SetLockoutEnabledAsync(identityUser, true).ConfigureAwait(false);
@@ -116,24 +116,20 @@ public class UserRepository : IUserRepository
 
         if (!signInResult.Succeeded)
         {
-            if (signInResult.IsLockedOut)
-            {
-                throw new LockoutException("Account is locked out");
-            }
             throw new InvalidCredentialsException("Invalid Email or Password");
         }
-        IdentityApplicationUser user = await _userManager.FindByEmailAsync(request.Email).ConfigureAwait(false) ?? throw new NotFoundException("User does not exist");
+        IdentityApplicationUser user = await _userManager.FindByEmailAsync(request.Email).ConfigureAwait(false) ?? throw new UserNotFoundException("User does not exist");
         return new(user.Id, request.Email, (await _userManager.GetRolesAsync(user).ConfigureAwait(false)).ToList());
     }
 
     public async Task<string> ForgotPasswordAsync(string email)
     {
-        IdentityApplicationUser user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new NotFoundException("Invalid Email");
+        IdentityApplicationUser user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new UserNotFoundException("Invalid Email");
         return await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false);
     }
     public async Task ResetPasswordAsync(string email, string token, string newPassword)
     {
-        IdentityApplicationUser user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new NotFoundException("Invalid Email");
+        IdentityApplicationUser user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new UserNotFoundException("Invalid Email");
         IdentityResult result = await _userManager.ResetPasswordAsync(user, token, newPassword).ConfigureAwait(false);
 
         if (!result.Succeeded)
@@ -150,7 +146,7 @@ public class UserRepository : IUserRepository
             await _roleManager.CreateAsync(new IdentityRole(newRole)).ConfigureAwait(false);
         }
 
-        IdentityApplicationUser identityApplicationUser = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new NotFoundException("Error finding user");
+        IdentityApplicationUser identityApplicationUser = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new UserNotFoundException("Error finding user");
         await _userManager.AddToRoleAsync(identityApplicationUser, newRole).ConfigureAwait(false);
         await _userManager.AddClaimAsync(identityApplicationUser, new Claim(ClaimTypes.Role, newRole)).ConfigureAwait(false);
         return true;

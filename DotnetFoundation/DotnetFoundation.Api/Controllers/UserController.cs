@@ -1,4 +1,3 @@
-using System.Net;
 using DotnetFoundation.Application.Exceptions;
 using DotnetFoundation.Application.Interfaces.Services;
 using DotnetFoundation.Application.Models.Common;
@@ -64,7 +63,7 @@ public class UserController : ControllerBase
 
             return Ok(response);
         }
-        catch (NotFoundException ex)
+        catch (UserNotFoundException ex)
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
@@ -98,7 +97,7 @@ public class UserController : ControllerBase
 
             return Ok(response);
         }
-        catch (NotFoundException ex)
+        catch (UserNotFoundException ex)
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
@@ -136,13 +135,7 @@ public class UserController : ControllerBase
 
             return Ok(response);
         }
-        catch (NotFoundException ex)
-        {
-            response.Message = ex.Message;
-            response.Status = ResponseStatus.Error;
-            return BadRequest(response);
-        }
-        catch (UserException ex)
+        catch (UserNotFoundException ex)
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
@@ -175,7 +168,7 @@ public class UserController : ControllerBase
 
             return Ok(response);
         }
-        catch (NotFoundException ex)
+        catch (UserNotFoundException ex)
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
