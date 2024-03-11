@@ -134,18 +134,18 @@ public class TaskController : ControllerBase
     /// Update details of a task when the Id is passed.
     /// </summary>
     /// <param name="taskId">Id of task record</param>
-    /// <param name="modifiedDetails">Modified details for task record</param>
-    [HttpPut("tasks/{taskId}")]
+    /// <param name="updatedTaskDetails">Modified details for task record</param>
+    [HttpPut("task/{taskId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<TaskDetailsResponse>>> UpdateTaskAsync(int taskId, TaskDetailsRequest modifiedDetails)
+    public async Task<ActionResult<BaseResponse<TaskDetailsResponse>>> UpdateTaskAsync(int taskId, TaskDetailsRequest updatedTaskDetails)
     {
         BaseResponse<TaskDetailsResponse> response = new(ResponseStatus.Fail);
         try
         {
-            response.Data = await _taskDetailsService.UpdateTaskAsync(taskId, modifiedDetails).ConfigureAwait(false);
+            response.Data = await _taskDetailsService.UpdateTaskAsync(taskId, updatedTaskDetails).ConfigureAwait(false);
             response.Status = ResponseStatus.Success;
 
             return Ok(response);

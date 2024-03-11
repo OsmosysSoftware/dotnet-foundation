@@ -49,26 +49,26 @@ public class TaskDetailsRepository : ITaskDetailsRepository
         return taskDetails.Id;
     }
 
-    public async Task<TaskDetails?> UpdateTaskAsync(TaskDetailsRequest modifiedDetails, TaskDetails existingDetails)
+    public async Task<TaskDetails?> UpdateTaskAsync(TaskDetailsRequest updatedTaskDetails, TaskDetails currentTaskDetails)
     {
         // Modify data
-        existingDetails.Description = modifiedDetails.Description;
-        existingDetails.Category = modifiedDetails.Category;
-        existingDetails.BudgetedHours = modifiedDetails.BudgetedHours;
-        existingDetails.AssignedTo = modifiedDetails.AssignedTo;
-        existingDetails.ModifiedOn = DateTime.UtcNow;
+        currentTaskDetails.Description = updatedTaskDetails.Description;
+        currentTaskDetails.Category = updatedTaskDetails.Category;
+        currentTaskDetails.BudgetedHours = updatedTaskDetails.BudgetedHours;
+        currentTaskDetails.AssignedTo = updatedTaskDetails.AssignedTo;
+        currentTaskDetails.ModifiedOn = DateTime.UtcNow;
 
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
-        return existingDetails;
+        return currentTaskDetails;
     }
 
-    public async Task<TaskDetails?> InactiveTaskAsync(TaskDetails existingDetails)
+    public async Task<TaskDetails?> InactiveTaskAsync(TaskDetails currentTaskDetails)
     {
         // Modify task to INACTIVE
-        existingDetails.Status = Status.INACTIVE;
-        existingDetails.ModifiedOn = DateTime.UtcNow;
+        currentTaskDetails.Status = Status.INACTIVE;
+        currentTaskDetails.ModifiedOn = DateTime.UtcNow;
 
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
-        return existingDetails;
+        return currentTaskDetails;
     }
 }
