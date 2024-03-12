@@ -1,4 +1,5 @@
 using System.Net;
+using DotnetFoundation.Api.Helpers;
 using DotnetFoundation.Application.Exceptions;
 using DotnetFoundation.Application.Interfaces.Services;
 using DotnetFoundation.Application.Models.Common;
@@ -13,9 +14,11 @@ namespace DotnetFoundation.Api.Controllers;
 public class AuthenticationController : ControllerBase
 {
     private readonly IAuthenticationService _authenticationService;
-    public AuthenticationController(IAuthenticationService authenticationService)
+    private readonly ErrorResponse _errorResponse;
+    public AuthenticationController(IAuthenticationService authenticationService, ErrorResponse errorResponse)
     {
         _authenticationService = authenticationService;
+        _errorResponse = errorResponse;
     }
 
     /// <summary>
@@ -40,11 +43,13 @@ public class AuthenticationController : ControllerBase
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
+            response.Errors = _errorResponse.GetErrorResponse();
             return BadRequest(response);
         }
         catch (Exception ex)
         {
             response.Message = ex.Message;
+            response.Errors = _errorResponse.GetErrorResponse();
             response.Status = ResponseStatus.Error;
             return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
@@ -71,13 +76,14 @@ public class AuthenticationController : ControllerBase
         catch (InvalidCredentialsException ex)
         {
             response.Message = ex.Message;
-
             response.Status = ResponseStatus.Error;
+            response.Errors = _errorResponse.GetErrorResponse();
             return BadRequest(response);
         }
         catch (Exception ex)
         {
             response.Message = ex.Message;
+            response.Errors = _errorResponse.GetErrorResponse();
             response.Status = ResponseStatus.Error;
             return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
@@ -105,17 +111,20 @@ public class AuthenticationController : ControllerBase
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
+            response.Errors = _errorResponse.GetErrorResponse();
             return BadRequest(response);
         }
         catch (InvalidTokenException ex)
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
+            response.Errors = _errorResponse.GetErrorResponse();
             return BadRequest(response);
         }
         catch (Exception ex)
         {
             response.Message = ex.Message;
+            response.Errors = _errorResponse.GetErrorResponse();
             response.Status = ResponseStatus.Error;
             return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
@@ -143,12 +152,14 @@ public class AuthenticationController : ControllerBase
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
+            response.Errors = _errorResponse.GetErrorResponse();
             return BadRequest(response);
         }
         catch (Exception ex)
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
+            response.Errors = _errorResponse.GetErrorResponse();
             return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
     }

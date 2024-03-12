@@ -34,34 +34,23 @@ public class TaskDetailsRepository : ITaskDetailsRepository
         return taskObj;
     }
 
-    public async Task<int?> InsertTaskAsync(TaskDetails taskDetails)
+    public async Task<int?> InsertTaskAsync(TaskDetails task)
     {
-         _dbContext.TaskDetails.Add(taskDetails);
+        _dbContext.TaskDetails.Add(task);
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
 
-        return taskDetails.Id;
+        return task.Id;
     }
 
-    public async Task<TaskDetails?> UpdateTaskAsync(TaskDetailsRequest modifiedDetails, TaskDetails existingDetails)
+    public async Task<TaskDetails?> UpdateTaskAsync(TaskDetails task)
     {
-        // Modify data
-        existingDetails.Description = modifiedDetails.Description;
-        existingDetails.Category = modifiedDetails.Category;
-        existingDetails.BudgetedHours = modifiedDetails.BudgetedHours;
-        existingDetails.AssignedTo = modifiedDetails.AssignedTo;
-        existingDetails.ModifiedOn = DateTime.UtcNow;
-
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
-        return existingDetails;
+        return task;
     }
 
-    public async Task<TaskDetails?> InactiveTaskAsync(TaskDetails existingDetails)
+    public async Task<TaskDetails?> InactiveTaskAsync(TaskDetails task)
     {
-        // Modify task to INACTIVE
-        existingDetails.Status = Status.INACTIVE;
-        existingDetails.ModifiedOn = DateTime.UtcNow;
-
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
-        return existingDetails;
+        return task;
     }
 }

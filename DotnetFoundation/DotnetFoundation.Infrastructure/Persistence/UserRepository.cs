@@ -1,11 +1,13 @@
 using DotnetFoundation.Application.Exceptions;
 using DotnetFoundation.Application.Interfaces.Persistence;
+using DotnetFoundation.Application.Models.Common;
 using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
 using DotnetFoundation.Application.Models.DTOs.UserDTO;
 using DotnetFoundation.Domain.Entities;
 using DotnetFoundation.Domain.Enums;
 using DotnetFoundation.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -17,12 +19,14 @@ public class UserRepository : IUserRepository
     private readonly SignInManager<IdentityApplicationUser> _signInManager;
     private readonly UserManager<IdentityApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
-    public UserRepository(SqlDatabaseContext sqlDatabaseContext, SignInManager<IdentityApplicationUser> signinManager, RoleManager<IdentityRole> roleManager, UserManager<IdentityApplicationUser> userManager)
+    private readonly IActionContextAccessor _actionContextAccessor;
+    public UserRepository(SqlDatabaseContext sqlDatabaseContext, SignInManager<IdentityApplicationUser> signinManager, RoleManager<IdentityRole> roleManager, UserManager<IdentityApplicationUser> userManager, IActionContextAccessor actionContextAccessor)
     {
         _dbContext = sqlDatabaseContext;
         _roleManager = roleManager;
         _signInManager = signinManager;
         _userManager = userManager;
+        _actionContextAccessor = actionContextAccessor;
     }
 
     public async Task<string> AddUserAsync(RegisterRequest request)
@@ -37,8 +41,9 @@ public class UserRepository : IUserRepository
 
         if (!identityResult.Succeeded)
         {
-            string errorDetails = string.Join(", ", identityResult.Errors.Select(e => e.Description));
-            throw new IdentityUserException($"Error creating identity user: {errorDetails}");
+            List<string> errorDetails = identityResult.Errors.Select(e => e.Description).ToList();
+            _actionContextAccessor?.ActionContext?.ModelState.AddModelError("UserCreation", string.Join(", ", errorDetails));
+            throw new IdentityUserException(ErrorValues.GenericUserErrorMessage);
         }
 
         ApplicationUser applicationUser = new()
@@ -58,7 +63,12 @@ public class UserRepository : IUserRepository
     }
     public async Task<List<string>> GetUserRoleAsync(string email)
     {
-        IdentityApplicationUser identityApplicationUser = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new UserNotFoundException("Error finding user");
+        IdentityApplicationUser? identityApplicationUser = await _userManager.FindByEmailAsync(email).ConfigureAwait(false);
+        if (identityApplicationUser == null)
+        {
+            _actionContextAccessor?.ActionContext?.ModelState.AddModelError("email", "Error Finding User");
+            throw new UserNotFoundException(ErrorValues.GenericUserErrorMessage);
+        }
         return (await _userManager.GetRolesAsync(identityApplicationUser).ConfigureAwait(false)).ToList();
     }
 
@@ -96,8 +106,20 @@ public class UserRepository : IUserRepository
         ApplicationUser? user = await _dbContext.ApplicationUsers
             .Where(u => u.Id == userId && u.Status == Status.ACTIVE)
             .FirstOrDefaultAsync()
-            .ConfigureAwait(false) ?? throw new UserNotFoundException("Error finding user");
-        IdentityApplicationUser? identityUser = await _userManager.FindByIdAsync(user.IdentityApplicationUserId!.ToString()).ConfigureAwait(false) ?? throw new UserNotFoundException("Error finding user");
+            .ConfigureAwait(false);
+
+        if (user == null)
+        {
+            _actionContextAccessor?.ActionContext?.ModelState.AddModelError("userId", "Error Finding User");
+            throw new UserNotFoundException(ErrorValues.GenericUserErrorMessage);
+        }
+
+        IdentityApplicationUser? identityUser = await _userManager.FindByIdAsync(user.IdentityApplicationUserId!.ToString()).ConfigureAwait(false);
+        if (identityUser == null)
+        {
+            _actionContextAccessor?.ActionContext?.ModelState.AddModelError("userId", "Error Finding User");
+            throw new UserNotFoundException(ErrorValues.GenericUserErrorMessage);
+        }
 
         // Disable user login
         await _userManager.SetLockoutEnabledAsync(identityUser, true).ConfigureAwait(false);
@@ -116,25 +138,43 @@ public class UserRepository : IUserRepository
 
         if (!signInResult.Succeeded)
         {
-            throw new InvalidCredentialsException("Invalid Email or Password");
+            _actionContextAccessor?.ActionContext?.ModelState.AddModelError("request", "Invalid Email or Password");
+            throw new InvalidCredentialsException(ErrorValues.GenericInvalidCredentialsMessage);
         }
-        IdentityApplicationUser user = await _userManager.FindByEmailAsync(request.Email).ConfigureAwait(false) ?? throw new UserNotFoundException("User does not exist");
+        IdentityApplicationUser? user = await _userManager.FindByEmailAsync(request.Email).ConfigureAwait(false);
+        if (user == null)
+        {
+            _actionContextAccessor?.ActionContext?.ModelState.AddModelError("email", "Error Finding User");
+            throw new UserNotFoundException(ErrorValues.GenericUserErrorMessage);
+        }
         return new(user.Id, request.Email, (await _userManager.GetRolesAsync(user).ConfigureAwait(false)).ToList());
     }
 
     public async Task<string> ForgotPasswordAsync(string email)
     {
-        IdentityApplicationUser user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new UserNotFoundException("Invalid Email");
+        IdentityApplicationUser? user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false);
+        if (user == null)
+        {
+            _actionContextAccessor?.ActionContext?.ModelState.AddModelError("email", "Error Finding User");
+            throw new UserNotFoundException(ErrorValues.GenericUserErrorMessage);
+        }
         return await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false);
     }
     public async Task ResetPasswordAsync(string email, string token, string newPassword)
     {
-        IdentityApplicationUser user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new UserNotFoundException("Invalid Email");
+        IdentityApplicationUser? user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false);
+        if (user == null)
+        {
+            _actionContextAccessor?.ActionContext?.ModelState.AddModelError("email", "Error Finding User");
+            throw new UserNotFoundException(ErrorValues.GenericUserErrorMessage);
+        }
         IdentityResult result = await _userManager.ResetPasswordAsync(user, token, newPassword).ConfigureAwait(false);
 
         if (!result.Succeeded)
         {
-            throw new InvalidTokenException("Invalid token");
+            List<string> errorDetails = result.Errors.Select(e => e.Description).ToList();
+            _actionContextAccessor?.ActionContext?.ModelState.AddModelError("token", string.Join(", ", errorDetails));
+            throw new IdentityUserException(ErrorValues.GenericUserErrorMessage);
         }
     }
     public async Task<bool> AddUserRoleAsync(string email, Roles role)
@@ -146,7 +186,12 @@ public class UserRepository : IUserRepository
             await _roleManager.CreateAsync(new IdentityRole(newRole)).ConfigureAwait(false);
         }
 
-        IdentityApplicationUser identityApplicationUser = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new UserNotFoundException("Error finding user");
+        IdentityApplicationUser? identityApplicationUser = await _userManager.FindByEmailAsync(email).ConfigureAwait(false);
+        if (identityApplicationUser == null)
+        {
+            _actionContextAccessor?.ActionContext?.ModelState.AddModelError("email", "Error Finding User");
+            throw new UserNotFoundException(ErrorValues.GenericUserErrorMessage);
+        }
         await _userManager.AddToRoleAsync(identityApplicationUser, newRole).ConfigureAwait(false);
         await _userManager.AddClaimAsync(identityApplicationUser, new Claim(ClaimTypes.Role, newRole)).ConfigureAwait(false);
         return true;

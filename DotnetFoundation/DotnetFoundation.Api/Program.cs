@@ -57,6 +57,7 @@ builder.Services.AddHttpContextAccessor();
 
 // Modify builder for different layers
 builder.Services.AddApplication();
+builder.Services.AddScoped<DotnetFoundation.Api.Helpers.ErrorResponse>();
 builder.Services.AddServices();
 builder.Services.AddInfrastructure(builder.Configuration);
 

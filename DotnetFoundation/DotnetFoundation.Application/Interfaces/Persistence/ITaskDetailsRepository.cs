@@ -11,7 +11,7 @@ public interface ITaskDetailsRepository
     public Task<List<TaskDetails>> GetAllTasksAsync();
     public Task<List<TaskDetails>> GetActiveTasksAsync();
     public Task<TaskDetails?> GetTaskByIdAsync(int id);
-    public Task<int?> InsertTaskAsync(TaskDetails taskDetails);
-    public Task<TaskDetails?> UpdateTaskAsync(TaskDetailsRequest modifiedDetails, TaskDetails existingDetails);
-    public Task<TaskDetails?> InactiveTaskAsync(TaskDetails existingDetails);
+    public Task<int?> InsertTaskAsync(TaskDetails task);
+    public Task<TaskDetails?> UpdateTaskAsync(TaskDetails task);
+    public Task<TaskDetails?> InactiveTaskAsync(TaskDetails task);
 }
