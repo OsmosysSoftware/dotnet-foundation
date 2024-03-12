@@ -43,7 +43,7 @@ public class TaskDetailsService : ITaskDetailsService
         if (response == null)
         {
             _actionContextAccessor?.ActionContext?.ModelState.AddModelError("TaskId", "Error Finding Task");
-            throw new NotFoundException(ErrorValues.GenericUserErrorMessage);
+            throw new TaskNotFoundException(ErrorValues.GenricNotFoundMessage);
         }
         return _mapper.Map<TaskDetailsResponse>(response);
     }
@@ -55,7 +55,7 @@ public class TaskDetailsService : ITaskDetailsService
         if (user == null)
         {
             _actionContextAccessor?.ActionContext?.ModelState.AddModelError("AssignedTo", "Error Finding User");
-            throw new UserNotFoundException(ErrorValues.GenericUserErrorMessage);
+            throw new UserNotFoundException(ErrorValues.GenricNotFoundMessage);
         }
         // Create new TaskDetails object and add relevant details
         TaskDetails taskDetails = new TaskDetails
@@ -83,7 +83,7 @@ public class TaskDetailsService : ITaskDetailsService
         if (task == null)
         {
             _actionContextAccessor?.ActionContext?.ModelState.AddModelError("TaskId", "Error Finding Task");
-            throw new NotFoundException(ErrorValues.GenericUserErrorMessage);
+            throw new TaskNotFoundException(ErrorValues.GenricNotFoundMessage);
         }
 
         User? user = await _userRepository.GetUserByIdAsync(request.AssignedTo).ConfigureAwait(false);
@@ -91,7 +91,7 @@ public class TaskDetailsService : ITaskDetailsService
         if (user == null)
         {
             _actionContextAccessor?.ActionContext?.ModelState.AddModelError("AssignedTo", "Error Finding User");
-            throw new UserNotFoundException(ErrorValues.GenericUserErrorMessage);
+            throw new UserNotFoundException(ErrorValues.GenricNotFoundMessage);
         }
         // Modify data
         task.Description = request.Description;
@@ -110,7 +110,7 @@ public class TaskDetailsService : ITaskDetailsService
         if (task == null)
         {
             _actionContextAccessor?.ActionContext?.ModelState.AddModelError("TaskId", "Error Finding Task");
-            throw new NotFoundException(ErrorValues.GenericUserErrorMessage);
+            throw new TaskNotFoundException(ErrorValues.GenricNotFoundMessage);
         }
 
         // Modify task to INACTIVE

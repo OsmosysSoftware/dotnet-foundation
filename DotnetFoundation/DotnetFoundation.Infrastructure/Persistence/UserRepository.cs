@@ -42,7 +42,7 @@ public class UserRepository : IUserRepository
         if (!identityResult.Succeeded)
         {
             List<string> errorDetails = identityResult.Errors.Select(e => e.Description).ToList();
-            _actionContextAccessor?.ActionContext?.ModelState.AddModelError("UserCreation", string.Join(", ", errorDetails));
+            _actionContextAccessor?.ActionContext?.ModelState.AddModelError("email", string.Join(", ", errorDetails));
             throw new IdentityUserException(ErrorValues.GenericUserErrorMessage);
         }
 
@@ -67,7 +67,7 @@ public class UserRepository : IUserRepository
         if (identityApplicationUser == null)
         {
             _actionContextAccessor?.ActionContext?.ModelState.AddModelError("email", "Error Finding User");
-            throw new UserNotFoundException(ErrorValues.GenericUserErrorMessage);
+            throw new UserNotFoundException(ErrorValues.GenricNotFoundMessage);
         }
         return (await _userManager.GetRolesAsync(identityApplicationUser).ConfigureAwait(false)).ToList();
     }
@@ -111,14 +111,14 @@ public class UserRepository : IUserRepository
         if (user == null)
         {
             _actionContextAccessor?.ActionContext?.ModelState.AddModelError("userId", "Error Finding User");
-            throw new UserNotFoundException(ErrorValues.GenericUserErrorMessage);
+            throw new UserNotFoundException(ErrorValues.GenricNotFoundMessage);
         }
 
         IdentityApplicationUser? identityUser = await _userManager.FindByIdAsync(user.IdentityApplicationUserId!.ToString()).ConfigureAwait(false);
         if (identityUser == null)
         {
             _actionContextAccessor?.ActionContext?.ModelState.AddModelError("userId", "Error Finding User");
-            throw new UserNotFoundException(ErrorValues.GenericUserErrorMessage);
+            throw new UserNotFoundException(ErrorValues.GenricNotFoundMessage);
         }
 
         // Disable user login
@@ -144,8 +144,8 @@ public class UserRepository : IUserRepository
         IdentityApplicationUser? user = await _userManager.FindByEmailAsync(request.Email).ConfigureAwait(false);
         if (user == null)
         {
-            _actionContextAccessor?.ActionContext?.ModelState.AddModelError("email", "Error Finding User");
-            throw new UserNotFoundException(ErrorValues.GenericUserErrorMessage);
+            _actionContextAccessor?.ActionContext?.ModelState.AddModelError("email", "Invalid Email or password");
+            throw new InvalidCredentialsException(ErrorValues.GenericInvalidCredentialsMessage);
         }
         return new(user.Id, request.Email, (await _userManager.GetRolesAsync(user).ConfigureAwait(false)).ToList());
     }
@@ -156,7 +156,7 @@ public class UserRepository : IUserRepository
         if (user == null)
         {
             _actionContextAccessor?.ActionContext?.ModelState.AddModelError("email", "Error Finding User");
-            throw new UserNotFoundException(ErrorValues.GenericUserErrorMessage);
+            throw new UserNotFoundException(ErrorValues.GenricNotFoundMessage);
         }
         return await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false);
     }
@@ -166,7 +166,7 @@ public class UserRepository : IUserRepository
         if (user == null)
         {
             _actionContextAccessor?.ActionContext?.ModelState.AddModelError("email", "Error Finding User");
-            throw new UserNotFoundException(ErrorValues.GenericUserErrorMessage);
+            throw new UserNotFoundException(ErrorValues.GenricNotFoundMessage);
         }
         IdentityResult result = await _userManager.ResetPasswordAsync(user, token, newPassword).ConfigureAwait(false);
 
@@ -174,7 +174,7 @@ public class UserRepository : IUserRepository
         {
             List<string> errorDetails = result.Errors.Select(e => e.Description).ToList();
             _actionContextAccessor?.ActionContext?.ModelState.AddModelError("token", string.Join(", ", errorDetails));
-            throw new IdentityUserException(ErrorValues.GenericUserErrorMessage);
+            throw new InvalidTokenException(ErrorValues.GenericInvalidTokenErrorMessage);
         }
     }
     public async Task<bool> AddUserRoleAsync(string email, Roles role)
@@ -190,7 +190,7 @@ public class UserRepository : IUserRepository
         if (identityApplicationUser == null)
         {
             _actionContextAccessor?.ActionContext?.ModelState.AddModelError("email", "Error Finding User");
-            throw new UserNotFoundException(ErrorValues.GenericUserErrorMessage);
+            throw new UserNotFoundException(ErrorValues.GenricNotFoundMessage);
         }
         await _userManager.AddToRoleAsync(identityApplicationUser, newRole).ConfigureAwait(false);
         await _userManager.AddClaimAsync(identityApplicationUser, new Claim(ClaimTypes.Role, newRole)).ConfigureAwait(false);
