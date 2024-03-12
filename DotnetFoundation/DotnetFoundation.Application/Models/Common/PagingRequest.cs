@@ -3,16 +3,16 @@ public class PagingRequest
 {
     private const int MaxPageSize = 50;
     public int PageNumber { get; set; }
-    private int pageSize;
+    private int _pageSize;
     public int PageSize
     {
         get
         {
-            return pageSize;
+            return _pageSize;
         }
         set
         {
-            pageSize = (value > MaxPageSize ? MaxPageSize : value) < 1 ? 1 : value;
+            _pageSize = (value > MaxPageSize ? MaxPageSize : value) < 1 ? 1 : value;
         }
     }
 }
