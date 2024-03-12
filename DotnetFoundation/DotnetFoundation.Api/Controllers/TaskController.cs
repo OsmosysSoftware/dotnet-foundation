@@ -26,19 +26,10 @@ public class TaskController : ControllerBase
     public async Task<ActionResult<BaseResponse<PagedList<TaskDetailsResponse>>>> GetAllTasksAsync([FromQuery] PagingRequest pagingRequest)
     {
         BaseResponse<PagedList<TaskDetailsResponse>> response = new(ResponseStatus.Fail);
-        try
-        {
-            response.Data = await _taskDetailsService.GetAllTasksAsync(pagingRequest).ConfigureAwait(false);
-            response.Status = ResponseStatus.Success;
+        response.Data = await _taskDetailsService.GetAllTasksAsync(pagingRequest).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
 
-            return Ok(response);
-        }
-        catch (Exception ex)
-        {
-            response.Message = ex.Message;
-            response.Status = ResponseStatus.Error;
-            return StatusCode(StatusCodes.Status500InternalServerError, response);
-        }
+        return Ok(response);
     }
 
     /// <summary>
@@ -50,19 +41,10 @@ public class TaskController : ControllerBase
     public async Task<ActionResult<BaseResponse<PagedList<TaskDetailsResponse>>>> GetActiveTasksAsync([FromQuery] PagingRequest pagingRequest)
     {
         BaseResponse<PagedList<TaskDetailsResponse>> response = new(ResponseStatus.Fail);
-        try
-        {
-            response.Data = await _taskDetailsService.GetActiveTasksAsync(pagingRequest).ConfigureAwait(false);
-            response.Status = ResponseStatus.Success;
+        response.Data = await _taskDetailsService.GetActiveTasksAsync(pagingRequest).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
 
-            return Ok(response);
-        }
-        catch (Exception ex)
-        {
-            response.Message = ex.Message;
-            response.Status = ResponseStatus.Error;
-            return StatusCode(StatusCodes.Status500InternalServerError, response);
-        }
+        return Ok(response);
     }
 
     /// <summary>
@@ -77,25 +59,10 @@ public class TaskController : ControllerBase
     public async Task<ActionResult<BaseResponse<TaskDetailsResponse>>> GetTaskByIdAsync(int taskId)
     {
         BaseResponse<TaskDetailsResponse> response = new(ResponseStatus.Fail);
-        try
-        {
-            response.Data = await _taskDetailsService.GetTaskByIdAsync(taskId).ConfigureAwait(false);
-            response.Status = ResponseStatus.Success;
+        response.Data = await _taskDetailsService.GetTaskByIdAsync(taskId).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
 
-            return Ok(response);
-        }
-        catch (NotFoundException ex)
-        {
-            response.Message = ex.Message;
-            response.Status = ResponseStatus.Error;
-            return BadRequest(response);
-        }
-        catch (Exception ex)
-        {
-            response.Message = ex.Message;
-            response.Status = ResponseStatus.Error;
-            return StatusCode(StatusCodes.Status500InternalServerError, response);
-        }
+        return Ok(response);
     }
 
     /// <summary>
@@ -109,25 +76,10 @@ public class TaskController : ControllerBase
     public async Task<ActionResult<BaseResponse<TaskDetailsResponse>>> InsertTaskAsync(TaskDetailsRequest detailRequest)
     {
         BaseResponse<TaskDetailsResponse> response = new(ResponseStatus.Fail);
-        try
-        {
-            response.Data = await _taskDetailsService.InsertTaskAsync(detailRequest).ConfigureAwait(false);
-            response.Status = ResponseStatus.Success;
+        response.Data = await _taskDetailsService.InsertTaskAsync(detailRequest).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
 
-            return Ok(response);
-        }
-        catch (NotFoundException ex)
-        {
-            response.Message = ex.Message;
-            response.Status = ResponseStatus.Error;
-            return BadRequest(response);
-        }
-        catch (Exception ex)
-        {
-            response.Message = ex.Message;
-            response.Status = ResponseStatus.Error;
-            return StatusCode(StatusCodes.Status500InternalServerError, response);
-        }
+        return Ok(response);
     }
 
     /// <summary>
@@ -143,25 +95,10 @@ public class TaskController : ControllerBase
     public async Task<ActionResult<BaseResponse<TaskDetailsResponse>>> UpdateTaskAsync(int taskId, TaskDetailsRequest updatedTaskDetails)
     {
         BaseResponse<TaskDetailsResponse> response = new(ResponseStatus.Fail);
-        try
-        {
-            response.Data = await _taskDetailsService.UpdateTaskAsync(taskId, updatedTaskDetails).ConfigureAwait(false);
-            response.Status = ResponseStatus.Success;
+        response.Data = await _taskDetailsService.UpdateTaskAsync(taskId, updatedTaskDetails).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
 
-            return Ok(response);
-        }
-        catch (NotFoundException ex)
-        {
-            response.Message = ex.Message;
-            response.Status = ResponseStatus.Error;
-            return BadRequest(response);
-        }
-        catch (Exception ex)
-        {
-            response.Message = ex.Message;
-            response.Status = ResponseStatus.Error;
-            return StatusCode(StatusCodes.Status500InternalServerError, response);
-        }
+        return Ok(response);
     }
 
     /// <summary>
@@ -176,24 +113,9 @@ public class TaskController : ControllerBase
     public async Task<ActionResult<BaseResponse<TaskDetailsResponse>>> InactiveTaskAsync(int taskId)
     {
         BaseResponse<TaskDetailsResponse> response = new(ResponseStatus.Fail);
-        try
-        {
-            response.Data = await _taskDetailsService.InactiveTaskAsync(taskId).ConfigureAwait(false);
-            response.Status = ResponseStatus.Success;
+        response.Data = await _taskDetailsService.InactiveTaskAsync(taskId).ConfigureAwait(false);
+        response.Status = ResponseStatus.Success;
 
-            return Ok(response);
-        }
-        catch (NotFoundException ex)
-        {
-            response.Message = ex.Message;
-            response.Status = ResponseStatus.Error;
-            return BadRequest(response);
-        }
-        catch (Exception ex)
-        {
-            response.Message = ex.Message;
-            response.Status = ResponseStatus.Error;
-            return StatusCode(StatusCodes.Status500InternalServerError, response);
-        }
+        return Ok(response);
     }
 }
