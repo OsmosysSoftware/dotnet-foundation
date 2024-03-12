@@ -75,6 +75,7 @@ public static class DependencyInjection
         // Configure service scope for repositories
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped(typeof(IPaginationService<>), typeof(PaginationService<>));
         services.AddScoped<ITaskDetailsRepository, TaskDetailsRepository>();
         services.AddHttpClient();
 
