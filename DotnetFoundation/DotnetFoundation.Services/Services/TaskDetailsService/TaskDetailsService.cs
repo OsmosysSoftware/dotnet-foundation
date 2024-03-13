@@ -1,7 +1,9 @@
 using AutoMapper;
 using DotnetFoundation.Application.Exceptions;
+using DotnetFoundation.Application.Exceptions;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Interfaces.Services;
+using DotnetFoundation.Application.Models.Common;
 using DotnetFoundation.Application.Models.Common;
 using DotnetFoundation.Application.Models.DTOs.TaskDetailsDTO;
 using DotnetFoundation.Domain.Entities;
@@ -25,16 +27,42 @@ public class TaskDetailsService : ITaskDetailsService
         _actionContextAccessor = actionContextAccessor;
     }
 
-    public async Task<List<TaskDetailsResponse>> GetAllTasksAsync()
+    public async Task<PagedList<TaskDetailsResponse>> GetAllTasksAsync(PagingRequest pagingRequest)
     {
-        List<TaskDetails> response = await _taskDetailsRepository.GetAllTasksAsync().ConfigureAwait(false);
-        return _mapper.Map<List<TaskDetailsResponse>>(response);
+        PagedList<TaskDetails> response = await _taskDetailsRepository.GetAllTasksAsync(pagingRequest).ConfigureAwait(false);
+
+        if (!response.Items.Any())
+        {
+            throw new NotFoundException($"No data fetched on PageNumber = {response.PageNumber} for PageSize = {response.PageSize}");
+        }
+
+        PagedList<TaskDetailsResponse> pagingResponse = new PagedList<TaskDetailsResponse>(
+            _mapper.Map<List<TaskDetailsResponse>>(response.Items),
+            response.PageNumber,
+            response.PageSize,
+            response.TotalCount
+        );
+
+        return pagingResponse;
     }
 
-    public async Task<List<TaskDetailsResponse>> GetActiveTasksAsync()
+    public async Task<PagedList<TaskDetailsResponse>> GetActiveTasksAsync(PagingRequest pagingRequest)
     {
-        List<TaskDetails> response = await _taskDetailsRepository.GetActiveTasksAsync().ConfigureAwait(false);
-        return _mapper.Map<List<TaskDetailsResponse>>(response);
+        PagedList<TaskDetails> response = await _taskDetailsRepository.GetActiveTasksAsync(pagingRequest).ConfigureAwait(false);
+
+        if (!response.Items.Any())
+        {
+            throw new NotFoundException($"No data fetched on PageNumber = {response.PageNumber} for PageSize = {response.PageSize}");
+        }
+
+        PagedList<TaskDetailsResponse> pagingResponse = new PagedList<TaskDetailsResponse>(
+            _mapper.Map<List<TaskDetailsResponse>>(response.Items),
+            response.PageNumber,
+            response.PageSize,
+            response.TotalCount
+        );
+
+        return pagingResponse;
     }
 
     public async Task<TaskDetailsResponse> GetTaskByIdAsync(int id)

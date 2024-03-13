@@ -1,31 +1,38 @@
 using DotnetFoundation.Application.Models.DTOs.TaskDetailsDTO;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 using DotnetFoundation.Domain.Enums;
+using DotnetFoundation.Application.Models.Common;
+using DotnetFoundation.Application.Interfaces.Integrations;
 
 namespace DotnetFoundation.Infrastructure.Persistence;
 
 public class TaskDetailsRepository : ITaskDetailsRepository
 {
     private readonly SqlDatabaseContext _dbContext;
-    public TaskDetailsRepository(SqlDatabaseContext sqlDatabaseContext)
+    private readonly IPaginationService<TaskDetails> _paginationService;
+    public TaskDetailsRepository(SqlDatabaseContext sqlDatabaseContext, IPaginationService<TaskDetails> paginationService)
     {
         _dbContext = sqlDatabaseContext;
+        _paginationService = paginationService;
     }
 
-    public async Task<List<TaskDetails>> GetAllTasksAsync()
+    public async Task<PagedList<TaskDetails>> GetAllTasksAsync(PagingRequest pagingRequest)
     {
-        List<TaskDetails> taskObj = await _dbContext.TaskDetails.ToListAsync().ConfigureAwait(false);
-        return taskObj;
+        IQueryable<TaskDetails> taskDetailsQueryable = _dbContext.TaskDetails.AsQueryable();
+
+        PagedList<TaskDetails> taskDetailsPagination = await _paginationService.ToPagedListAsync(taskDetailsQueryable,
+            pagingRequest.PageNumber, pagingRequest.PageSize).ConfigureAwait(false);
+        return taskDetailsPagination;
     }
 
-    public async Task<List<TaskDetails>> GetActiveTasksAsync()
+    public async Task<PagedList<TaskDetails>> GetActiveTasksAsync(PagingRequest pagingRequest)
     {
-        List<TaskDetails> taskObj = (await _dbContext.TaskDetails
-            .Where(task => task.Status == Status.ACTIVE)
-            .ToListAsync().ConfigureAwait(false));
-        return taskObj;
+        IQueryable<TaskDetails> taskDetailsQueryable = _dbContext.TaskDetails.Where(task => task.Status == Status.ACTIVE).AsQueryable();
+
+        PagedList<TaskDetails> taskDetailsPagination = await _paginationService.ToPagedListAsync(taskDetailsQueryable,
+            pagingRequest.PageNumber, pagingRequest.PageSize).ConfigureAwait(false);
+        return taskDetailsPagination;
     }
 
     public async Task<TaskDetails?> GetTaskByIdAsync(int id)

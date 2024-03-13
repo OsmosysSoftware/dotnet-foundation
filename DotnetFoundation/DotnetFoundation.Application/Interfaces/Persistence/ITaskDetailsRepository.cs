@@ -1,4 +1,5 @@
-﻿using DotnetFoundation.Application.Models.DTOs.TaskDetailsDTO;
+﻿using DotnetFoundation.Application.Models.Common;
+using DotnetFoundation.Application.Models.DTOs.TaskDetailsDTO;
 using DotnetFoundation.Domain.Entities;
 
 namespace DotnetFoundation.Application.Interfaces.Persistence;
@@ -8,8 +9,8 @@ namespace DotnetFoundation.Application.Interfaces.Persistence;
 /// </summary>
 public interface ITaskDetailsRepository
 {
-    public Task<List<TaskDetails>> GetAllTasksAsync();
-    public Task<List<TaskDetails>> GetActiveTasksAsync();
+    public Task<PagedList<TaskDetails>> GetAllTasksAsync(PagingRequest pagingRequest);
+    public Task<PagedList<TaskDetails>> GetActiveTasksAsync(PagingRequest pagingRequest);
     public Task<TaskDetails?> GetTaskByIdAsync(int id);
     public Task<int?> InsertTaskAsync(TaskDetails task);
     public Task<TaskDetails?> UpdateTaskAsync(TaskDetails task);
