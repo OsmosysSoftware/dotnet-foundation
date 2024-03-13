@@ -1,7 +1,7 @@
-using System.Net;
 using DotnetFoundation.Api.Helpers;
 using DotnetFoundation.Application.Exceptions;
 using DotnetFoundation.Application.Interfaces.Services;
+using DotnetFoundation.Application.Interfaces.Validator;
 using DotnetFoundation.Application.Models.Common;
 using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
 using DotnetFoundation.Application.Models.Enums;
@@ -11,14 +11,14 @@ namespace DotnetFoundation.Api.Controllers;
 
 [ApiController]
 [Route("/api/auth")]
-public class AuthenticationController : ControllerBase
+public class AuthenticationController : BaseController
 {
     private readonly IAuthenticationService _authenticationService;
-    private readonly ErrorResponse _errorResponse;
-    public AuthenticationController(IAuthenticationService authenticationService, ErrorResponse errorResponse)
+    private readonly IUserValidator _userValidator;
+    public AuthenticationController(IAuthenticationService authenticationService, IUserValidator userValidator)
     {
         _authenticationService = authenticationService;
-        _errorResponse = errorResponse;
+        _userValidator = userValidator;
     }
 
     /// <summary>
@@ -34,6 +34,12 @@ public class AuthenticationController : ControllerBase
         BaseResponse<AuthenticationResponse> response = new(ResponseStatus.Fail);
         try
         {
+            bool isRegisteredEmail = await _userValidator.IsEmailRegistered(request.Email).ConfigureAwait(false);
+            if (isRegisteredEmail)
+            {
+                ModelState.AddModelError("email", "Email already in use");
+                throw new IdentityUserException(ErrorValues.GenricValidationMessage);
+            }
             response.Data = await _authenticationService.RegisterAsync(request).ConfigureAwait(false);
             response.Status = ResponseStatus.Success;
 
@@ -43,13 +49,13 @@ public class AuthenticationController : ControllerBase
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
-            response.Errors = _errorResponse.GetErrorResponse();
+            response.Errors = GetErrorResponse();
             return BadRequest(response);
         }
         catch (Exception ex)
         {
             response.Message = ex.Message;
-            response.Errors = _errorResponse.GetErrorResponse();
+            response.Errors = GetErrorResponse();
             response.Status = ResponseStatus.Error;
             return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
@@ -77,13 +83,13 @@ public class AuthenticationController : ControllerBase
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
-            response.Errors = _errorResponse.GetErrorResponse();
+            response.Errors = GetErrorResponse();
             return BadRequest(response);
         }
         catch (Exception ex)
         {
             response.Message = ex.Message;
-            response.Errors = _errorResponse.GetErrorResponse();
+            response.Errors = GetErrorResponse();
             response.Status = ResponseStatus.Error;
             return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
@@ -102,6 +108,12 @@ public class AuthenticationController : ControllerBase
         BaseResponse<int> response = new(ResponseStatus.Fail);
         try
         {
+            bool isValidEmail = await _userValidator.ValidEmailId(request.Email).ConfigureAwait(false);
+            if (!isValidEmail)
+            {
+                ModelState.AddModelError("email", "Error Finding User");
+                throw new UserNotFoundException(ErrorValues.GenricNotFoundMessage);
+            }
             await _authenticationService.ResetPasswordAsync(request).ConfigureAwait(false);
             response.Status = ResponseStatus.Success;
 
@@ -111,20 +123,20 @@ public class AuthenticationController : ControllerBase
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
-            response.Errors = _errorResponse.GetErrorResponse();
+            response.Errors = GetErrorResponse();
             return BadRequest(response);
         }
         catch (InvalidTokenException ex)
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
-            response.Errors = _errorResponse.GetErrorResponse();
+            response.Errors = GetErrorResponse();
             return BadRequest(response);
         }
         catch (Exception ex)
         {
             response.Message = ex.Message;
-            response.Errors = _errorResponse.GetErrorResponse();
+            response.Errors = GetErrorResponse();
             response.Status = ResponseStatus.Error;
             return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
@@ -143,6 +155,12 @@ public class AuthenticationController : ControllerBase
         BaseResponse<int> response = new(ResponseStatus.Fail);
         try
         {
+            bool isValidEmail = await _userValidator.ValidEmailId(email).ConfigureAwait(false);
+            if (!isValidEmail)
+            {
+                ModelState.AddModelError("email", "Error Finding User");
+                throw new UserNotFoundException(ErrorValues.GenricNotFoundMessage);
+            }
             await _authenticationService.ForgotPasswordAsync(email).ConfigureAwait(false);
             response.Status = ResponseStatus.Success;
 
@@ -152,14 +170,14 @@ public class AuthenticationController : ControllerBase
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
-            response.Errors = _errorResponse.GetErrorResponse();
+            response.Errors = GetErrorResponse();
             return BadRequest(response);
         }
         catch (Exception ex)
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
-            response.Errors = _errorResponse.GetErrorResponse();
+            response.Errors = GetErrorResponse();
             return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
     }

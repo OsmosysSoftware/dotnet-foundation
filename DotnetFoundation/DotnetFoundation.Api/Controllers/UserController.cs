@@ -1,6 +1,7 @@
 using DotnetFoundation.Api.Helpers;
 using DotnetFoundation.Application.Exceptions;
 using DotnetFoundation.Application.Interfaces.Services;
+using DotnetFoundation.Application.Interfaces.Validator;
 using DotnetFoundation.Application.Models.Common;
 using DotnetFoundation.Application.Models.DTOs.UserDTO;
 using DotnetFoundation.Application.Models.Enums;
@@ -11,15 +12,15 @@ namespace DotnetFoundation.Api.Controllers;
 
 [ApiController]
 [Route("api/users")]
-public class UserController : ControllerBase
+public class UserController : BaseController
 {
     private readonly IUserService _userService;
-    private readonly ErrorResponse _errorResponse;
+    private readonly IUserValidator _userValidator;
 
-    public UserController(IUserService userService, ErrorResponse errorResponse)
+    public UserController(IUserService userService, IUserValidator userValidator)
     {
         _userService = userService;
-        _errorResponse = errorResponse;
+        _userValidator = userValidator;
     }
 
     /// <summary>
@@ -44,7 +45,7 @@ public class UserController : ControllerBase
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
-            response.Errors = _errorResponse.GetErrorResponse();
+            response.Errors = GetErrorResponse();
             return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
     }
@@ -63,6 +64,12 @@ public class UserController : ControllerBase
         BaseResponse<UserResponse> response = new(ResponseStatus.Fail);
         try
         {
+            bool IsValidUserId = await _userValidator.ValidUserId(userId).ConfigureAwait(false);
+            if (IsValidUserId)
+            {
+                ModelState.AddModelError("userId", "User Not Found");
+                throw new UserNotFoundException(ErrorValues.GenricNotFoundMessage);
+            }
             response.Data = await _userService.GetUserByIdAsync(userId).ConfigureAwait(false);
             response.Status = ResponseStatus.Success;
 
@@ -72,13 +79,13 @@ public class UserController : ControllerBase
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
-            response.Errors = _errorResponse.GetErrorResponse();
+            response.Errors = GetErrorResponse();
             return BadRequest(response);
         }
         catch (Exception ex)
         {
             response.Message = ex.Message;
-            response.Errors = _errorResponse.GetErrorResponse();
+            response.Errors = GetErrorResponse();
             response.Status = ResponseStatus.Error;
             return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
@@ -88,18 +95,24 @@ public class UserController : ControllerBase
     /// Add new user role.
     /// Authorize - ADMIN role
     /// </summary>
-    /// <param name="roleRequest">Role request details</param>
+    /// <param name="request">Role request details</param>
     [HttpPost("addrole")]
     [Authorize(Roles = "ADMIN")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<bool>>> AddUserRoleAsync(UserRoleRequest roleRequest)
+    public async Task<ActionResult<BaseResponse<bool>>> AddUserRoleAsync(UserRoleRequest request)
     {
         BaseResponse<bool> response = new(ResponseStatus.Fail);
         try
         {
-            response.Data = await _userService.AddUserRoleAsync(roleRequest.Email, roleRequest.Role).ConfigureAwait(false);
+            bool isValidEmail = await _userValidator.ValidEmailId(request.Email).ConfigureAwait(false);
+            if (!isValidEmail)
+            {
+                ModelState.AddModelError("email", "Error Finding User");
+                throw new UserNotFoundException(ErrorValues.GenricNotFoundMessage);
+            }
+            response.Data = await _userService.AddUserRoleAsync(request).ConfigureAwait(false);
             response.Status = ResponseStatus.Success;
 
             return Ok(response);
@@ -108,13 +121,13 @@ public class UserController : ControllerBase
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
-            response.Errors = _errorResponse.GetErrorResponse();
+            response.Errors = GetErrorResponse();
             return BadRequest(response);
         }
         catch (Exception ex)
         {
             response.Message = ex.Message;
-            response.Errors = _errorResponse.GetErrorResponse();
+            response.Errors = GetErrorResponse();
             response.Status = ResponseStatus.Error;
             return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
@@ -124,22 +137,24 @@ public class UserController : ControllerBase
     ///  Update user details by user id.
     /// </summary>
     /// <param name="userId">Id of user record</param>
-    /// <param name="updateUserRequest">user details updation request</param>
+    /// <param name="request">user details updation request</param>
     [HttpPut("{userId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<UserResponse>>> UpdateUserAsync(int userId, UpdateUserRequest updateUserRequest)
+    public async Task<ActionResult<BaseResponse<UserResponse>>> UpdateUserAsync(int userId, UpdateUserRequest request)
     {
         BaseResponse<UserResponse> response = new(ResponseStatus.Fail);
-        if (updateUserRequest == null)
-        {
-            return BadRequest("Invalid request data");
-        }
         try
         {
-            response.Data = await _userService.UpdateUserAsync(userId, updateUserRequest).ConfigureAwait(false);
+            bool IsValidUserId = await _userValidator.ValidUserId(userId).ConfigureAwait(false);
+            if (IsValidUserId)
+            {
+                ModelState.AddModelError("userId", "User Not Found");
+                throw new UserNotFoundException(ErrorValues.GenricNotFoundMessage);
+            }
+            response.Data = await _userService.UpdateUserAsync(userId, request).ConfigureAwait(false);
             response.Status = ResponseStatus.Success;
 
             return Ok(response);
@@ -148,13 +163,13 @@ public class UserController : ControllerBase
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
-            response.Errors = _errorResponse.GetErrorResponse();
+            response.Errors = GetErrorResponse();
             return BadRequest(response);
         }
         catch (Exception ex)
         {
             response.Message = ex.Message;
-            response.Errors = _errorResponse.GetErrorResponse();
+            response.Errors = GetErrorResponse();
             response.Status = ResponseStatus.Error;
             return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
@@ -174,6 +189,12 @@ public class UserController : ControllerBase
         BaseResponse<UserResponse> response = new(ResponseStatus.Fail);
         try
         {
+            bool IsValidUserId = await _userValidator.ValidUserId(userId).ConfigureAwait(false);
+            if (IsValidUserId)
+            {
+                ModelState.AddModelError("userId", "User Not Found");
+                throw new UserNotFoundException(ErrorValues.GenricNotFoundMessage);
+            }
             response.Data = await _userService.DeleteUserAsync(userId).ConfigureAwait(false);
             response.Status = ResponseStatus.Success;
 
@@ -183,14 +204,14 @@ public class UserController : ControllerBase
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
-            response.Errors = _errorResponse.GetErrorResponse();
+            response.Errors = GetErrorResponse();
             return BadRequest(response);
         }
         catch (Exception ex)
         {
             response.Message = ex.Message;
             response.Status = ResponseStatus.Error;
-            response.Errors = _errorResponse.GetErrorResponse();
+            response.Errors = GetErrorResponse();
             return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
     }

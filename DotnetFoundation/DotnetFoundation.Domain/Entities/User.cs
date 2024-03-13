@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using DotnetFoundation.Domain.Common;
 
 namespace DotnetFoundation.Domain.Entities;

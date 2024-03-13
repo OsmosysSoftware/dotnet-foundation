@@ -1,9 +1,7 @@
 using AutoMapper;
 using DotnetFoundation.Application.Exceptions;
-using DotnetFoundation.Application.Exceptions;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Interfaces.Services;
-using DotnetFoundation.Application.Models.Common;
 using DotnetFoundation.Application.Models.Common;
 using DotnetFoundation.Application.Models.DTOs.TaskDetailsDTO;
 using DotnetFoundation.Domain.Entities;
@@ -15,26 +13,17 @@ namespace DotnetFoundation.Services.Services.TaskDetailsService;
 public class TaskDetailsService : ITaskDetailsService
 {
     private readonly ITaskDetailsRepository _taskDetailsRepository;
-    private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
-    private readonly IActionContextAccessor _actionContextAccessor;
 
-    public TaskDetailsService(ITaskDetailsRepository taskDetailsRepository, IMapper mapper, IUserRepository userRepository, IActionContextAccessor actionContextAccessor)
+    public TaskDetailsService(ITaskDetailsRepository taskDetailsRepository, IMapper mapper)
     {
         _taskDetailsRepository = taskDetailsRepository;
-        _userRepository = userRepository;
         _mapper = mapper;
-        _actionContextAccessor = actionContextAccessor;
     }
 
-    public async Task<PagedList<TaskDetailsResponse>> GetAllTasksAsync(PagingRequest pagingRequest)
+    public async Task<PagedList<TaskDetailsResponse>> GetAllTasksAsync(PagingRequest request)
     {
-        PagedList<TaskDetails> response = await _taskDetailsRepository.GetAllTasksAsync(pagingRequest).ConfigureAwait(false);
-
-        if (!response.Items.Any())
-        {
-            throw new NotFoundException($"No data fetched on PageNumber = {response.PageNumber} for PageSize = {response.PageSize}");
-        }
+        PagedList<TaskDetails> response = await _taskDetailsRepository.GetAllTasksAsync(request).ConfigureAwait(false);
 
         PagedList<TaskDetailsResponse> pagingResponse = new PagedList<TaskDetailsResponse>(
             _mapper.Map<List<TaskDetailsResponse>>(response.Items),
@@ -46,15 +35,9 @@ public class TaskDetailsService : ITaskDetailsService
         return pagingResponse;
     }
 
-    public async Task<PagedList<TaskDetailsResponse>> GetActiveTasksAsync(PagingRequest pagingRequest)
+    public async Task<PagedList<TaskDetailsResponse>> GetActiveTasksAsync(PagingRequest request)
     {
-        PagedList<TaskDetails> response = await _taskDetailsRepository.GetActiveTasksAsync(pagingRequest).ConfigureAwait(false);
-
-        if (!response.Items.Any())
-        {
-            throw new NotFoundException($"No data fetched on PageNumber = {response.PageNumber} for PageSize = {response.PageSize}");
-        }
-
+        PagedList<TaskDetails> response = await _taskDetailsRepository.GetActiveTasksAsync(request).ConfigureAwait(false);
         PagedList<TaskDetailsResponse> pagingResponse = new PagedList<TaskDetailsResponse>(
             _mapper.Map<List<TaskDetailsResponse>>(response.Items),
             response.PageNumber,
@@ -68,23 +51,11 @@ public class TaskDetailsService : ITaskDetailsService
     public async Task<TaskDetailsResponse> GetTaskByIdAsync(int id)
     {
         TaskDetails? response = await _taskDetailsRepository.GetTaskByIdAsync(id).ConfigureAwait(false);
-        if (response == null)
-        {
-            _actionContextAccessor?.ActionContext?.ModelState.AddModelError("TaskId", "Error Finding Task");
-            throw new TaskNotFoundException(ErrorValues.GenricNotFoundMessage);
-        }
         return _mapper.Map<TaskDetailsResponse>(response);
     }
 
     public async Task<TaskDetailsResponse> InsertTaskAsync(TaskDetailsRequest request)
     {
-        User? user = await _userRepository.GetUserByIdAsync(request.AssignedTo).ConfigureAwait(false);
-
-        if (user == null)
-        {
-            _actionContextAccessor?.ActionContext?.ModelState.AddModelError("AssignedTo", "Error Finding User");
-            throw new UserNotFoundException(ErrorValues.GenricNotFoundMessage);
-        }
         // Create new TaskDetails object and add relevant details
         TaskDetails taskDetails = new TaskDetails
         {
@@ -107,22 +78,8 @@ public class TaskDetailsService : ITaskDetailsService
     public async Task<TaskDetailsResponse> UpdateTaskAsync(int id, TaskDetailsRequest request)
     {
         TaskDetails? task = await _taskDetailsRepository.GetTaskByIdAsync(id).ConfigureAwait(false);
-
-        if (task == null)
-        {
-            _actionContextAccessor?.ActionContext?.ModelState.AddModelError("TaskId", "Error Finding Task");
-            throw new TaskNotFoundException(ErrorValues.GenricNotFoundMessage);
-        }
-
-        User? user = await _userRepository.GetUserByIdAsync(request.AssignedTo).ConfigureAwait(false);
-
-        if (user == null)
-        {
-            _actionContextAccessor?.ActionContext?.ModelState.AddModelError("AssignedTo", "Error Finding User");
-            throw new UserNotFoundException(ErrorValues.GenricNotFoundMessage);
-        }
         // Modify data
-        task.Description = request.Description;
+        task!.Description = request.Description;
         task.Category = request.Category;
         task.BudgetedHours = request.BudgetedHours;
         task.AssignedTo = request.AssignedTo;
@@ -135,14 +92,8 @@ public class TaskDetailsService : ITaskDetailsService
     public async Task<TaskDetailsResponse> InactiveTaskAsync(int id)
     {
         TaskDetails? task = await _taskDetailsRepository.GetTaskByIdAsync(id).ConfigureAwait(false);
-        if (task == null)
-        {
-            _actionContextAccessor?.ActionContext?.ModelState.AddModelError("TaskId", "Error Finding Task");
-            throw new TaskNotFoundException(ErrorValues.GenricNotFoundMessage);
-        }
-
         // Modify task to INACTIVE
-        task.Status = Status.INACTIVE;
+        task!.Status = Status.INACTIVE;
         task.ModifiedOn = DateTime.UtcNow;
 
         TaskDetails? response = await _taskDetailsRepository.InactiveTaskAsync(task).ConfigureAwait(false);

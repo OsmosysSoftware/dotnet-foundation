@@ -1,4 +1,3 @@
-using DotnetFoundation.Application.Models.DTOs.TaskDetailsDTO;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Domain.Entities;
 using DotnetFoundation.Domain.Enums;
