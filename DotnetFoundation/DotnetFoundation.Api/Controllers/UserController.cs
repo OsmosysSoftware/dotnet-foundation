@@ -65,7 +65,7 @@ public class UserController : BaseController
         try
         {
             bool IsValidUserId = await _userValidator.ValidUserId(userId).ConfigureAwait(false);
-            if (IsValidUserId)
+            if (!IsValidUserId)
             {
                 ModelState.AddModelError("userId", "User Not Found");
                 throw new UserNotFoundException(ErrorValues.GenricNotFoundMessage);
@@ -149,7 +149,7 @@ public class UserController : BaseController
         try
         {
             bool IsValidUserId = await _userValidator.ValidUserId(userId).ConfigureAwait(false);
-            if (IsValidUserId)
+            if (!IsValidUserId)
             {
                 ModelState.AddModelError("userId", "User Not Found");
                 throw new UserNotFoundException(ErrorValues.GenricNotFoundMessage);
@@ -190,7 +190,7 @@ public class UserController : BaseController
         try
         {
             bool IsValidUserId = await _userValidator.ValidUserId(userId).ConfigureAwait(false);
-            if (IsValidUserId)
+            if (!IsValidUserId)
             {
                 ModelState.AddModelError("userId", "User Not Found");
                 throw new UserNotFoundException(ErrorValues.GenricNotFoundMessage);

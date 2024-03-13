@@ -14,7 +14,7 @@ public class UserValidator : IUserValidator
     }
     public async Task<bool> IsEmailRegistered(string email)
     {
-        return await _userRepository.CheckEmailExist(email).ConfigureAwait(false);
+        return await _userRepository.CheckEmailRegistered(email).ConfigureAwait(false);
     }
     public async Task<bool> ValidUserId(int userId)
     {
@@ -23,7 +23,7 @@ public class UserValidator : IUserValidator
     }
     public async Task<bool> ValidEmailId(string email)
     {
-        return await _userRepository.CheckEmailRegistered(email).ConfigureAwait(false);
+        return await _userRepository.CheckEmailExist(email).ConfigureAwait(false);
     }
 
 }
