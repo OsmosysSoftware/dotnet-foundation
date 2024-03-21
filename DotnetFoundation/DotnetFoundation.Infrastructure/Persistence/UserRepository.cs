@@ -1,14 +1,11 @@
 using DotnetFoundation.Application.Exceptions;
-using DotnetFoundation.Application.Interfaces.Integrations;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
 using DotnetFoundation.Application.Models.DTOs.UserDTO;
 using DotnetFoundation.Domain.Entities;
 using DotnetFoundation.Domain.Enums;
 using DotnetFoundation.Infrastructure.Identity;
-using DotnetFoundation.Infrastructure.Integrations;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -122,7 +119,7 @@ public class UserRepository : IUserRepository
         {
             throw new InvalidCredentialsException("Invalid Email or Password");
         }
-        IdentityApplicationUser user = await _userManager.FindByEmailAsync(request.Email).ConfigureAwait(false);
+        IdentityApplicationUser? user = await _userManager.FindByEmailAsync(request.Email).ConfigureAwait(false);
         return new(null, user!.Id, request.Email, (await _userManager.GetRolesAsync(user).ConfigureAwait(false)).ToList());
     }
 

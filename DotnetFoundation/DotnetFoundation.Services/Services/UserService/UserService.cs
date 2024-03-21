@@ -1,5 +1,4 @@
 using AutoMapper;
-using DotnetFoundation.Application.Exceptions;
 using DotnetFoundation.Application.Interfaces.Integrations;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Interfaces.Services;

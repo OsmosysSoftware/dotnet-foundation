@@ -19,5 +19,6 @@ public interface IUserRepository
     public Task<List<string>> GetUserRoleAsync(string email);
     public Task<bool> CheckEmailExist(string email);
     public Task<bool> CheckEmailRegistered(string email);
-
+    public Task<int> GetUserIdByIdentityId(string IdentityId);
+    public Task ChangePasswordAsync(string userId, UserChangePassword request);
 }
