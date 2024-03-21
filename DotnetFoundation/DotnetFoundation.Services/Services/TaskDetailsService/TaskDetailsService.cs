@@ -57,7 +57,7 @@ public class TaskDetailsService : ITaskDetailsService
     public async Task<TaskDetailsResponse> InsertTaskAsync(TaskDetailsRequest request)
     {
         // Create new TaskDetails object and add relevant details
-        TaskDetails taskDetails = new TaskDetails
+        TaskDetails taskDetails = new()
         {
             Description = request.Description,
             BudgetedHours = request.BudgetedHours,

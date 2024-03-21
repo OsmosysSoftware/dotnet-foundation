@@ -2,6 +2,7 @@ using System.Transactions;
 using DotnetFoundation.Application.Interfaces.Integrations;
 using DotnetFoundation.Application.Interfaces.Persistence;
 using DotnetFoundation.Application.Interfaces.Services;
+using DotnetFoundation.Application.Interfaces.Utility;
 using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
 using DotnetFoundation.Application.Models.DTOs.UserDTO;
 
@@ -24,6 +25,8 @@ public class AuthenticationService : IAuthenticationService
     public async Task<AuthenticationResponse> LoginAsync(LoginRequest request)
     {
         UserInfo userInfo = await _userRepository.LoginUserAsync(request).ConfigureAwait(false);
+        userInfo.Id = await _userRepository.GetUserIdByIdentityId(userInfo.IdentityId).ConfigureAwait(false);
+
         return new AuthenticationResponse
         {
             Token = _jwtService.GenerateJwtToken(userInfo),
@@ -34,12 +37,13 @@ public class AuthenticationService : IAuthenticationService
     {
         using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
 
-        string userId = await _userRepository.AddUserAsync(request).ConfigureAwait(false);
+        string identityUserId = await _userRepository.AddUserAsync(request).ConfigureAwait(false);
+        int userId = await _userRepository.GetUserIdByIdentityId(identityUserId).ConfigureAwait(false);
         await _userRepository.AddUserRoleAsync(request.Email, 0).ConfigureAwait(false);
 
         List<string> userRoles = await _userRepository.GetUserRoleAsync(request.Email).ConfigureAwait(false);
 
-        UserInfo userInfo = new(userId, request.Email, userRoles);
+        UserInfo userInfo = new(userId, identityUserId, request.Email, userRoles);
 
         // If everything succeeds, commit the transaction
         scope.Complete();

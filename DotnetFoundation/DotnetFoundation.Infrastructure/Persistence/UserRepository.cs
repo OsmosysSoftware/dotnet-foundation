@@ -6,7 +6,6 @@ using DotnetFoundation.Domain.Entities;
 using DotnetFoundation.Domain.Enums;
 using DotnetFoundation.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -121,7 +120,7 @@ public class UserRepository : IUserRepository
             throw new InvalidCredentialsException("Invalid Email or Password");
         }
         IdentityApplicationUser? user = await _userManager.FindByEmailAsync(request.Email).ConfigureAwait(false);
-        return new(user!.Id, request.Email, (await _userManager.GetRolesAsync(user).ConfigureAwait(false)).ToList());
+        return new(null, user!.Id, request.Email, (await _userManager.GetRolesAsync(user).ConfigureAwait(false)).ToList());
     }
 
     public async Task<string> ForgotPasswordAsync(string email)
@@ -138,6 +137,17 @@ public class UserRepository : IUserRepository
         {
             throw new InvalidTokenException("Invalid token");
         }
+    }
+    public async Task ChangePasswordAsync(string userId, UserChangePassword request)
+    {
+        IdentityApplicationUser? user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false);
+        IdentityResult result = await _userManager.ChangePasswordAsync(user!, request.CurrentPassword, request.NewPassword).ConfigureAwait(false);
+        if (!result.Succeeded)
+        {
+            string errorDetails = string.Join(", ", result.Errors.Select(e => e.Description));
+            throw new IdentityUserException($"Error changing user password: {errorDetails}");
+        }
+        await _signInManager.RefreshSignInAsync(user!).ConfigureAwait(false);
     }
     public async Task<bool> AddUserRoleAsync(string email, Roles role)
     {
@@ -165,5 +175,13 @@ public class UserRepository : IUserRepository
     {
         IdentityApplicationUser? user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false);
         return user != null;
+    }
+    public async Task<int> GetUserIdByIdentityId(string IdentityId)
+    {
+        return await _dbContext.ApplicationUsers
+            .Where(u => u.IdentityApplicationUserId == IdentityId)
+            .Select(u => u.Id)
+            .FirstOrDefaultAsync()
+            .ConfigureAwait(false);
     }
 }

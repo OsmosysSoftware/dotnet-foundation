@@ -21,26 +21,45 @@ public class EmailService : IEmailService
 
     public async Task<string> SendForgetPasswordEmailAsync(string email, string body)
     {
-        // Read the JWT token from the environment variable
-        string apiKey = Environment.GetEnvironmentVariable("OSMOX_SERVER_KEY") ?? throw new Exception("Server key Missing");
-        string notificationApiUrl = _configuration["Notification:OsmoxServerUrl"] ?? throw new Exception("Server url Missing");
+        string templatePath = _configuration["Emails:ForgetPassword:Path"] ?? throw new Exception("ForgetPassword template path Missing");
+        string subject = _configuration["Emails:ForgetPassword:Subject"] ?? throw new Exception("ForgetPassword subject Missing");
 
-        _httpClient.DefaultRequestHeaders.Clear();
-        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
-        Notification payload = new Notification
+        Notification payload = CreateNotificationPayload(email, subject, ReadHtmlTemplate(templatePath, body));
+
+        return await SendNotificationAsync(payload).ConfigureAwait(false);
+    }
+    public async Task<string> SendChangePasswordEmailAsync(string email)
+    {
+        string templatePath = _configuration["Emails:PasswordChange:Path"] ?? throw new Exception("PasswordChange template path Missing");
+        string subject = _configuration["Emails:PasswordChange:Subject"] ?? throw new Exception("PasswordChange subject Missing");
+
+        Notification payload = CreateNotificationPayload(email, subject, ReadHtmlTemplate(templatePath, ""));
+
+        return await SendNotificationAsync(payload).ConfigureAwait(false);
+    }
+    private Notification CreateNotificationPayload(string to, string subject, string htmlBody)
+    {
+        return new Notification
         {
             ChannelType = ChannelType.MailGun,
             Data = new NotificationData
             {
                 From = _configuration["Notification:From"] ?? throw new Exception("From Address Missing"),
-                To = email,
-                Subject = _configuration["Emails:ForgetPassword:Subject"],
-                Text = "Forget password Token",
-                Html = ReadHtmlTemplate(_configuration["Emails:ForgetPassword:Path"]!, body)
+                To = to,
+                Subject = subject,
+                Text = "Notification Text",
+                Html = htmlBody
             }
         };
+    }
+    private async Task<string> SendNotificationAsync(Notification payload)
+    {
+        string apiKey = Environment.GetEnvironmentVariable("OSMOX_SERVER_KEY") ?? throw new Exception("Server key Missing");
+        string notificationApiUrl = _configuration["Notification:OsmoxServerUrl"] ?? throw new Exception("Server url Missing");
 
-        // Convert payload to JSON with lowercase property names
+        _httpClient.DefaultRequestHeaders.Clear();
+        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
+
         string jsonBody = JsonConvert.SerializeObject(payload, new JsonSerializerSettings
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver()
@@ -51,13 +70,11 @@ public class EmailService : IEmailService
         HttpResponseMessage response = await _httpClient.PostAsync(notificationApiUrl, content).ConfigureAwait(false);
         if (response.IsSuccessStatusCode)
         {
-            // Notification sent successfully, handle the response as needed.
             string responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             return responseContent;
         }
         else
         {
-            // Handle the case where the notification was not sent successfully.
             throw new Exception($"Failed to send notification. Status code: {response.StatusCode}");
         }
     }
