@@ -55,6 +55,7 @@ public class UserController : BaseController
     /// </summary>
     /// <param name="userId">Id of user record</param>
     [HttpGet("{userId}")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -139,6 +140,7 @@ public class UserController : BaseController
     /// <param name="userId">Id of user record</param>
     /// <param name="request">user details updation request</param>
     [HttpPut("{userId}")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -180,6 +182,7 @@ public class UserController : BaseController
     /// </summary>
     /// <param name="userId">Id of user record</param>
     [HttpDelete("{userId}")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
