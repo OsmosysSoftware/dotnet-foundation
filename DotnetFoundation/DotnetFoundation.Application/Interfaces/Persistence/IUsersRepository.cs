@@ -17,6 +17,7 @@ public interface IUserRepository
     public Task<int> UpdateUserAsync(User user);
     public Task<User> DeleteUserAsync(int userId);
     public Task<List<string>> GetUserRoleAsync(string email);
-    public Task<int> GetUserIdByIdentityId(string IdentityId);
-    public Task ChangePasswordAsync(string userId, UserChangePassword request);
+    public Task<bool> CheckEmailExist(string email);
+    public Task<bool> CheckEmailRegistered(string email);
+
 }
