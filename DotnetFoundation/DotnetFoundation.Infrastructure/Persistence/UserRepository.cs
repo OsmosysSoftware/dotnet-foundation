@@ -140,14 +140,14 @@ public class UserRepository : IUserRepository
     }
     public async Task ChangePasswordAsync(string userId, UserChangePassword request)
     {
-        IdentityApplicationUser user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false) ?? throw new NotFoundException("Error finding user");
-        IdentityResult result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword).ConfigureAwait(false);
+        IdentityApplicationUser? user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false);
+        IdentityResult result = await _userManager.ChangePasswordAsync(user!, request.CurrentPassword, request.NewPassword).ConfigureAwait(false);
         if (!result.Succeeded)
         {
             string errorDetails = string.Join(", ", result.Errors.Select(e => e.Description));
             throw new IdentityUserException($"Error changing user password: {errorDetails}");
         }
-        await _signInManager.RefreshSignInAsync(user).ConfigureAwait(false);
+        await _signInManager.RefreshSignInAsync(user!).ConfigureAwait(false);
     }
     public async Task<bool> AddUserRoleAsync(string email, Roles role)
     {
