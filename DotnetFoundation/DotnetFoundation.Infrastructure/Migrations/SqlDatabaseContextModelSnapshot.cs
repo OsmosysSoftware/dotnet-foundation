@@ -116,13 +116,13 @@ namespace DotnetFoundation.Infrastructure.Migrations
                             Id = 1,
                             Country = "India",
                             CreatedBy = 1,
-                            CreatedOn = new DateTime(2024, 3, 8, 10, 54, 33, 198, DateTimeKind.Utc).AddTicks(5932),
-                            Email = "osmox@admin.com",
+                            CreatedOn = new DateTime(2024, 3, 8, 10, 54, 33, 198, DateTimeKind.Utc),
+                            Email = "admin@osmox.com",
                             FirstName = "Super",
-                            IdentityApplicationUserId = "343abb08-4cbd-4a9b-93e1-dca377b5d984",
+                            IdentityApplicationUserId = "a41617a2-e65b-4560-b70c-9727e393cd98",
                             LastName = "Admin",
                             ModifiedBy = 1,
-                            ModifiedOn = new DateTime(2024, 3, 8, 10, 54, 33, 198, DateTimeKind.Utc).AddTicks(5933),
+                            ModifiedOn = new DateTime(2024, 3, 8, 10, 54, 33, 198, DateTimeKind.Utc),
                             PhoneNumber = "0000000000",
                             Status = 1
                         });
@@ -194,19 +194,19 @@ namespace DotnetFoundation.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "343abb08-4cbd-4a9b-93e1-dca377b5d984",
+                            Id = "a41617a2-e65b-4560-b70c-9727e393cd98",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "26085b3f-071d-4feb-bf47-a58d1b1b2ad4",
-                            Email = "osmox@admin.com",
+                            Email = "admin@osmox.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
-                            NormalizedEmail = "OSMOX@ADMIN.COM",
-                            NormalizedUserName = "OSMOX@ADMIN.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBS0gzyuTTqyBCz3+Gjc4XcQ6izhvEsRUWlAlKv/OLHgbPVWyDI7CKR9nrQYElX1IA==",
+                            NormalizedEmail = "ADMIN@OSMOX.COM",
+                            NormalizedUserName = "ADMIN@OSMOX.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFDzmRdDmebZIXyg8o5ETbSALfTUZ18lLpuaHKgLqTXREIDt4V5jVTIPjL2IwXlb1w==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "c496f24f-7e1b-449c-90d3-885490a07388",
                             TwoFactorEnabled = false,
-                            UserName = "osmox@admin.com"
+                            UserName = "admin@osmox.com"
                         });
                 });
 
@@ -238,7 +238,7 @@ namespace DotnetFoundation.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "e2136d42-58a2-4b50-ad76-a34466d2d3d5",
+                            Id = "676d8532-6650-4323-bc71-f4047782136f",
                             Name = "SUPERADMIN",
                             NormalizedName = "SUPERADMIN"
                         });
@@ -295,7 +295,7 @@ namespace DotnetFoundation.Infrastructure.Migrations
                             Id = 1,
                             ClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
                             ClaimValue = "SUPERADMIN",
-                            UserId = "343abb08-4cbd-4a9b-93e1-dca377b5d984"
+                            UserId = "a41617a2-e65b-4560-b70c-9727e393cd98"
                         });
                 });
 
@@ -338,8 +338,8 @@ namespace DotnetFoundation.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            UserId = "343abb08-4cbd-4a9b-93e1-dca377b5d984",
-                            RoleId = "e2136d42-58a2-4b50-ad76-a34466d2d3d5"
+                            UserId = "a41617a2-e65b-4560-b70c-9727e393cd98",
+                            RoleId = "676d8532-6650-4323-bc71-f4047782136f"
                         });
                 });
 

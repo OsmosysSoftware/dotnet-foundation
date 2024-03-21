@@ -13,7 +13,7 @@ public static class ModelBuilderExtensions
         string superAdminId = Environment.GetEnvironmentVariable("SUPER_ADMIN_ID") ?? throw new Exception("No SUPER_ADMIN_ID specified");
         string superAdminEmail = Environment.GetEnvironmentVariable("SUPER_ADMIN_EMAIL") ?? throw new Exception("No SUPER_ADMIN_EMAIL specified");
         string superAdminPassword = Environment.GetEnvironmentVariable("SUPER_ADMIN_PASSWORD") ?? throw new Exception("No SUPER_ADMIN_PASSWORD specified");
-        string claimType = Environment.GetEnvironmentVariable("CLAIM_TYPE") ?? throw new Exception("No CLAIM_TYPE specified");
+        string claimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
 
         // Seeding roles
         modelBuilder.Entity<IdentityRole>().HasData(
@@ -32,7 +32,9 @@ public static class ModelBuilderExtensions
             Email = superAdminEmail,
             EmailConfirmed = true,
             NormalizedUserName = superAdminEmail.ToUpper(),
-            NormalizedEmail = superAdminEmail.ToUpper()
+            NormalizedEmail = superAdminEmail.ToUpper(),
+            ConcurrencyStamp = "26085b3f-071d-4feb-bf47-a58d1b1b2ad4",
+            SecurityStamp = "c496f24f-7e1b-449c-90d3-885490a07388"
         };
 
         // Hasher to hash the password before seeding the user to the db
@@ -62,9 +64,9 @@ public static class ModelBuilderExtensions
             Email = superAdminEmail,
             IdentityApplicationUserId = identityApplicationUser.Id,
             CreatedBy = 1,
-            CreatedOn = DateTime.UtcNow,
+            CreatedOn = new DateTime(2024, 3, 8, 10, 54, 33, 198, DateTimeKind.Utc),
             ModifiedBy = 1,
-            ModifiedOn = DateTime.UtcNow,
+            ModifiedOn = new DateTime(2024, 3, 8, 10, 54, 33, 198, DateTimeKind.Utc),
             Status = Status.ACTIVE
         };
 
