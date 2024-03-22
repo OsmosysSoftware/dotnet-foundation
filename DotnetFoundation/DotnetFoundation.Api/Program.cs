@@ -54,9 +54,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 // logging using serilog
-Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-   .CreateLogger();
+Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).CreateLogger();
 Log.Logger.Information("Logging has started");
 builder.Host.UseSerilog();
 
