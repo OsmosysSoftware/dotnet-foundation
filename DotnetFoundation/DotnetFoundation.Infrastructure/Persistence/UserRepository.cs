@@ -177,14 +177,14 @@ public class UserRepository : IUserRepository
 
     public async Task<string> GetConfirmationToken(string Id)
     {
-        IdentityApplicationUser? user = await _userManager.FindByIdAsync(Id).ConfigureAwait(false) ?? throw new NotFoundException("Error finding user");
-        return await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
+        IdentityApplicationUser? user = await _userManager.FindByIdAsync(Id).ConfigureAwait(false);
+        return await _userManager.GenerateEmailConfirmationTokenAsync(user!).ConfigureAwait(false);
     }
 
     public async Task ConfirmEmailAsync(string email, string token)
     {
-        IdentityApplicationUser user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ?? throw new NotFoundException("Error finding user");
-        IdentityResult result = await _userManager.ConfirmEmailAsync(user, token).ConfigureAwait(false);
+        IdentityApplicationUser? user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false) ;
+        IdentityResult result = await _userManager.ConfirmEmailAsync(user!, token).ConfigureAwait(false);
         if (!result.Succeeded)
         {
             throw new InvalidTokenException($"Invalid token");
