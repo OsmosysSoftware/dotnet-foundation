@@ -1,5 +1,7 @@
+using DotnetFoundation.Api.Helpers;
 using DotnetFoundation.Application.Exceptions;
 using DotnetFoundation.Application.Interfaces.Services;
+using DotnetFoundation.Application.Interfaces.Validator;
 using DotnetFoundation.Application.Models.Common;
 using DotnetFoundation.Application.Models.DTOs.TaskDetailsDTO;
 using DotnetFoundation.Application.Models.Enums;
@@ -9,12 +11,14 @@ namespace DotnetFoundation.Api.Controllers;
 
 [ApiController]
 [Route("api")]
-public class TaskController : ControllerBase
+public class TaskController : BaseController
 {
     private readonly ITaskDetailsService _taskDetailsService;
-    public TaskController(ITaskDetailsService TaskDetailsService)
+    private readonly ITaskValidator _taskValidator;
+    public TaskController(ITaskDetailsService TaskDetailsService, ITaskValidator taskValidator)
     {
         _taskDetailsService = TaskDetailsService;
+        _taskValidator = taskValidator;
     }
 
     /// <summary>
@@ -23,13 +27,23 @@ public class TaskController : ControllerBase
     [HttpGet("tasks")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<PagedList<TaskDetailsResponse>>>> GetAllTasksAsync([FromQuery] PagingRequest pagingRequest)
+    public async Task<ActionResult<BaseResponse<PagedList<TaskDetailsResponse>>>> GetAllTasksAsync([FromQuery] PagingRequest request)
     {
         BaseResponse<PagedList<TaskDetailsResponse>> response = new(ResponseStatus.Fail);
-        response.Data = await _taskDetailsService.GetAllTasksAsync(pagingRequest).ConfigureAwait(false);
-        response.Status = ResponseStatus.Success;
+        try
+        {
+            response.Data = await _taskDetailsService.GetAllTasksAsync(request).ConfigureAwait(false);
+            response.Status = ResponseStatus.Success;
 
-        return Ok(response);
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            response.Message = ex.Message;
+            response.Errors = GetErrorResponse();
+            response.Status = ResponseStatus.Error;
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
+        }
     }
 
     /// <summary>
@@ -38,13 +52,23 @@ public class TaskController : ControllerBase
     [HttpGet("tasks/active")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<PagedList<TaskDetailsResponse>>>> GetActiveTasksAsync([FromQuery] PagingRequest pagingRequest)
+    public async Task<ActionResult<BaseResponse<PagedList<TaskDetailsResponse>>>> GetActiveTasksAsync([FromQuery] PagingRequest request)
     {
         BaseResponse<PagedList<TaskDetailsResponse>> response = new(ResponseStatus.Fail);
-        response.Data = await _taskDetailsService.GetActiveTasksAsync(pagingRequest).ConfigureAwait(false);
-        response.Status = ResponseStatus.Success;
+        try
+        {
+            response.Data = await _taskDetailsService.GetActiveTasksAsync(request).ConfigureAwait(false);
+            response.Status = ResponseStatus.Success;
 
-        return Ok(response);
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            response.Message = ex.Message;
+            response.Errors = GetErrorResponse();
+            response.Status = ResponseStatus.Error;
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
+        }
     }
 
     /// <summary>
@@ -59,46 +83,125 @@ public class TaskController : ControllerBase
     public async Task<ActionResult<BaseResponse<TaskDetailsResponse>>> GetTaskByIdAsync(int taskId)
     {
         BaseResponse<TaskDetailsResponse> response = new(ResponseStatus.Fail);
-        response.Data = await _taskDetailsService.GetTaskByIdAsync(taskId).ConfigureAwait(false);
-        response.Status = ResponseStatus.Success;
+        try
+        {
+            bool isValidTaskId = await _taskValidator.ValidTaskId(taskId).ConfigureAwait(false);
+            if (!isValidTaskId)
+            {
+                ModelState.AddModelError("taskId", "Error Finding Task");
+                throw new TaskNotFoundException(ErrorValues.GenricNotFoundMessage);
+            }
 
-        return Ok(response);
+            response.Data = await _taskDetailsService.GetTaskByIdAsync(taskId).ConfigureAwait(false);
+            response.Status = ResponseStatus.Success;
+
+            return Ok(response);
+        }
+        catch (TaskNotFoundException ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            response.Errors = GetErrorResponse();
+            return BadRequest(response);
+        }
+        catch (Exception ex)
+        {
+            response.Message = ex.Message;
+            response.Errors = GetErrorResponse();
+            response.Status = ResponseStatus.Error;
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
+        }
     }
 
     /// <summary>
     /// Add new task.
     /// </summary>
-    /// <param name="detailRequest">Role request details</param>
+    /// <param name="request">Role request details</param>
     [HttpPost("task")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<TaskDetailsResponse>>> InsertTaskAsync(TaskDetailsRequest detailRequest)
+    public async Task<ActionResult<BaseResponse<TaskDetailsResponse>>> InsertTaskAsync(TaskDetailsRequest request)
     {
         BaseResponse<TaskDetailsResponse> response = new(ResponseStatus.Fail);
-        response.Data = await _taskDetailsService.InsertTaskAsync(detailRequest).ConfigureAwait(false);
-        response.Status = ResponseStatus.Success;
+        try
+        {
+            bool isValidAssignedTo = await _taskValidator.ValidAssignedTo(request.AssignedTo).ConfigureAwait(false);
+            if (!isValidAssignedTo)
+            {
+                ModelState.AddModelError("assignedTo", "Error Finding User");
+                throw new UserNotFoundException(ErrorValues.GenricNotFoundMessage);
+            }
+            response.Data = await _taskDetailsService.InsertTaskAsync(request).ConfigureAwait(false);
+            response.Status = ResponseStatus.Success;
 
-        return Ok(response);
+            return Ok(response);
+        }
+        catch (UserNotFoundException ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            response.Errors = GetErrorResponse();
+            return BadRequest(response);
+        }
+        catch (Exception ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            response.Errors = GetErrorResponse();
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
+        }
     }
 
     /// <summary>
     /// Update details of a task when the Id is passed.
     /// </summary>
     /// <param name="taskId">Id of task record</param>
-    /// <param name="updatedTaskDetails">Modified details for task record</param>
+    /// <param name="request">Modified details for task record</param>
     [HttpPut("task/{taskId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<BaseResponse<TaskDetailsResponse>>> UpdateTaskAsync(int taskId, TaskDetailsRequest updatedTaskDetails)
+    public async Task<ActionResult<BaseResponse<TaskDetailsResponse>>> UpdateTaskAsync(int taskId, TaskDetailsRequest request)
     {
         BaseResponse<TaskDetailsResponse> response = new(ResponseStatus.Fail);
-        response.Data = await _taskDetailsService.UpdateTaskAsync(taskId, updatedTaskDetails).ConfigureAwait(false);
-        response.Status = ResponseStatus.Success;
+        try
+        {
+            bool isValidTaskId = await _taskValidator.ValidTaskId(taskId).ConfigureAwait(false);
+            bool isValidAssignedTo = await _taskValidator.ValidAssignedTo(request.AssignedTo).ConfigureAwait(false);
 
-        return Ok(response);
+            if (!isValidTaskId)
+            {
+                ModelState.AddModelError("taskId", "Error Finding Task");
+            }
+            if (!isValidAssignedTo)
+            {
+                ModelState.AddModelError("assignedTo", "Error Finding User");
+            }
+            if (!isValidTaskId || !isValidAssignedTo)
+            {
+                throw new NotFoundException(ErrorValues.GenricNotFoundMessage);
+            }
+
+            response.Data = await _taskDetailsService.UpdateTaskAsync(taskId, request).ConfigureAwait(false);
+            response.Status = ResponseStatus.Success;
+            return Ok(response);
+        }
+        catch (NotFoundException ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            response.Errors = GetErrorResponse();
+            return BadRequest(response);
+        }
+        catch (Exception ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            response.Errors = GetErrorResponse();
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
+        }
     }
 
     /// <summary>
@@ -113,9 +216,33 @@ public class TaskController : ControllerBase
     public async Task<ActionResult<BaseResponse<TaskDetailsResponse>>> InactiveTaskAsync(int taskId)
     {
         BaseResponse<TaskDetailsResponse> response = new(ResponseStatus.Fail);
-        response.Data = await _taskDetailsService.InactiveTaskAsync(taskId).ConfigureAwait(false);
-        response.Status = ResponseStatus.Success;
+        try
+        {
+            bool isValidTaskId = await _taskValidator.ValidTaskId(taskId).ConfigureAwait(false);
+            if (!isValidTaskId)
+            {
+                ModelState.AddModelError("taskId", "Error Finding Task");
+                throw new TaskNotFoundException(ErrorValues.GenricNotFoundMessage);
+            }
 
-        return Ok(response);
+            response.Data = await _taskDetailsService.InactiveTaskAsync(taskId).ConfigureAwait(false);
+            response.Status = ResponseStatus.Success;
+
+            return Ok(response);
+        }
+        catch (TaskNotFoundException ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            response.Errors = GetErrorResponse();
+            return BadRequest(response);
+        }
+        catch (Exception ex)
+        {
+            response.Message = ex.Message;
+            response.Status = ResponseStatus.Error;
+            response.Errors = GetErrorResponse();
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
+        }
     }
 }

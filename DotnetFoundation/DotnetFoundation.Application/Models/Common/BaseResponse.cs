@@ -3,6 +3,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DotnetFoundation.Application.Models.Common;
 
+public static class ErrorValues
+{
+    public static readonly string GenricValidationMessage = "Generic Validation Error";
+    public static readonly string GenricNotFoundMessage = "Generic Not Found Error";
+    public static readonly string InternalServerError = "An internal server error has occured";
+    public static readonly string GenericUserErrorMessage = "Generic User Error";
+    public static readonly string GenericInvalidCredentialsMessage = "Invalid Credentials";
+    public static readonly string GenericInvalidTokenErrorMessage = "Invalid Token";
+
+}
 public class BaseResponse<T>
 {
     public BaseResponse(ResponseStatus status) => Status = status;

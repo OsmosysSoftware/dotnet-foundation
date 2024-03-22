@@ -1,9 +1,10 @@
 using DotnetFoundation.Application.Interfaces.Integrations;
 using DotnetFoundation.Application.Interfaces.Persistence;
-using DotnetFoundation.Application.Interfaces.Services;
+using DotnetFoundation.Application.Interfaces.Utility;
 using DotnetFoundation.Infrastructure.Identity;
 using DotnetFoundation.Infrastructure.Integrations;
 using DotnetFoundation.Infrastructure.Persistence;
+using DotnetFoundation.Infrastructure.Utility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +22,7 @@ public static class DependencyInjection
         // Configure database context
         services.AddDbContext<SqlDatabaseContext>(options =>
         {
-            string connectionString = configuration.GetConnectionString("DBConnection") ?? throw new Exception("Invalid connection string");
+            string connectionString = configuration.GetConnectionString("DBConnection") ?? throw new InvalidOperationException("Invalid connection string");
             options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
         });
 
@@ -36,7 +37,7 @@ public static class DependencyInjection
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
-                string JWT_KEY = Environment.GetEnvironmentVariable("JWT_KEY") ?? throw new Exception("No JWT key specified");
+                string JWT_KEY = Environment.GetEnvironmentVariable("JWT_KEY") ?? throw new InvalidOperationException("No JWT key specified");
 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -75,6 +76,7 @@ public static class DependencyInjection
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped(typeof(IPaginationService<>), typeof(PaginationService<>));
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<ITaskDetailsRepository, TaskDetailsRepository>();
         services.AddHttpClient();
 
