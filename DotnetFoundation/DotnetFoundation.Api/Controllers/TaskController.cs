@@ -5,6 +5,7 @@ using DotnetFoundation.Application.Interfaces.Validator;
 using DotnetFoundation.Application.Models.Common;
 using DotnetFoundation.Application.Models.DTOs.TaskDetailsDTO;
 using DotnetFoundation.Application.Models.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DotnetFoundation.Api.Controllers;
@@ -25,6 +26,7 @@ public class TaskController : BaseController
     /// Get all tasks.
     /// </summary>
     [HttpGet("tasks")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<BaseResponse<PagedList<TaskDetailsResponse>>>> GetAllTasksAsync([FromQuery] PagingRequest request)
@@ -50,6 +52,7 @@ public class TaskController : BaseController
     /// Get all active tasks.
     /// </summary>
     [HttpGet("tasks/active")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<BaseResponse<PagedList<TaskDetailsResponse>>>> GetActiveTasksAsync([FromQuery] PagingRequest request)
@@ -76,6 +79,7 @@ public class TaskController : BaseController
     /// </summary>
     /// <param name="taskId">Id of task record</param>
     [HttpGet("tasks/{taskId}")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -118,6 +122,7 @@ public class TaskController : BaseController
     /// </summary>
     /// <param name="request">Role request details</param>
     [HttpPost("task")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -159,6 +164,7 @@ public class TaskController : BaseController
     /// <param name="taskId">Id of task record</param>
     /// <param name="request">Modified details for task record</param>
     [HttpPut("task/{taskId}")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -209,6 +215,7 @@ public class TaskController : BaseController
     /// </summary>
     /// <param name="taskId">Id of task record</param>
     [HttpDelete("tasks/{taskId}")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

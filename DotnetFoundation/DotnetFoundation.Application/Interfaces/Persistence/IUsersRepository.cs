@@ -1,3 +1,4 @@
+using DotnetFoundation.Application.Models.Common;
 using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
 using DotnetFoundation.Application.Models.DTOs.UserDTO;
 using DotnetFoundation.Domain.Entities;
@@ -9,7 +10,7 @@ public interface IUserRepository
 {
     public Task<string> AddUserAsync(RegisterRequest request);
     public Task<UserInfo> LoginUserAsync(LoginRequest request);
-    public Task<List<User>> GetAllUsersAsync();
+    public Task<PagedList<User>> GetAllUsersAsync(PagingRequest pagingRequest);
     public Task<User?> GetUserByIdAsync(int userId);
     public Task<string> ForgotPasswordAsync(string email);
     public Task ResetPasswordAsync(string email, string token, string newPassword);

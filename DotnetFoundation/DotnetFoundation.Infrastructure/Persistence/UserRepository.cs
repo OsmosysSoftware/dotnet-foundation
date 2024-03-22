@@ -1,5 +1,7 @@
 using DotnetFoundation.Application.Exceptions;
+using DotnetFoundation.Application.Interfaces.Integrations;
 using DotnetFoundation.Application.Interfaces.Persistence;
+using DotnetFoundation.Application.Models.Common;
 using DotnetFoundation.Application.Models.DTOs.AuthenticationDTO;
 using DotnetFoundation.Application.Models.DTOs.UserDTO;
 using DotnetFoundation.Domain.Entities;
@@ -17,12 +19,14 @@ public class UserRepository : IUserRepository
     private readonly SignInManager<IdentityApplicationUser> _signInManager;
     private readonly UserManager<IdentityApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
-    public UserRepository(SqlDatabaseContext sqlDatabaseContext, SignInManager<IdentityApplicationUser> signinManager, RoleManager<IdentityRole> roleManager, UserManager<IdentityApplicationUser> userManager)
+    private readonly IPaginationService<User> _paginationService;
+    public UserRepository(SqlDatabaseContext sqlDatabaseContext, SignInManager<IdentityApplicationUser> signinManager, RoleManager<IdentityRole> roleManager, UserManager<IdentityApplicationUser> userManager, IPaginationService<User> paginationService)
     {
         _dbContext = sqlDatabaseContext;
         _roleManager = roleManager;
         _signInManager = signinManager;
         _userManager = userManager;
+        _paginationService = paginationService;
     }
 
     public async Task<string> AddUserAsync(RegisterRequest request)
@@ -62,20 +66,12 @@ public class UserRepository : IUserRepository
         return (await _userManager.GetRolesAsync(identityApplicationUser!).ConfigureAwait(false)).ToList();
     }
 
-    public async Task<List<User>> GetAllUsersAsync()
+    public async Task<PagedList<User>> GetAllUsersAsync(PagingRequest pagingRequest)
     {
-        return (await _dbContext.ApplicationUsers
-            .Where(u => u.Status == Status.ACTIVE)
-            .ToListAsync().ConfigureAwait(false))
-            .Select(user => new User
-            {
-                Id = user.Id,
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Country = user.Country,
-                PhoneNumber = user.PhoneNumber
-            }).ToList();
+        IQueryable<User> usersQueryable = _dbContext.ApplicationUsers.Where(u => u.Status == Status.ACTIVE).AsQueryable();
+        PagedList<User> usersPagination = await _paginationService.ToPagedListAsync(usersQueryable,
+            pagingRequest.PageNumber, pagingRequest.PageSize).ConfigureAwait(false);
+        return usersPagination;
     }
 
     public async Task<User?> GetUserByIdAsync(int userId)
