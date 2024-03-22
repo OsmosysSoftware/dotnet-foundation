@@ -40,10 +40,15 @@ public class AuthenticationService : IAuthenticationService
         string identityUserId = await _userRepository.AddUserAsync(request).ConfigureAwait(false);
         int userId = await _userRepository.GetUserIdByIdentityId(identityUserId).ConfigureAwait(false);
         await _userRepository.AddUserRoleAsync(request.Email, 0).ConfigureAwait(false);
+        string token = await _userRepository.GetConfirmationToken(identityUserId).ConfigureAwait(false);
+
 
         List<string> userRoles = await _userRepository.GetUserRoleAsync(request.Email).ConfigureAwait(false);
 
         UserInfo userInfo = new(userId, identityUserId, request.Email, userRoles);
+
+        // Send confirmation email
+        await _emailService.SendConfirmationEmailAsync(request.Email, token).ConfigureAwait(false);
 
         // If everything succeeds, commit the transaction
         scope.Complete();
@@ -52,6 +57,12 @@ public class AuthenticationService : IAuthenticationService
         {
             Token = _jwtService.GenerateJwtToken(userInfo),
         };
+    }
+    
+    public async Task ConfirmEmailAsync(ConfirmEmailRequest request)
+    {
+        await _userRepository.ConfirmEmailAsync(request.Email, request.Token).ConfigureAwait(false);
+        await _emailService.SendCompleteRegistrationEmailAsync(request.Email).ConfigureAwait(false);
     }
 
     public async Task ForgotPasswordAsync(string email)
