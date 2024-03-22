@@ -93,7 +93,7 @@ public class UserController : BaseController
 
     /// <summary>
     /// Add new user role.
-    /// Authorize - ADMIN role
+    /// Authorize - SUPERADMIN role
     /// </summary>
     /// <param name="request">Role request details</param>
     [HttpPost("addrole")]

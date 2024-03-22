@@ -3,6 +3,7 @@ using DotnetFoundation.Domain.Entities;
 using DotnetFoundation.Domain.Enums;
 using DotnetFoundation.Application.Models.Common;
 using DotnetFoundation.Application.Interfaces.Integrations;
+using DotnetFoundation.Infrastructure.DatabaseContext;
 
 namespace DotnetFoundation.Infrastructure.Persistence;
 

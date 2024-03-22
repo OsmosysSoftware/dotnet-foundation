@@ -1,4 +1,4 @@
-namespace DotnetFoundation.Infrastructure;
+namespace DotnetFoundation.Infrastructure.DatabaseContext;
 
 using DotnetFoundation.Domain.Entities;
 using DotnetFoundation.Infrastructure.Identity;
@@ -37,6 +37,10 @@ public class SqlDatabaseContext : IdentityDbContext<IdentityApplicationUser>
         .HasIndex(t => t.AssignedTo);
 
         builder.Entity<TaskDetails>().ToTable("tasks");
+
+        // NOTE: Ensure Seed function is the last line
+        // All migrations should be done before seeding
+        builder.Seed();
     }
 }
 

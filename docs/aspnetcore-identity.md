@@ -30,6 +30,6 @@ ASP.NET Core Identity is a membership system that adds authentication and author
 
 For more information on AspNetCore.Identity, please check the following links:
 
-1. [Identity in AspNetCore for Dotnet 7](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity?view=aspnetcore-7.0&tabs=visual-studio)
+1. [Identity in AspNetCore](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity?view=aspnetcore-8.0&tabs=visual-studio)
 
 2. [ASP.NET Core Identity source code](https://github.com/dotnet/aspnetcore/tree/main/src/Identity)

@@ -55,6 +55,7 @@ It is divided into the following parts, going from the innermost layer to the ou
 > Clean architecture pattern puts the focus on domain (inner circle) and contains various logical components that have well defined interactions with one another.
 
 ![Dotnet Foundation Architecture for Project Components](./images/ca_components2.png)
+
 Fig. 2: Components in DotnetFoundation with Clean Architecture
 
 ## Advantages of Clean Architecture

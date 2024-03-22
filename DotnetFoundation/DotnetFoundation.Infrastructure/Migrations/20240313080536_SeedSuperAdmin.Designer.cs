@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DotnetFoundation.Infrastructure.Migrations
 {
     [DbContext(typeof(SqlDatabaseContext))]
-    [Migration("20240228001806_UpdateUserTable")]
-    partial class UpdateUserTable
+    [Migration("20240313080536_SeedSuperAdmin")]
+    partial class SeedSuperAdmin
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,6 +21,49 @@ namespace DotnetFoundation.Infrastructure.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            modelBuilder.Entity("DotnetFoundation.Domain.Entities.TaskDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("AssignedTo")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BudgetedHours")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Category")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ModifiedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssignedTo");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("tasks", (string)null);
+                });
 
             modelBuilder.Entity("DotnetFoundation.Infrastructure.Identity.ApplicationUser", b =>
                 {
@@ -38,6 +81,7 @@ namespace DotnetFoundation.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("FirstName")
@@ -68,6 +112,23 @@ namespace DotnetFoundation.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("users", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Country = "India",
+                            CreatedBy = 1,
+                            CreatedOn = new DateTime(2024, 3, 8, 10, 54, 33, 198, DateTimeKind.Utc),
+                            Email = "admin@osmox.com",
+                            FirstName = "Super",
+                            IdentityApplicationUserId = "a41617a2-e65b-4560-b70c-9727e393cd98",
+                            LastName = "Admin",
+                            ModifiedBy = 1,
+                            ModifiedOn = new DateTime(2024, 3, 8, 10, 54, 33, 198, DateTimeKind.Utc),
+                            PhoneNumber = "0000000000",
+                            Status = 1
+                        });
                 });
 
             modelBuilder.Entity("DotnetFoundation.Infrastructure.Identity.IdentityApplicationUser", b =>
@@ -132,6 +193,24 @@ namespace DotnetFoundation.Infrastructure.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "a41617a2-e65b-4560-b70c-9727e393cd98",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "26085b3f-071d-4feb-bf47-a58d1b1b2ad4",
+                            Email = "admin@osmox.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ADMIN@OSMOX.COM",
+                            NormalizedUserName = "ADMIN@OSMOX.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFDzmRdDmebZIXyg8o5ETbSALfTUZ18lLpuaHKgLqTXREIDt4V5jVTIPjL2IwXlb1w==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "c496f24f-7e1b-449c-90d3-885490a07388",
+                            TwoFactorEnabled = false,
+                            UserName = "admin@osmox.com"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -158,6 +237,14 @@ namespace DotnetFoundation.Infrastructure.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "676d8532-6650-4323-bc71-f4047782136f",
+                            Name = "SUPERADMIN",
+                            NormalizedName = "SUPERADMIN"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -204,6 +291,15 @@ namespace DotnetFoundation.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("AspNetUserClaims", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+                            ClaimValue = "SUPERADMIN",
+                            UserId = "a41617a2-e65b-4560-b70c-9727e393cd98"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -241,6 +337,13 @@ namespace DotnetFoundation.Infrastructure.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "a41617a2-e65b-4560-b70c-9727e393cd98",
+                            RoleId = "676d8532-6650-4323-bc71-f4047782136f"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
