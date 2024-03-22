@@ -10,4 +10,5 @@ public interface IUserService
     public Task<bool> AddUserRoleAsync(UserRoleRequest request);
     public Task<UserResponse?> UpdateUserAsync(int userId, UpdateUserRequest request);
     public Task<UserResponse?> DeleteUserAsync(int userId);
+    public Task ChangePasswordAsync(UserChangePassword request);
 }
