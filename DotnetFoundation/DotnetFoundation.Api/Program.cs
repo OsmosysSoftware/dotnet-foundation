@@ -5,6 +5,7 @@ using DotnetFoundation.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using Serilog.Templates;
 using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -54,7 +55,17 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 // logging using serilog
-Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).CreateLogger();
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.File(
+        formatter: new ExpressionTemplate(
+            "{ {Timestamp: @t, Level: @l, TracebackId: @tr, RequestMethod, RequestPath, StatusCode, SourceContext, Data:{EventId: @i, RequestId}, Message: @m, Exception: @x} }\n\n"
+        ),
+        path: "logs/log-.ndjson",
+        rollingInterval: RollingInterval.Day)
+    .WriteTo.Console(
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss zzz} [{Level:u3}] {Message:lj} <s:{SourceContext}>{NewLine}{Exception}\n")
+    .CreateLogger();
+
 Log.Logger.Information("Logging has started");
 builder.Host.UseSerilog();
 
