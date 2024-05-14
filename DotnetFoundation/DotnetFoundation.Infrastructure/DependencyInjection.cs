@@ -37,7 +37,11 @@ public static class DependencyInjection
         services.Configure<DataProtectionTokenProviderOptions>(options => options.TokenLifespan = TimeSpan.FromMinutes(Convert.ToDouble(configuration["Appsettings:IdentityTokenLifespanInMinutes"])));
 
         // Authentication
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
             .AddJwtBearer(options =>
             {
                 string JWT_KEY = Environment.GetEnvironmentVariable("JWT_KEY") ?? throw new InvalidOperationException("No JWT key specified");
@@ -50,6 +54,7 @@ public static class DependencyInjection
                     ValidateAudience = true,
                     ValidIssuer = configuration["Jwt:Issuer"],
                     ValidAudience = configuration["Jwt:Audience"],
+                    // ClockSkew will be used for Lifetime validators
                     ClockSkew = TimeSpan.Zero,
                     ValidateLifetime = true,
                     LifetimeValidator = (DateTime? notBefore, DateTime? expires, SecurityToken securityToken, TokenValidationParameters validationParameters) =>
