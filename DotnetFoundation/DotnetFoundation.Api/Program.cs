@@ -39,7 +39,7 @@ builder.Services.AddSwaggerGen(options =>
 
     options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
     {
-        Name = "JWT Authorization",
+        Name = "Authorization",
         Description = "Standard Authorization header using the Bearer Scheme (\"bearer {token}\")",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey
