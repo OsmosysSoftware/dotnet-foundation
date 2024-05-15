@@ -26,7 +26,7 @@ Press `Ctrl+Shift+P`, type "Dev Containers: Reopen in container," and select thi
 
 ### Step 5: Check and Configure Environment Variables
 
-Ensure that you have the necessary environment variables configured by checking the existence of the .env file. Use the provided .env.example file as a template
+Ensure that you have the necessary environment variables configured by checking the existence of the .env file. Use the provided [env example file](../.env.example) as a template.
 
 ### Step 6: Verify Dev Container Setup
 
